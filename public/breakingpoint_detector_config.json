@@ -1,15 +1,15 @@
 {
   "schema": "breakingpoint.detector/v1",
-  "source": "BreakingPoint Lab \u00b7 Monte-Carlo validated on 50,000 simulated sessions",
-  "generated_at": "2026-10-04T01:39:36",
-  "config_id": "ewma|a=0.4|bp=2|w=1.5|m=2|clip=2.5",
+  "source": "BreakingPoint Lab \u00b7 Monte-Carlo validated on 100,000 simulated sessions",
+  "generated_at": "2026-10-04T11:16:01",
+  "config_id": "ewma|a=0.4|bp=2|w=1|m=0|clip=2.5",
   "mode": "ewma",
   "ewma_alpha": 0.4,
   "cusum_k": 0.5,
   "cusum_h": 4.0,
-  "warning_threshold": 1.5,
+  "warning_threshold": 1.0,
   "breakpoint_threshold": 2.0,
-  "minimum_persistent_reps": 2,
+  "minimum_persistent_reps": 0,
   "outlier_clip": 2.5,
   "z_clip": 6.0,
   "feature_weighting": "grouped_quality",
@@ -27,91 +27,91 @@
   },
   "selection_rule": "Selection is performed on the SELECTION split only (even-numbered session blocks); all reported performance comes from the held-out EVALUATION split (odd-numbered blocks). (1) Eligibility: false-positive rate <= 5% in EVERY no-change scenario (A no change, B isolated bad rep, E camera noise, F landmark dropout, G high natural variability) \u2014 the constraint must hold under each nuisance condition, not merely on average (this implies pooled FPR <= 5%). (2) Among eligible configurations, keep those whose miss rate over drift scenarios C,D,H is within 2 percentage points of the best eligible miss rate. (3) From those, choose the lowest median detection delay; ties broken by lower mean detection delay, then lower pooled false-positive rate, then the simpler detector family (consecutive < EWMA = CUSUM < combined). If no configuration is eligible, the configuration with the lowest pooled false-positive rate is chosen and the report flags it.",
   "validation": {
-    "num_sessions": 50000,
-    "num_sessions_selection": 25000,
-    "num_sessions_holdout": 25000,
+    "num_sessions": 100000,
+    "num_sessions_selection": 50000,
+    "num_sessions_holdout": 50000,
     "reported_on": "held-out evaluation split",
-    "num_no_change_sessions_holdout": 15550,
-    "num_drift_sessions_holdout": 9450,
-    "false_positive_rate": 0.0218,
+    "num_no_change_sessions_holdout": 31100,
+    "num_drift_sessions_holdout": 18900,
+    "false_positive_rate": 0.0223,
     "false_positive_rate_ci95": [
-      0.0196,
-      0.0242
+      0.0208,
+      0.0241
     ],
-    "true_positive_rate": 0.8889,
+    "true_positive_rate": 0.8961,
     "true_positive_rate_ci95": [
-      0.8824,
-      0.8951
+      0.8917,
+      0.9004
     ],
-    "miss_rate": 0.1056,
-    "early_alarm_rate": 0.0055,
+    "miss_rate": 0.0997,
+    "early_alarm_rate": 0.0042,
     "median_detection_delay": 4.0,
     "median_detection_delay_ci95": [
       4.0,
       4.0
     ],
-    "mean_detection_delay": 4.088,
+    "mean_detection_delay": 4.075,
     "median_changepoint_error": 1.0,
     "per_scenario": {
       "A_no_change": {
-        "n": 3100,
-        "false_positive_rate": 0.0135
+        "n": 6200,
+        "false_positive_rate": 0.0189
       },
       "B_isolated_bad_rep": {
-        "n": 3100,
-        "false_positive_rate": 0.0394
+        "n": 6200,
+        "false_positive_rate": 0.0385
       },
       "C_gradual_drift": {
-        "n": 3150,
-        "true_positive_rate": 0.8695,
-        "miss_rate": 0.1254,
-        "early_alarm_rate": 0.0051,
+        "n": 6300,
+        "true_positive_rate": 0.871,
+        "miss_rate": 0.1244,
+        "early_alarm_rate": 0.0046,
         "median_detection_delay": 5.0
       },
       "D_sudden_change": {
-        "n": 3150,
-        "true_positive_rate": 0.9016,
-        "miss_rate": 0.0914,
-        "early_alarm_rate": 0.007,
+        "n": 6300,
+        "true_positive_rate": 0.9049,
+        "miss_rate": 0.0897,
+        "early_alarm_rate": 0.0054,
         "median_detection_delay": 3.0
       },
       "E_camera_noise": {
-        "n": 3100,
-        "false_positive_rate": 0.0158
+        "n": 6200,
+        "false_positive_rate": 0.0126
       },
       "F_landmark_dropout": {
-        "n": 3100,
-        "false_positive_rate": 0.0226
+        "n": 6200,
+        "false_positive_rate": 0.0255
       },
       "G_high_variability": {
-        "n": 3150,
-        "false_positive_rate": 0.0178
+        "n": 6300,
+        "false_positive_rate": 0.0163
       },
       "H_recovery": {
-        "n": 3150,
-        "true_positive_rate": 0.8956,
-        "miss_rate": 0.1,
-        "early_alarm_rate": 0.0044,
+        "n": 6300,
+        "true_positive_rate": 0.9125,
+        "miss_rate": 0.0849,
+        "early_alarm_rate": 0.0025,
         "median_detection_delay": 4.0
       }
     },
     "recovery_check": {
-      "n_sessions": 1132.0,
-      "spearman_rho": 0.8275,
-      "mae_percentage_points": 14.2467,
-      "status_accuracy": 0.8021
+      "n_sessions": 2259.0,
+      "spearman_rho": 0.8219,
+      "mae_percentage_points": 14.029,
+      "status_accuracy": 0.8265
     },
     "num_detector_configs": 5056,
     "num_drift_score_variants": 5,
     "num_configs_evaluated": 25280,
     "eligible_config_found": true,
-    "shards_merged": 1,
+    "shards_merged": 20,
     "base_seed": 42,
     "grid": "full",
     "grid_hash": "907e0ee8d7abf95c",
     "generator_version": "1.0",
     "lab_version": "1.0.0",
-    "compute_environment": "local workstation",
+    "compute_environment": "UF HiPerGator (Slurm job 44695920)",
     "figures": [
       "ablation.png",
       "changepoint_accuracy.png",
