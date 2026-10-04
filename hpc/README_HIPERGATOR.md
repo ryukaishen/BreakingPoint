@@ -137,6 +137,8 @@ Environment variables understood by the scripts:
 
 On a workstation core, one block of 250 sessions × 25,280 configurations takes ≈ 6 s.
 A 50,000-session run took 359 s of wall time on 16 worker processes, plus ≈ 25 s for finalize.
+**Measured on HiPerGator:** the default 100,000-session submission (20 tasks × 5,000 sessions, 8 CPUs each) finished
+each array task in 30–59 s (job 44695919, 564 CPU-process seconds in total) and the finalize job in 37 s (job 44695920).
 So a 5,000-session array task on 8 CPUs needs well under a minute of compute, and a
 10,000-session task about a minute. The 1-hour limit is deliberately generous. Peak memory is
 roughly 0.5 GB per worker process; 16 GB for 8 workers leaves ample headroom.

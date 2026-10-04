@@ -26,8 +26,8 @@ primitives (§11–12); one statistical core and one validated detector serve al
              BREAKINGPOINT
                    ^
                    |
-        HiPerGator-calibrated            (BreakingPoint Lab; the currently shipped parameters come from a
-         detector parameters              completed 50,000-session local run of the same pipeline)
+        HiPerGator-calibrated            (BreakingPoint Lab: 100,000 simulated sessions on UF HiPerGator,
+         detector parameters              Slurm array 44695919 + finalize 44695920)
 ```
 
 It consists of two cooperating components that share one statistical core:
@@ -178,15 +178,16 @@ run_t  = number of consecutive reps with s̃ > warningThreshold
 - **Onset estimate** = first rep of the current CUSUM excursion (the rep after C was last 0) — the classic CUSUM
   change-point estimator. So BreakingPoint reports both when it became confident (alarm) and when drift likely
   began (onset).
-- Winsorizing s and the persistence requirement are what stop one bad rep from triggering.
+- Winsorizing s, the EWMA smoothing and (when configured) the persistence requirement stop one bad rep from triggering.
 
-**Shipped configuration** (chosen by the Lab, `config_id ewma|a=0.4|bp=2|w=1.5|m=2|clip=2.5`):
-EWMA, α = 0.4, warning 1.5σ, BreakingPoint 2.0σ, persistence 2 reps, outlier clip 2.5σ, grouped-quality
-weighting, drop missing features.
+**Shipped configuration** (chosen on UF HiPerGator, `config_id ewma|a=0.4|bp=2|w=1|m=0|clip=2.5`):
+EWMA, α = 0.4, warning 1.0σ, BreakingPoint 2.0σ, no extra run-length rule (m = 0), outlier clip 2.5σ,
+grouped-quality weighting, drop missing features. With the input capped at 2.5σ, one extreme rep moves Z by at most
+`0.4·2.5 = 1.0σ`, half the alarm level. From a stable state (Z ≤ 1.0) Z can rise at most `0.4·2.5 + 0.6·Z` per rep,
+so the alarm needs at least three consecutive strongly elevated reps.
 
 On the Form Drawdown chart the thresholds are drawn in drift-score units, `μ0 + threshold·σ0`, and apply to
-the white EWMA line. Bars are the per-rep drift; a bar above the warning line counts as an "elevated rep" for the
-persistence rule.
+the white EWMA line. Bars are the per-rep drift.
 
 ## 7. Recovery check (`src/detection/recovery.ts`)
 
@@ -198,8 +199,8 @@ recovery% = clamp( 1 − excess(recovery reps) / excess(post-BreakingPoint reps)
 recovered  ⇔ recovery% ≥ 75 % and mean recovery drift ≤ warning level;  partial ⇔ ≥ 40 %;  else persistent
 ```
 
-In the Lab's scenario H (1,132 sessions), the estimate tracked the simulated truth with Spearman ρ = 0.83
-(MAE 14 percentage points; "recovered" status agreed with truth in 80 % of sessions).
+In the HiPerGator run's scenario H (2,259 sessions), the estimate tracked the simulated truth with Spearman ρ = 0.82
+(MAE 14.0 percentage points; "recovered" status agreed with truth in 82.6 % of sessions).
 
 ## 8. BreakingPoint Lab
 
@@ -255,31 +256,37 @@ On the selection split only:
 2. Keep eligible configurations within 2 percentage points of the best eligible miss rate.
 3. Choose the lowest median detection delay; ties → lower mean delay → lower pooled FPR → simpler family.
 
-All reported performance comes from the held-out split. A first version of the rule only required pooled
-FPR ≤ 5 % (and ≤ 10 % per scenario); it selected a configuration with 9.4 % false alarms on isolated bad reps.
-We tightened the rule because "one bad rep shouldn't trigger" is a core product promise; the cost was about
-2.4 pp of miss rate and 1 rep of delay (the analysis is reproducible from `results/config_results.csv`).
+All reported performance comes from the held-out split. During development (a 50,000-session local run), a first
+version of the rule only required pooled FPR ≤ 5 % (and ≤ 10 % per scenario); it selected a configuration with 9.4 %
+false alarms on isolated bad reps. We tightened the rule because "one bad rep shouldn't trigger" is a core product
+promise; in that run the cost was about 2.4 pp of miss rate and 1 rep of delay.
 
-### 8.5 Results (local workstation, 50,000 sessions; held-out 25,000)
+### 8.5 Results (UF HiPerGator, 100,000 sessions; held-out 50,000)
+
+Twenty-task Slurm array (job 44695919, 8 CPUs per task, 30–59 s per task; 564 CPU-process seconds in total) plus a
+finalize job (44695920, 37 s). All numbers are from `results/VALIDATION_REPORT.md`.
 
 | | value |
 |---|---|
-| FPR (all no-change) | 2.2 % (2.0–2.4 %) |
-| FPR by scenario A / B / E / F / G | 1.4 / 3.9 / 1.6 / 2.3 / 1.8 % |
-| detected / early / missed (drift scenarios) | 88.9 % / 0.6 % / 10.6 % |
-| detected by scenario C / D / H | 87.0 / 90.2 / 89.6 % |
+| FPR (all no-change) | 2.2 % (2.1–2.4 %) |
+| FPR by scenario A / B / E / F / G | 1.9 / 3.9 / 1.3 / 2.5 / 1.6 % |
+| detected / early / missed (drift scenarios) | 89.6 % / 0.4 % / 10.0 % |
+| detected by scenario C / D / H | 87.1 / 90.5 / 91.2 % |
 | median detection delay (C / D / H) | 4 reps (5 / 3 / 4) |
 | median change-point error | 1 rep |
 
-Comparisons: the naive "any rep > 2σ" rule had 52.4 % FPR; replacing the personal baseline with population norms
-(same detector, evaluation set of 10,000 sessions) raised FPR from 2.2 % to 18.8 % (31.4 % for high-variability athletes)
-and cut detection from 88.8 % to 40.5 %.
+Comparisons: the naive "any rep > 2σ" rule had 51.9 % FPR. Replacing the personal baseline with population norms
+(same detector, 20,000-session evaluation set) raised FPR from 2.2 % to 17.8 % (30.5 % for high-variability athletes)
+and cut detection from 89.8 % to 40.0 %.
 
-Robustness (3,000 + 3,000 sessions per level): FPR stays ≈ 1–2 % as pose jitter grows to 5× when the jitter is also
-present during calibration (sensitivity drops: detection 87 % → 21 %). If noise increases only **after** calibration,
-FPR rises (6 % at 1.5×, 17 % at 2×) — reported as a limitation and the reason for the capture-quality gate and
-recalibration advice. With isolated bad reps at 10 % of reps FPR is 5.2 %; with 30 % landmark dropout FPR is 1.0 %
-and detection 71 %.
+Robustness: FPR stays ≈ 1–2 % as pose jitter grows to 5× when the jitter is also present during calibration
+(sensitivity drops: detection 87 % → 21 %). If noise increases only **after** calibration, FPR rises (6.3 % at 1.5×,
+17.3 % at 2×). This is reported as a limitation and is the reason for the capture-quality gate and recalibration
+advice. With isolated bad reps at 10 % of reps FPR is 5.7 %; with 30 % landmark dropout FPR is 1.1 % and detection 71 %.
+
+The earlier 50,000-session local run of the same pipeline gave consistent results (2.2 % FPR, 88.9 % detection).
+The per-configuration CSVs in `results/` (`summary.csv`, `config_results.csv`, …) are from that local run; the
+HiPerGator run's report, figures and exported config are the authoritative results.
 
 All numbers above come from `results/VALIDATION_REPORT.md` of the run that was actually executed; HiPerGator runs
 regenerate the same report at larger scale.

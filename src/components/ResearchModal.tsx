@@ -64,7 +64,8 @@ drift = sqrt( Σ w_i·z_i² / Σ w_i )      w_i = group weight × landmark confi
 CUSUM  C_t = max(0, C_{t−1} + s_t − k)         k = ${c.cusumK}, h = ${c.cusumH}
 mode   ${c.mode}   ·   warning ${c.warningThreshold}σ   ·   breaking point ${c.breakpointThreshold}σ   ·   persistence ≥ ${c.minimumPersistentReps} reps`}</code>
       <p>
-        One weird rep cannot trigger a breaking point: the input is winsorized and the alarm requires persistence. Once fired, the onset is estimated as the
+        One weird rep cannot trigger a breaking point: each rep's input is winsorized and smoothed by the EWMA
+        {c.minimumPersistentReps > 0 ? ', and the alarm also requires a run of elevated reps' : ', so a single extreme rep moves the smoothed drift by at most α × clip'}. Once fired, the onset is estimated as the
         first rep of the current CUSUM excursion (the classic CUSUM change-point estimator), so BreakingPoint reports both <i>when it became sure</i> and{' '}
         <i>when the drift likely began</i>.
       </p>

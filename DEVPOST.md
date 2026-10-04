@@ -154,21 +154,22 @@ athlete entered a persistently different movement regime?"**
 - In-control reference μ₀, σ₀ from **leave-one-out** drift scores of the calibration reps. This calibrates the
   detector to how variable *this* athlete naturally is.
 - `s_t = (D_t − μ₀)/σ₀`, winsorized; **EWMA** `Z_t = αs_t + (1−α)Z_{t−1}`; **CUSUM** `C_t = max(0, C_{t−1} + s_t − k)`;
-  persistence requirement; onset = first rep of the current CUSUM excursion.
-- Selected operating point: **EWMA α = 0.4, breaking point 2.0σ, warning 1.5σ, ≥ 2 persistent reps, winsorize at 2.5σ**.
+  optional run-length (persistence) requirement; onset = first rep of the current CUSUM excursion.
+- Selected operating point (on HiPerGator): **EWMA α = 0.4, warning 1.0σ, breaking point 2.0σ, winsorize at 2.5σ**,
+  no extra run-length rule. One extreme rep can move the smoothed drift by at most 1σ, half the alarm level.
 - Selection rule: false-positive rate ≤ 5 % in **every** no-change scenario → within 2 pp of the best miss rate → lowest
   median detection delay.
 
-**Validation results (local workstation run that actually completed: 50,000 simulated sessions; 25,000 held out).**
-*Update this block with the HiPerGator report after the cluster run completes.*
+**Validation results: UF HiPerGator, 100,000 simulated sessions (50,000 held out).** Twenty-task Slurm array
+(8 CPUs per task) plus a merge job; every number is from `results/VALIDATION_REPORT.md`.
 
-- False-positive rate on no-change sessions: **2.2 %** (95 % CI 2.0–2.4 %), and ≤ 3.9 % in each nuisance scenario
-  (isolated bad rep, camera noise, dropout, high variability)
-- Drift sessions detected: **88.9 %**, median delay **4 reps**, median onset error **1 rep**
-- Naive "flag any rep above 2σ": **52.4 %** false-positive rate
-- Same detector with population norms instead of a personal baseline: false alarms rose from 2.2 % to **18.8 %**
-  (31.4 % for high-variability athletes), and detection fell from 88.8 % to **40.5 %**. This is the quantitative case
-  for personalization.
+- False-positive rate on no-change sessions: **2.2 %** (95 % CI 2.1–2.4 %), and ≤ 3.9 % in every nuisance scenario
+  (isolated bad rep 3.9 %, camera noise 1.3 %, landmark dropout 2.5 %, high variability 1.6 %)
+- Drift sessions detected: **89.6 %** (95 % CI 89.2–90.0 %), median delay **4 reps**, median onset error **1 rep**
+- Naive "flag any rep above 2σ": **51.9 %** false-positive rate
+- Same detector with population norms instead of a personal baseline (20,000-session evaluation set): false alarms rose
+  from 2.2 % to **17.8 %** (30.5 % for high-variability athletes), and detection fell from 89.8 % to **40.0 %**. This is
+  the quantitative case for personalization.
 
 ## Research rationale
 
@@ -188,7 +189,7 @@ athlete entered a persistently different movement regime?"**
   (mean ≈ 0, SD ≈ 1.1 in no-change sessions).
 - **"One bad rep" vs real drift.** EWMA and CUSUM can both be tripped by a single huge outlier. Winsorizing and a
   persistence rule fixed this, and the Lab chose how much.
-- **Choosing the selection rule honestly.** Our first rule (pooled FPR ≤ 5 %) picked a detector with 9.4 % false
+- **Choosing the selection rule honestly.** In a 50,000-session local run, our first rule (pooled FPR ≤ 5 %) picked a detector with 9.4 % false
   alarms on isolated bad reps. We tightened it to "≤ 5 % in every no-change scenario", accepting about +2 pp miss
   rate and +1 rep delay.
 - **Camera noise after calibration.** The stress test showed false alarms rise if capture quality degrades after the

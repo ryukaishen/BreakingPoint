@@ -70,19 +70,15 @@ Under the hood: on-device pose estimation, rep segmentation, a robust personal b
 and sequential EWMA and CUSUM change detection. A detector like this has a sensitivity problem: too aggressive and one
 bad rep is a false alarm, too conservative and real drift is caught late. So we treated it like a backtesting problem.
 
-> **Say version A only if the HiPerGator run has completed** (numbers from `results/VALIDATION_REPORT.md` of that run):
->
-> On UF's HiPerGator supercomputer we simulated **[N_HPC]** individualized athlete sessions with known change points —
-> varying drift, sensor noise, outliers, missing landmarks and natural variability — and swept **25,280** detector
-> configurations. The detector BreakingPoint uses was selected from those experiments: on held-out sessions it raised
-> false alarms in **[FPR_HPC]** of no-change sessions and caught **[TPR_HPC]** of drift.
->
-> **Version B (true today, from the completed local run):**
->
-> We simulated individualized athlete sessions with known change points and swept **25,280** detector configurations.
-> In a **50,000-session** backtest, the selected configuration had a **2.2 %** false-positive rate on held-out no-change
-> sessions and caught **89 %** of drift. The same pipeline is packaged as a Slurm array for UF's HiPerGator. The detector
-> is calibrated at the movement-signal level and shared by every protocol; sport-specific validation is next.
+On UF's HiPerGator supercomputer we simulated **100,000** individualized athlete sessions with known change points,
+varying drift, sensor noise, outliers, missing landmarks and natural variability, and swept **25,280** detector
+configurations. The detector BreakingPoint uses was selected from those experiments, not chosen by hand. On held-out
+sessions it raised false alarms in **2.2 %** of no-change sessions and caught **about 90 %** of drift, a median of
+**four reps** after it began. The detector is calibrated at the movement-signal level and shared by every protocol;
+sport-specific validation is next.
+
+*(Every number here is from `results/VALIDATION_REPORT.md` of HiPerGator jobs 44695919/44695920: 89.6 % detection,
+95 % CI 89.2–90.0 %.)*
 
 ### 2:25–2:45 · Impact
 
@@ -108,7 +104,7 @@ like the ideal athlete. It asks whether you still move like yourself.**
 | Is every sport in the library working? | No, and the UI says so. Squat and repeated jump are ready, forward lunge is beta, and everything else is roadmap and cannot be launched. Tests enforce that. |
 | Did the HPC study validate soccer / pickleball? | No. The Lab validates the detector's statistical behaviour under controlled synthetic drift. It's calibrated at the movement-signal level; sport-specific clinical validation is future work. |
 | Does the sport change the detector? | No. Sport profiles contain no detector parameters, and a test checks that every protocol runs with the identical exported config. |
-| How do you avoid false alarms from one bad rep? | Per-rep input is winsorized and the alarm needs consecutive elevated reps plus the smoothed drift above threshold. In the backtest, isolated bad reps triggered in 3.9 % of sessions; for the lunge, a test shows one malformed rep doesn't trigger. |
+| How do you avoid false alarms from one bad rep? | Each rep's input is capped at 2.5σ and smoothed by the EWMA, so one extreme rep can move the smoothed drift by at most 1σ, half the 2σ alarm level. It takes several elevated reps in a row to cross it. In the 100,000-session HiPerGator backtest, isolated bad reps triggered in 3.9 % of sessions; for the lunge, a test shows one malformed rep doesn't trigger. |
 | What do labels like "explosive fatigue" mean? | They name the movement family with the largest standardized changes (explosive output, recovery speed, range of motion, asymmetry…). They describe movement change and are never diagnoses. |
 | Monocular camera accuracy? | Not lab-grade, which is why we only compare an athlete with themselves from the same setup. Poor-quality reps are not scored. |
 | Is the demo faked? | The demo athlete is synthetic, and labeled as such, but its landmarks go through the full real pipeline. When the breaking point fires is decided by the real detector at runtime. |

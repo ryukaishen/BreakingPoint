@@ -320,7 +320,8 @@ function MonitorView(p: Props) {
   const pattern = state !== 'STABLE' ? sessionPattern(s.exercise, s.monitorReps, s.onsetRep ?? s.firstWarnRep, s.baseline?.reference.sigma0, p.launch.patternLabels) : null;
   const triggerText =
     mode === 'ewma'
-      ? `Triggers when smoothed drift (EWMA) crosses ${fmt(th?.breakpointLevel)} after ≥${s.config.minimumPersistentReps} elevated reps`
+      ? `Triggers when smoothed drift (EWMA) crosses ${fmt(th?.breakpointLevel)}` +
+        (s.config.minimumPersistentReps > 0 ? ` after ≥${s.config.minimumPersistentReps} elevated reps` : ' — one odd rep moves it at most halfway')
       : mode === 'cusum'
         ? `Triggers when CUSUM evidence exceeds h = ${s.config.cusumH}`
         : mode === 'combined'

@@ -74,8 +74,8 @@ are shared, with the same validated parameters for every protocol.
              BREAKINGPOINT           + descriptive movement pattern (e.g. EXPLOSIVE FATIGUE, RECOVERY SLOWING)
                    ^
                    |
-       Lab-calibrated detector parameters
-   (BreakingPoint Lab Monte-Carlo backtest; HiPerGator Slurm pipeline)
+     HiPerGator-calibrated detector parameters
+   (BreakingPoint Lab · 100,000 simulated sessions · Slurm array)
 ```
 
 | movement primitive | status | sports using it today |
@@ -193,10 +193,11 @@ EWMA   Z_t = α s_t + (1−α) Z_{t−1}
 CUSUM  C_t = max(0, C_{t−1} + s_t − k)
 ```
 
-The shipped configuration (selected by the Lab, see below) is **EWMA, α = 0.4**: BreakingPoint fires
-when the smoothed drift exceeds **2.0 σ** after **≥ 2 consecutive** elevated reps (> 1.5 σ), with
-per-rep input winsorized at 2.5 σ. A single bad rep cannot trigger it. The drift **onset** is
-estimated with the classic CUSUM change-point estimator (first rep of the current CUSUM excursion).
+The shipped configuration (selected on UF HiPerGator, see below) is **EWMA, α = 0.4**: drift is flagged as
+*emerging* when the smoothed drift exceeds **1.0 σ** and BreakingPoint fires when it exceeds **2.0 σ**, with
+per-rep input winsorized at **2.5 σ** (no extra run-length rule). A single extreme rep moves the smoothed drift
+by at most 1 σ, half the alarm level, so one bad rep cannot trigger it. The drift **onset** is estimated
+with the classic CUSUM change-point estimator (first rep of the current CUSUM excursion).
 
 ## Validation (BreakingPoint Lab)
 
@@ -211,27 +212,32 @@ conservative and real drift is caught late. We treated it like **strategy backte
 - **Transparent selection rule** on a *selection split*; all reported numbers come from a *held-out split*:
   FPR ≤ 5 % in **every** no-change scenario → keep configs within 2 pp of the best miss rate → lowest median delay.
 
-**Local workstation run (actually completed): 50,000 simulated sessions** (25,000 selection / 25,000 held-out).
-HiPerGator runs (100k–1M sessions) use the identical code via `sbatch hpc/sweep.slurm` — see
-[hpc/README_HIPERGATOR.md](hpc/README_HIPERGATOR.md); replace the numbers below with that run's report when it completes.
+**UF HiPerGator run (completed): 100,000 simulated sessions** (50,000 selection / 50,000 held-out), as a
+20-task Slurm array (job 44695919, 8 CPUs per task, 30–59 s each) plus a merge/finalize job (44695920, 37 s).
+See [hpc/README_HIPERGATOR.md](hpc/README_HIPERGATOR.md). The exported configuration is the one the app loads.
 
 | held-out metric (selected detector) | value |
 |---|---|
-| False-positive rate, all no-change sessions | **2.2 %** (95 % CI 2.0–2.4 %) |
-| …isolated bad rep / camera noise / dropout / high variability | 3.9 % / 1.6 % / 2.3 % / 1.8 % |
-| Drift sessions detected | **88.9 %** (95 % CI 88.2–89.5 %) |
+| False-positive rate, all no-change sessions | **2.2 %** (95 % CI 2.1–2.4 %) |
+| …no change / isolated bad rep / camera noise / dropout / high variability | 1.9 % / 3.9 % / 1.3 % / 2.5 % / 1.6 % |
+| Drift sessions detected | **89.6 %** (95 % CI 89.2–90.0 %) |
+| …gradual / sudden / drift-then-recovery | 87.1 % / 90.5 % / 91.2 % |
 | Median detection delay | **4 reps** after the true change |
 | Median change-point (onset) error | 1 rep |
 
-| detector comparison (held-out split) | false-positive rate | drift detected after the change |
-|---|---|---|
-| **BreakingPoint (selected, sequential)** | **2.2 %** | **88.9 %** |
-| Naive "flag any rep > 2σ" | 52.4 % | 70.0 % (fired *before* the change in 28.3 %) |
+| detector comparison (held-out split) | false-positive rate | miss rate | median delay |
+|---|---|---|---|
+| **BreakingPoint (selected: EWMA)** | **2.2 %** | **10.0 %** | 4 reps |
+| Best CUSUM-only | 3.0 % | 9.5 % | 4 reps |
+| Best EWMA + CUSUM | 2.0 % | 12.3 % | 3 reps |
+| Naive "flag any rep > 2σ" | 51.9 % | 1.5 % | 1 rep |
 
-| same detector, different reference (evaluation set, 10,000 fresh sessions) | false-positive rate | drift detected |
+| same detector, different reference (evaluation set, 20,000 fresh sessions) | false-positive rate | drift detected |
 |---|---|---|
-| **Personal baseline (BreakingPoint)** | **2.2 %** (1.5 % for high-variability athletes) | **88.8 %** |
-| Population norms ("universal rules") | 18.8 % (31.4 % for high-variability athletes) | 40.5 % |
+| **Personal baseline (BreakingPoint)** | **2.2 %** (1.7 % for high-variability athletes) | **89.8 %** |
+| Population norms ("universal rules") | 17.8 % (30.5 % for high-variability athletes) | 40.0 % |
+
+An earlier 50,000-session local run of the same pipeline gave consistent results (2.2 % FPR, 88.9 % detection).
 
 Full report: [results/VALIDATION_REPORT.md](results/VALIDATION_REPORT.md). Synthetic sessions test the
 detector's statistical behaviour under controlled conditions — they are not clinical data.
