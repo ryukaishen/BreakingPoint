@@ -1,0 +1,34 @@
+# dependencies / build
+node_modules/
+dist/
+*.tsbuildinfo
+
+# large downloaded runtime assets (re-created by `npm install` / `npm run setup:assets`)
+public/mediapipe/
+public/models/
+
+# python
+__pycache__/
+*.pyc
+.venv/
+venv/
+.pytest_cache/
+
+# Lab outputs: shards and logs are regenerated; keep the curated results
+results/shards/
+results/logs/
+results/robustness_cache/
+hpc/logs/*
+!hpc/logs/.gitkeep
+.venv-hpg/
+results_smoke/
+slurm-*.out
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# local editor / agent tooling
+.claude/

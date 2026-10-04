@@ -1,0 +1,49 @@
+detector,variant,config_id,scenario,scenario_label,type,n_sessions,false_positive_rate,fpr_ci_lo,fpr_ci_hi,detection_rate,detection_ci_lo,detection_ci_hi,miss_rate,early_alarm_rate,median_delay,median_delay_ci_lo,median_delay_ci_hi,mean_delay,median_changepoint_error
+BreakingPoint (selected),grouped_quality+drop,ewma|a=0.4|bp=2|w=1.5|m=2|clip=2.5,A_no_change,A · No change,no_change,3100,0.013548,0.010039,0.018262,,,,,,,,,,
+BreakingPoint (selected),grouped_quality+drop,ewma|a=0.4|bp=2|w=1.5|m=2|clip=2.5,B_isolated_bad_rep,B · Isolated bad rep,no_change,3100,0.039355,0.033061,0.046789,,,,,,,,,,
+BreakingPoint (selected),grouped_quality+drop,ewma|a=0.4|bp=2|w=1.5|m=2|clip=2.5,C_gradual_drift,C · Gradual fatigue drift,change,3150,,,,0.869524,0.85731,0.880838,0.125397,0.005079,5.0,5.0,5.0,5.203724,2.0
+BreakingPoint (selected),grouped_quality+drop,ewma|a=0.4|bp=2|w=1.5|m=2|clip=2.5,D_sudden_change,D · Sudden change,change,3150,,,,0.901587,0.890691,0.911506,0.091429,0.006984,3.0,3.0,3.0,3.084155,0.0
+BreakingPoint (selected),grouped_quality+drop,ewma|a=0.4|bp=2|w=1.5|m=2|clip=2.5,E_camera_noise,E · Camera noise,no_change,3100,0.015806,0.011977,0.020834,,,,,,,,,,
+BreakingPoint (selected),grouped_quality+drop,ewma|a=0.4|bp=2|w=1.5|m=2|clip=2.5,F_landmark_dropout,F · Landmark dropout,no_change,3100,0.022581,0.017912,0.028431,,,,,,,,,,
+BreakingPoint (selected),grouped_quality+drop,ewma|a=0.4|bp=2|w=1.5|m=2|clip=2.5,G_high_variability,G · High natural variability,no_change,3150,0.017778,0.013716,0.023014,,,,,,,,,,
+BreakingPoint (selected),grouped_quality+drop,ewma|a=0.4|bp=2|w=1.5|m=2|clip=2.5,H_recovery,H · Drift then recovery,change,3150,,,,0.895556,0.884389,0.905759,0.1,0.004444,4.0,4.0,4.0,4.015243,1.0
+Best EWMA-only,grouped+drop,ewma|a=0.6|bp=2.5|w=1.5|m=3|clip=3,A_no_change,A · No change,no_change,3100,0.014194,0.01059,0.019,,,,,,,,,,
+Best EWMA-only,grouped+drop,ewma|a=0.6|bp=2.5|w=1.5|m=3|clip=3,B_isolated_bad_rep,B · Isolated bad rep,no_change,3100,0.047742,0.04078,0.055824,,,,,,,,,,
+Best EWMA-only,grouped+drop,ewma|a=0.6|bp=2.5|w=1.5|m=3|clip=3,C_gradual_drift,C · Gradual fatigue drift,change,3150,,,,0.853968,0.841205,0.865869,0.138413,0.007619,5.0,4.0,5.0,4.879554,2.0
+Best EWMA-only,grouped+drop,ewma|a=0.6|bp=2.5|w=1.5|m=3|clip=3,D_sudden_change,D · Sudden change,change,3150,,,,0.88254,0.870827,0.89332,0.111111,0.006349,2.0,2.0,2.0,2.413309,0.0
+Best EWMA-only,grouped+drop,ewma|a=0.6|bp=2.5|w=1.5|m=3|clip=3,E_camera_noise,E · Camera noise,no_change,3100,0.014839,0.011143,0.019735,,,,,,,,,,
+Best EWMA-only,grouped+drop,ewma|a=0.6|bp=2.5|w=1.5|m=3|clip=3,F_landmark_dropout,F · Landmark dropout,no_change,3100,0.029355,0.02397,0.035904,,,,,,,,,,
+Best EWMA-only,grouped+drop,ewma|a=0.6|bp=2.5|w=1.5|m=3|clip=3,G_high_variability,G · High natural variability,no_change,3150,0.01873,0.014549,0.024084,,,,,,,,,,
+Best EWMA-only,grouped+drop,ewma|a=0.6|bp=2.5|w=1.5|m=3|clip=3,H_recovery,H · Drift then recovery,change,3150,,,,0.900635,0.889695,0.910599,0.092063,0.007302,3.0,3.0,3.0,3.529432,1.0
+Best CUSUM-only,grouped_quality+drop,cusum|k=0.75|h=6|w=1.5|m=3|clip=2.5,A_no_change,A · No change,no_change,3100,0.018387,0.014219,0.023747,,,,,,,,,,
+Best CUSUM-only,grouped_quality+drop,cusum|k=0.75|h=6|w=1.5|m=3|clip=2.5,B_isolated_bad_rep,B · Isolated bad rep,no_change,3100,0.041935,0.035428,0.049577,,,,,,,,,,
+Best CUSUM-only,grouped_quality+drop,cusum|k=0.75|h=6|w=1.5|m=3|clip=2.5,C_gradual_drift,C · Gradual fatigue drift,change,3150,,,,0.869841,0.857639,0.881143,0.124444,0.005714,5.0,5.0,5.0,5.433942,2.0
+Best CUSUM-only,grouped_quality+drop,cusum|k=0.75|h=6|w=1.5|m=3|clip=2.5,D_sudden_change,D · Sudden change,change,3150,,,,0.913333,0.902998,0.922662,0.080317,0.006349,3.0,3.0,3.0,3.224192,0.0
+Best CUSUM-only,grouped_quality+drop,cusum|k=0.75|h=6|w=1.5|m=3|clip=2.5,E_camera_noise,E · Camera noise,no_change,3100,0.016452,0.012535,0.021565,,,,,,,,,,
+Best CUSUM-only,grouped_quality+drop,cusum|k=0.75|h=6|w=1.5|m=3|clip=2.5,F_landmark_dropout,F · Landmark dropout,no_change,3100,0.026129,0.021073,0.032358,,,,,,,,,,
+Best CUSUM-only,grouped_quality+drop,cusum|k=0.75|h=6|w=1.5|m=3|clip=2.5,G_high_variability,G · High natural variability,no_change,3150,0.02254,0.017908,0.028334,,,,,,,,,,
+Best CUSUM-only,grouped_quality+drop,cusum|k=0.75|h=6|w=1.5|m=3|clip=2.5,H_recovery,H · Drift then recovery,change,3150,,,,0.900635,0.889695,0.910599,0.094921,0.004444,4.0,4.0,4.0,4.288685,1.0
+Best EWMA+CUSUM,grouped_quality+drop,combined|a=0.5|bp=2.5|k=0.25|h=2|w=1|m=0|clip=3,A_no_change,A · No change,no_change,3100,0.007419,0.004949,0.011109,,,,,,,,,,
+Best EWMA+CUSUM,grouped_quality+drop,combined|a=0.5|bp=2.5|k=0.25|h=2|w=1|m=0|clip=3,B_isolated_bad_rep,B · Isolated bad rep,no_change,3100,0.038387,0.032175,0.045742,,,,,,,,,,
+Best EWMA+CUSUM,grouped_quality+drop,combined|a=0.5|bp=2.5|k=0.25|h=2|w=1|m=0|clip=3,C_gradual_drift,C · Gradual fatigue drift,change,3150,,,,0.846667,0.833662,0.858827,0.147937,0.005397,5.0,5.0,5.0,5.034496,2.0
+Best EWMA+CUSUM,grouped_quality+drop,combined|a=0.5|bp=2.5|k=0.25|h=2|w=1|m=0|clip=3,D_sudden_change,D · Sudden change,change,3150,,,,0.872698,0.860603,0.883886,0.121905,0.005397,2.0,2.0,2.0,2.600218,1.0
+Best EWMA+CUSUM,grouped_quality+drop,combined|a=0.5|bp=2.5|k=0.25|h=2|w=1|m=0|clip=3,E_camera_noise,E · Camera noise,no_change,3100,0.012258,0.008944,0.01678,,,,,,,,,,
+Best EWMA+CUSUM,grouped_quality+drop,combined|a=0.5|bp=2.5|k=0.25|h=2|w=1|m=0|clip=3,F_landmark_dropout,F · Landmark dropout,no_change,3100,0.02129,0.01677,0.026996,,,,,,,,,,
+Best EWMA+CUSUM,grouped_quality+drop,combined|a=0.5|bp=2.5|k=0.25|h=2|w=1|m=0|clip=3,G_high_variability,G · High natural variability,no_change,3150,0.013651,0.01015,0.018336,,,,,,,,,,
+Best EWMA+CUSUM,grouped_quality+drop,combined|a=0.5|bp=2.5|k=0.25|h=2|w=1|m=0|clip=3,H_recovery,H · Drift then recovery,change,3150,,,,0.881587,0.869837,0.892408,0.113333,0.005079,4.0,4.0,4.0,3.673389,1.0
+Best consecutive-threshold,grouped_quality+drop,consecutive|bp=2|n=3,A_no_change,A · No change,no_change,3100,0.014839,0.011143,0.019735,,,,,,,,,,
+Best consecutive-threshold,grouped_quality+drop,consecutive|bp=2|n=3,B_isolated_bad_rep,B · Isolated bad rep,no_change,3100,0.03871,0.03247,0.046091,,,,,,,,,,
+Best consecutive-threshold,grouped_quality+drop,consecutive|bp=2|n=3,C_gradual_drift,C · Gradual fatigue drift,change,3150,,,,0.843175,0.830058,0.855455,0.151429,0.005397,5.0,5.0,5.0,5.080572,2.0
+Best consecutive-threshold,grouped_quality+drop,consecutive|bp=2|n=3,D_sudden_change,D · Sudden change,change,3150,,,,0.883492,0.871818,0.894232,0.110476,0.006032,2.0,2.0,2.0,2.418613,0.0
+Best consecutive-threshold,grouped_quality+drop,consecutive|bp=2|n=3,E_camera_noise,E · Camera noise,no_change,3100,0.016774,0.012815,0.02193,,,,,,,,,,
+Best consecutive-threshold,grouped_quality+drop,consecutive|bp=2|n=3,F_landmark_dropout,F · Landmark dropout,no_change,3100,0.025806,0.020784,0.032002,,,,,,,,,,
+Best consecutive-threshold,grouped_quality+drop,consecutive|bp=2|n=3,G_high_variability,G · High natural variability,no_change,3150,0.016508,0.012611,0.021583,,,,,,,,,,
+Best consecutive-threshold,grouped_quality+drop,consecutive|bp=2|n=3,H_recovery,H · Drift then recovery,change,3150,,,,0.89873,0.887704,0.908785,0.096508,0.004762,4.0,4.0,4.0,3.723419,1.0
+Naive single-rep 2σ threshold,grouped_quality+drop,consecutive|bp=2|n=1,A_no_change,A · No change,no_change,3100,0.430645,0.41331,0.448152,,,,,,,,,,
+Naive single-rep 2σ threshold,grouped_quality+drop,consecutive|bp=2|n=1,B_isolated_bad_rep,B · Isolated bad rep,no_change,3100,0.984194,0.979166,0.988023,,,,,,,,,,
+Naive single-rep 2σ threshold,grouped_quality+drop,consecutive|bp=2|n=1,C_gradual_drift,C · Gradual fatigue drift,change,3150,,,,0.673968,0.657395,0.690118,0.02127,0.304762,2.0,2.0,3.0,2.818182,2.0
+Naive single-rep 2σ threshold,grouped_quality+drop,consecutive|bp=2|n=1,D_sudden_change,D · Sudden change,change,3150,,,,0.688889,0.6725,0.704818,0.015238,0.295873,0.0,0.0,0.0,0.416129,0.0
+Naive single-rep 2σ threshold,grouped_quality+drop,consecutive|bp=2|n=1,E_camera_noise,E · Camera noise,no_change,3100,0.330323,0.313985,0.347081,,,,,,,,,,
+Naive single-rep 2σ threshold,grouped_quality+drop,consecutive|bp=2|n=1,F_landmark_dropout,F · Landmark dropout,no_change,3100,0.508065,0.490466,0.525643,,,,,,,,,,
+Naive single-rep 2σ threshold,grouped_quality+drop,consecutive|bp=2|n=1,G_high_variability,G · High natural variability,no_change,3150,0.369524,0.352836,0.386529,,,,,,,,,,
+Naive single-rep 2σ threshold,grouped_quality+drop,consecutive|bp=2|n=1,H_recovery,H · Drift then recovery,change,3150,,,,0.73746,0.721811,0.752531,0.013651,0.248889,2.0,2.0,2.0,1.755919,1.0

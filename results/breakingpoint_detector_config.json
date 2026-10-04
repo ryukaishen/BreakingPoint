@@ -1,0 +1,129 @@
+{
+  "schema": "breakingpoint.detector/v1",
+  "source": "BreakingPoint Lab \u00b7 Monte-Carlo validated on 50,000 simulated sessions",
+  "generated_at": "2026-10-04T01:39:36",
+  "config_id": "ewma|a=0.4|bp=2|w=1.5|m=2|clip=2.5",
+  "mode": "ewma",
+  "ewma_alpha": 0.4,
+  "cusum_k": 0.5,
+  "cusum_h": 4.0,
+  "warning_threshold": 1.5,
+  "breakpoint_threshold": 2.0,
+  "minimum_persistent_reps": 2,
+  "outlier_clip": 2.5,
+  "z_clip": 6.0,
+  "feature_weighting": "grouped_quality",
+  "missing_feature_handling": "drop",
+  "quality_min": 0.5,
+  "min_coverage": 0.5,
+  "reference": {
+    "mu0_default": 1.0,
+    "sigma0_default": 0.35,
+    "mu0_min": 0.5,
+    "mu0_max": 2.0,
+    "sigma0_min": 0.2,
+    "sigma0_max": 0.8,
+    "sigma0_rel_min": 0.25
+  },
+  "selection_rule": "Selection is performed on the SELECTION split only (even-numbered session blocks); all reported performance comes from the held-out EVALUATION split (odd-numbered blocks). (1) Eligibility: false-positive rate <= 5% in EVERY no-change scenario (A no change, B isolated bad rep, E camera noise, F landmark dropout, G high natural variability) \u2014 the constraint must hold under each nuisance condition, not merely on average (this implies pooled FPR <= 5%). (2) Among eligible configurations, keep those whose miss rate over drift scenarios C,D,H is within 2 percentage points of the best eligible miss rate. (3) From those, choose the lowest median detection delay; ties broken by lower mean detection delay, then lower pooled false-positive rate, then the simpler detector family (consecutive < EWMA = CUSUM < combined). If no configuration is eligible, the configuration with the lowest pooled false-positive rate is chosen and the report flags it.",
+  "validation": {
+    "num_sessions": 50000,
+    "num_sessions_selection": 25000,
+    "num_sessions_holdout": 25000,
+    "reported_on": "held-out evaluation split",
+    "num_no_change_sessions_holdout": 15550,
+    "num_drift_sessions_holdout": 9450,
+    "false_positive_rate": 0.0218,
+    "false_positive_rate_ci95": [
+      0.0196,
+      0.0242
+    ],
+    "true_positive_rate": 0.8889,
+    "true_positive_rate_ci95": [
+      0.8824,
+      0.8951
+    ],
+    "miss_rate": 0.1056,
+    "early_alarm_rate": 0.0055,
+    "median_detection_delay": 4.0,
+    "median_detection_delay_ci95": [
+      4.0,
+      4.0
+    ],
+    "mean_detection_delay": 4.088,
+    "median_changepoint_error": 1.0,
+    "per_scenario": {
+      "A_no_change": {
+        "n": 3100,
+        "false_positive_rate": 0.0135
+      },
+      "B_isolated_bad_rep": {
+        "n": 3100,
+        "false_positive_rate": 0.0394
+      },
+      "C_gradual_drift": {
+        "n": 3150,
+        "true_positive_rate": 0.8695,
+        "miss_rate": 0.1254,
+        "early_alarm_rate": 0.0051,
+        "median_detection_delay": 5.0
+      },
+      "D_sudden_change": {
+        "n": 3150,
+        "true_positive_rate": 0.9016,
+        "miss_rate": 0.0914,
+        "early_alarm_rate": 0.007,
+        "median_detection_delay": 3.0
+      },
+      "E_camera_noise": {
+        "n": 3100,
+        "false_positive_rate": 0.0158
+      },
+      "F_landmark_dropout": {
+        "n": 3100,
+        "false_positive_rate": 0.0226
+      },
+      "G_high_variability": {
+        "n": 3150,
+        "false_positive_rate": 0.0178
+      },
+      "H_recovery": {
+        "n": 3150,
+        "true_positive_rate": 0.8956,
+        "miss_rate": 0.1,
+        "early_alarm_rate": 0.0044,
+        "median_detection_delay": 4.0
+      }
+    },
+    "recovery_check": {
+      "n_sessions": 1132.0,
+      "spearman_rho": 0.8275,
+      "mae_percentage_points": 14.2467,
+      "status_accuracy": 0.8021
+    },
+    "num_detector_configs": 5056,
+    "num_drift_score_variants": 5,
+    "num_configs_evaluated": 25280,
+    "eligible_config_found": true,
+    "shards_merged": 1,
+    "base_seed": 42,
+    "grid": "full",
+    "grid_hash": "907e0ee8d7abf95c",
+    "generator_version": "1.0",
+    "lab_version": "1.0.0",
+    "compute_environment": "local workstation",
+    "figures": [
+      "ablation.png",
+      "changepoint_accuracy.png",
+      "detection_by_severity.png",
+      "detection_tradeoff.png",
+      "dropout_robustness.png",
+      "noise_robustness.png",
+      "noise_shift_stress_test.png",
+      "outlier_robustness.png",
+      "parameter_heatmap.png",
+      "personal_vs_population.png",
+      "scenario_examples.png"
+    ]
+  }
+}

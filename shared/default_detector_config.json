@@ -1,0 +1,26 @@
+{
+  "schema": "breakingpoint.detector/v1",
+  "source": "Built-in defaults (pre-validation)",
+  "mode": "combined",
+  "ewma_alpha": 0.4,
+  "cusum_k": 0.5,
+  "cusum_h": 4.0,
+  "warning_threshold": 2.0,
+  "breakpoint_threshold": 2.5,
+  "minimum_persistent_reps": 2,
+  "outlier_clip": 4.0,
+  "z_clip": 6.0,
+  "feature_weighting": "grouped_quality",
+  "missing_feature_handling": "drop",
+  "quality_min": 0.5,
+  "min_coverage": 0.5,
+  "reference": {
+    "mu0_default": 1.0,
+    "sigma0_default": 0.35,
+    "mu0_min": 0.5,
+    "mu0_max": 2.0,
+    "sigma0_min": 0.2,
+    "sigma0_max": 0.8,
+    "sigma0_rel_min": 0.25
+  }
+}

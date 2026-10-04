@@ -1,0 +1,11 @@
+label,color,fpr,miss,median_delay,fpr_lo,fpr_hi,miss_lo,miss_hi,config_id,variant
+BreakingPoint (selected),#E45756,0.021801,0.105608,4.0,0.019621,0.024217,0.099571,0.111966,ewma|a=0.4|bp=2|w=1.5|m=2|clip=2.5,grouped_quality+drop
+Best EWMA+CUSUM,#54A24B,0.018585,0.127725,3.0,0.016578,0.02083,0.121146,0.134606,combined|a=0.5|bp=2.5|k=0.25|h=2|w=1|m=0|clip=3,grouped_quality+drop
+Best EWMA-only,#4C78A8,0.024952,0.113862,3.0,0.022615,0.027523,0.107614,0.120424,ewma|a=0.6|bp=2.5|w=1.5|m=3|clip=3,grouped+drop
+Best CUSUM-only,#F58518,0.02508,0.099894,4.0,0.022737,0.027658,0.09401,0.106104,cusum|k=0.75|h=6|w=1.5|m=3|clip=2.5,grouped_quality+drop
+Best consecutive-threshold,#B279A2,0.022508,0.119471,3.0,0.020292,0.02496,0.113086,0.126166,consecutive|bp=2|n=3,grouped_quality+drop
+Naive single-rep 2σ threshold,#9CA3AF,0.524051,0.01672,1.0,0.516197,0.531894,0.014324,0.019508,consecutive|bp=2|n=1,grouped_quality+drop
+"Selected detector · equal weights, drop",#CBD5E1,0.022637,0.116296,4.0,0.020414,0.025095,0.109988,0.122916,ewma|a=0.4|bp=2|w=1.5|m=2|clip=2.5,equal+drop
+"Selected detector · grouped weights, drop",#CBD5E1,0.022122,0.106138,4.0,0.019926,0.024555,0.100087,0.112509,ewma|a=0.4|bp=2|w=1.5|m=2|clip=2.5,grouped+drop
+"Selected detector · grouped quality weights, impute",#CBD5E1,0.018457,0.111323,4.0,0.016457,0.020694,0.105138,0.117823,ewma|a=0.4|bp=2|w=1.5|m=2|clip=2.5,grouped_quality+impute
+"Selected detector · grouped quality weights, skip rep",#CBD5E1,0.017235,0.148042,4.0,0.015305,0.019403,0.141025,0.155346,ewma|a=0.4|bp=2|w=1.5|m=2|clip=2.5,grouped_quality+skip_rep
