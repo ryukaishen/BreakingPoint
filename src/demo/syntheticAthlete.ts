@@ -10,7 +10,7 @@ import { LM, NUM_LANDMARKS, type Pose } from '../pose/landmarks';
 import { gaussian, mulberry32 } from '../utils/stats';
 
 export interface RepSpec {
-  kind: 'squat' | 'cmj';
+  kind: 'squat' | 'cmj' | 'lunge';
   /** Squat depth scale (1 ≈ parallel). */
   depth: number;
   /** Extra forward trunk lean at the bottom (deg). */
@@ -23,6 +23,8 @@ export interface RepSpec {
   asym: number;
   /** CMJ flight time (s). */
   flight?: number;
+  /** Lunge step-length scale (1 = nominal). */
+  step?: number;
 }
 
 export const FPS = 30;
@@ -49,6 +51,8 @@ interface Kin {
   lift: number; // whole-body vertical lift (CMJ flight), image units
   heel: number; // heel raise (plantarflexion), image units
   arms: number; // arm swing 0..1
+  /** Forward-lunge geometry (both feet planted; legs solved by inverse kinematics). */
+  lunge?: { frontX: number; frontLift: number; hipX: number; drop: number; rearHeel: number };
 }
 
 export class SyntheticAthlete {
@@ -91,7 +95,7 @@ export class SyntheticAthlete {
     if (this.cur) {
       this.tRep += DT;
       const r = this.cur;
-      const res = r.kind === 'squat' ? this.squatKin(r, this.tRep) : this.cmjKin(r, this.tRep);
+      const res = r.kind === 'squat' ? this.squatKin(r, this.tRep) : r.kind === 'lunge' ? this.lungeKin(r, this.tRep) : this.cmjKin(r, this.tRep);
       k = res.kin;
       if (res.done) this.cur = null;
     }
@@ -135,7 +139,117 @@ export class SyntheticAthlete {
     return { kin: base, done: t >= t6 };
   }
 
+  private lungeKin(r: RepSpec, t: number): { kin: Kin; done: boolean } {
+    const S = 0.4 * (r.step ?? 1); // step length (image-height units)
+    const D = 0.17 * r.depth; // hip drop at the bottom
+    const t1 = r.ecc;
+    const t2 = t1 + r.pause;
+    const t3 = t2 + r.conc;
+    const t4 = t3 + r.rest;
+    let foot = 0;
+    let hipX = 0;
+    let p = 0;
+    let lift = 0;
+    if (t < t1) {
+      const u = t / t1;
+      foot = ease(u / 0.45);
+      hipX = ease(u / 0.7);
+      p = ease((u - 0.2) / 0.8);
+      lift = u < 0.45 ? Math.sin((Math.PI * u) / 0.45) : 0;
+    } else if (t < t2) {
+      foot = 1;
+      hipX = 1;
+      p = 1;
+    } else if (t < t3) {
+      const v = (t - t2) / r.conc;
+      p = 1 - ease(v / 0.75);
+      hipX = 1 - ease(v / 0.85);
+      foot = 1 - ease((v - 0.35) / 0.65);
+      lift = v > 0.35 ? Math.sin((Math.PI * (v - 0.35)) / 0.65) : 0;
+    }
+    return {
+      kin: {
+        p, depth: r.depth, trunk: r.trunk, asym: r.asym, lift: 0, heel: 0, arms: 0.35 * p,
+        lunge: { frontX: S * foot, frontLift: 0.035 * lift, hipX: 0.5 * S * hipX, drop: D * p, rearHeel: 0.025 * p },
+      },
+      done: t >= t4,
+    };
+  }
+
+  /** Lunge pose: separate path so squat / CMJ random sequences are untouched. */
+  private lungePose(k: Kin): Pose {
+    const L = k.lunge as NonNullable<Kin['lunge']>;
+    const n = () => gaussian(this.rand) * this.noise;
+    const sway = 0.002 * Math.sin(this.t * 1.7);
+    const legLen = SHANK + THIGH;
+    const hip = { x: L.hipX, y: FLOOR - legLen + L.drop };
+    const hipFar = { x: hip.x + FAR_DX, y: hip.y + FAR_DY };
+    const ik = (ankle: { x: number; y: number }, h: { x: number; y: number }) => {
+      const dx = h.x - ankle.x;
+      const dy = h.y - ankle.y;
+      const d = Math.min(Math.max(Math.hypot(dx, dy), Math.abs(THIGH - SHANK) + 1e-6), legLen - 1e-6);
+      const base = Math.atan2(dy, dx);
+      const a = Math.acos((SHANK * SHANK + d * d - THIGH * THIGH) / (2 * SHANK * d));
+      const c1 = { x: ankle.x + SHANK * Math.cos(base + a), y: ankle.y + SHANK * Math.sin(base + a) };
+      const c2 = { x: ankle.x + SHANK * Math.cos(base - a), y: ankle.y + SHANK * Math.sin(base - a) };
+      return c1.x >= c2.x ? c1 : c2; // knees flex anteriorly
+    };
+    const nearAnkle = { x: L.frontX, y: FLOOR - L.frontLift };
+    const farAnkle = { x: FAR_DX, y: FLOOR + FAR_DY - L.rearHeel };
+    const nearKnee = ik(nearAnkle, hip);
+    let farKnee = ik(farAnkle, hipFar);
+    if (k.asym > 0) {
+      // asymmetry: the rear knee bends less (blend toward the hip-ankle line)
+      const vx = farAnkle.x - hipFar.x;
+      const vy = farAnkle.y - hipFar.y;
+      const tt = ((farKnee.x - hipFar.x) * vx + (farKnee.y - hipFar.y) * vy) / (vx * vx + vy * vy || 1);
+      const proj = { x: hipFar.x + tt * vx, y: hipFar.y + tt * vy };
+      const b = Math.min(0.8, k.asym * 4 * k.p);
+      farKnee = { x: farKnee.x + b * (proj.x - farKnee.x), y: farKnee.y + b * (proj.y - farKnee.y) };
+    }
+    const aTr = rad(4 + k.p * (8 + k.trunk));
+    const sh = { x: hip.x + TRUNK * Math.sin(aTr) + sway, y: hip.y - TRUNK * Math.cos(aTr) };
+    const shFar = { x: sh.x + FAR_DX, y: sh.y + FAR_DY };
+    const head = { x: sh.x + NECK * Math.sin(aTr * 0.6), y: sh.y - NECK * Math.cos(aTr * 0.6) - 0.03 };
+    const armA = rad(10 + k.arms * 45);
+    const arm = (s0: { x: number; y: number }) => {
+      const e = { x: s0.x + UPPER_ARM * Math.sin(armA), y: s0.y + UPPER_ARM * Math.cos(armA) };
+      const w = { x: e.x + FOREARM * Math.sin(armA + rad(12)), y: e.y + FOREARM * Math.cos(armA + rad(12)) };
+      return { e, w };
+    };
+    const armN = arm(sh);
+    const armF = arm(shFar);
+    const vn = () => Math.min(0.995, 0.965 + gaussian(this.rand) * 0.012);
+    const vf = () => Math.min(0.95, 0.8 + gaussian(this.rand) * 0.03);
+    const pts: { x: number; y: number; v: number }[] = Array.from({ length: NUM_LANDMARKS }, () => ({ x: 0, y: 0, v: 0.2 }));
+    const set = (i: number, q: { x: number; y: number }, v: number) => (pts[i] = { x: q.x, y: q.y, v });
+    set(LM.nose, { x: head.x + 0.04, y: head.y + 0.01 }, vn());
+    set(LM.leftEar, { x: head.x - 0.005, y: head.y - 0.004 }, vn());
+    set(LM.rightEar, { x: head.x + FAR_DX - 0.005, y: head.y - 0.004 + FAR_DY }, 0.35);
+    set(LM.leftShoulder, sh, vn());
+    set(LM.rightShoulder, shFar, vf());
+    set(LM.leftElbow, armN.e, vn());
+    set(LM.rightElbow, armF.e, vf() - 0.1);
+    set(LM.leftWrist, armN.w, vn());
+    set(LM.rightWrist, armF.w, vf() - 0.12);
+    set(LM.leftHip, hip, vn());
+    set(LM.rightHip, hipFar, vf());
+    set(LM.leftKnee, nearKnee, vn());
+    set(LM.rightKnee, farKnee, vf());
+    set(LM.leftAnkle, nearAnkle, vn());
+    set(LM.rightAnkle, farAnkle, vf());
+    set(LM.leftHeel, { x: nearAnkle.x - 0.035, y: nearAnkle.y + 0.018 }, vn());
+    set(LM.rightHeel, { x: farAnkle.x - 0.035, y: farAnkle.y + 0.018 - L.rearHeel * 0.6 }, vf());
+    set(LM.leftFoot, { x: nearAnkle.x + 0.075, y: nearAnkle.y + 0.022 }, vn());
+    set(LM.rightFoot, { x: farAnkle.x + 0.075, y: FLOOR + FAR_DY + 0.022 }, vf());
+    for (let i = 1; i <= 10; i++) if (i !== 7 && i !== 8) pts[i] = { x: head.x + 0.02, y: head.y, v: 0.3 };
+    for (const i of [17, 18, 19, 20, 21, 22]) pts[i] = { ...(i % 2 ? armN.w : armF.w), v: 0.4 };
+    const cx = 0.2; // keep the stepping athlete centred
+    return pts.map((q) => ({ x: 0.5 + (q.x - cx) / this.aspect + n(), y: q.y + n(), visibility: q.v }));
+  }
+
   private pose(k: Kin): Pose {
+    if (k.lunge) return this.lungePose(k);
     const n = () => gaussian(this.rand) * this.noise;
     const sway = 0.0025 * Math.sin(this.t * 1.7);
     const pts: { x: number; y: number; v: number }[] = Array.from({ length: NUM_LANDMARKS }, () => ({ x: 0, y: 0, v: 0.2 }));

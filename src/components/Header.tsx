@@ -1,15 +1,17 @@
-import type { ExerciseType } from '../biomechanics/catalog';
+import type { LaunchContext } from '../protocols/launch';
 import type { Snapshot } from '../session/engine';
 import { Book, Flask, LogoMark, Reset } from './Icons';
+import { SportIcon } from './SportIcons';
 
 interface Props {
-  view: 'landing' | 'session';
+  view: 'landing' | 'sport' | 'session';
   snap: Snapshot | null;
   mode: 'demo' | 'live';
-  exercise: ExerciseType;
+  launch: LaunchContext;
   athlete: string;
   onHome: () => void;
-  onExercise: (e: ExerciseType) => void;
+  onChangeProtocol: () => void;
+  onLibrary: () => void;
   onAthlete: (name: string) => void;
   onResearch: () => void;
   onLab: () => void;
@@ -32,7 +34,7 @@ function Stepper({ snap }: { snap: Snapshot }) {
           {i > 0 && <span className="step-sep" />}
           <span className={`step ${s.active ? 'active' : ''} ${s.done && !s.active ? 'done' : ''}`}>
             <span className="num">{s.done && !s.active ? '✓' : s.n}</span>
-            {s.label}
+            <span className="lbl">{s.label}</span>
           </span>
         </div>
       ))}
@@ -52,14 +54,20 @@ export function Header(p: Props) {
         <span className="brand-tag">EDGE</span>
       </div>
       <div className="header-center">
-        <div className="seg" role="tablist" aria-label="Exercise">
-          <button className={p.exercise === 'squat' ? 'active' : ''} disabled={locked} onClick={() => p.onExercise('squat')} title="Bodyweight squat">
-            Squat
+        {p.view === 'session' && (
+          <button
+            className="context-chip"
+            onClick={p.onChangeProtocol}
+            disabled={locked}
+            title={locked ? 'Finish or end the set to change protocol' : 'Change sport or protocol'}
+          >
+            <SportIcon id={p.launch.sport.icon} size={18} />
+            <span className="cc-sport">{p.launch.contextName}</span>
+            <span className="cc-sep">·</span>
+            <span className="cc-proto">{p.launch.title}</span>
+            {p.launch.status === 'BETA' && <span className="status-badge beta">beta</span>}
           </button>
-          <button className={p.exercise === 'cmj' ? 'active' : ''} disabled={locked} onClick={() => p.onExercise('cmj')} title="Countermovement jump">
-            Jump (CMJ)
-          </button>
-        </div>
+        )}
         {p.view === 'session' && p.snap && <Stepper snap={p.snap} />}
       </div>
       <div className="header-right">
@@ -70,9 +78,12 @@ export function Header(p: Props) {
           </span>
         )}
         <label className="row hide-sm" style={{ gap: 4 }} title="Athlete name (stored only on this device)">
-          <span className="muted" style={{ fontSize: 12 }}>Athlete</span>
+          <span className="muted athlete-lbl" style={{ fontSize: 12 }}>Athlete</span>
           <input className="name-input" value={p.athlete} maxLength={18} onChange={(e) => p.onAthlete(e.target.value)} />
         </label>
+        <button className="btn ghost sm hide-sm" onClick={p.onLibrary} title="Movement protocol library">
+          Protocols
+        </button>
         <button className="btn ghost sm hide-sm" onClick={p.onLab} title="BreakingPoint Lab validation">
           <Flask size={15} /> Lab
         </button>
@@ -81,7 +92,7 @@ export function Header(p: Props) {
         </button>
         {p.view === 'session' && (
           <button className="btn ghost sm hide-sm" onClick={p.onResetBaseline} title="Clear the personal baseline and recalibrate">
-            <Reset size={15} /> Reset baseline
+            <Reset size={15} />
           </button>
         )}
       </div>

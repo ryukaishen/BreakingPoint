@@ -1,6 +1,9 @@
 import type { Baseline } from '../baseline/baseline';
-import { featureSpecs, formatFeatureValue, formatWithUnit, specFor, type ExerciseType } from '../biomechanics/catalog';
+import { featureSpecs, formatFeatureValue, formatWithUnit, type ExerciseType } from '../biomechanics/catalog';
 import type { FeatureDeviation } from '../detection/driftScore';
+import { useLabels } from '../protocols/labels';
+import type { LaunchContext } from '../protocols/launch';
+import { sessionPattern } from '../protocols/patterns';
 import type { RepRecord, Snapshot } from '../session/engine';
 import { RECOVERY_REPS } from '../session/engine';
 import { arrow, fmt, fmtSigma, pct, STATE_CLASS, STATE_COLOR, STATE_LABEL } from '../utils/format';
@@ -9,6 +12,7 @@ import { Check, Close } from './Icons';
 interface Props {
   snap: Snapshot;
   mode: 'demo' | 'live';
+  launch: LaunchContext;
   selectedRep: number | null;
   onSelectRep: (r: number | null) => void;
   savedBaseline: Baseline | null;
@@ -29,19 +33,19 @@ function zColor(z: number) {
 }
 
 export function Contributors({ devs, exercise, max = 4 }: { devs: FeatureDeviation[]; exercise: ExerciseType; max?: number }) {
+  const L = useLabels(exercise);
   if (!devs.length) return <div className="muted" style={{ fontSize: 13 }}>No scored features yet.</div>;
   return (
     <div className="contrib-list">
       {devs.slice(0, max).map((d, i) => {
-        const spec = specFor(exercise, d.key);
         const z = d.zClipped ?? 0;
         const w = Math.min(50, (Math.abs(z) / 4) * 50);
         return (
           <div className="contrib-row" key={d.key}>
             <span className="rank">{i + 1}</span>
             <span className="name">
-              {spec?.short ?? d.key}
-              <small>{z > 0 ? spec?.upWord : spec?.downWord}</small>
+              {L.short(d.key)}
+              <small>{z > 0 ? L.up(d.key) : L.down(d.key)}</small>
             </span>
             <span className="zbar">
               <span className="mid" />
@@ -58,6 +62,7 @@ export function Contributors({ devs, exercise, max = 4 }: { devs: FeatureDeviati
 }
 
 export function BaselineTable({ baseline, exercise }: { baseline: Baseline; exercise: ExerciseType }) {
+  const L = useLabels(exercise);
   return (
     <table className="baseline-table">
       <thead>
@@ -72,7 +77,7 @@ export function BaselineTable({ baseline, exercise }: { baseline: Baseline; exer
           const b = baseline.features[s.key];
           return (
             <tr key={s.key}>
-              <td>{s.short}</td>
+              <td>{L.short(s.key)}</td>
               {b ? (
                 <>
                   <td className="num">{formatWithUnit(s, b.center)}</td>
@@ -130,6 +135,7 @@ function Gauge({ label, value, max, ticks, color, valueText }: { label: string; 
 
 function RepDetail({ rep, baseline, exercise, onClose }: { rep: RepRecord; baseline: Baseline | null; exercise: ExerciseType; onClose: () => void }) {
   const st = rep.step;
+  const L = useLabels(exercise);
   return (
     <div className="panel rep-detail">
       <div className="panel-title">
@@ -162,7 +168,7 @@ function RepDetail({ rep, baseline, exercise, onClose }: { rep: RepRecord; basel
         const b = baseline?.features[s.key];
         return (
           <div className="feat" key={s.key}>
-            <span>{s.short}</span>
+            <span>{L.short(s.key)}</span>
             <span className="num">{formatWithUnit(s, rep.features.values[s.key])}</span>
             <span className="num muted">{b ? formatFeatureValue(s, b.center) : '—'}</span>
             <span className="num" style={{ color: d?.used ? zColor(d.zClipped ?? 0) : '#556072' }}>
@@ -191,7 +197,7 @@ function SetupView(p: Props) {
           <li>
             <span className="ic">1</span>
             <span>
-              Stand <b>side-on</b>, roughly 30–45° to the camera (your left or right side facing it).
+              <b>{p.launch.title}</b> · {p.launch.protocol.camera}.
             </span>
           </li>
           <li>
@@ -209,7 +215,8 @@ function SetupView(p: Props) {
       <div className="panel">
         <div className="panel-title">Step 1 · Learn your baseline</div>
         <p className="muted" style={{ marginTop: 0, fontSize: 13 }}>
-          Perform 5–8 controlled reps at your normal tempo while fresh. BreakingPoint learns how <b>you</b> move — not an "ideal" form.
+          Perform 5–8 controlled {p.launch.primitive.name.toLowerCase()} reps at your normal tempo while fresh. BreakingPoint learns how <b>you</b> move — not an
+          "ideal" form.
         </p>
         <div className="col">
           <button className="btn primary lg block" onClick={p.onStartCalibration}>
@@ -244,7 +251,7 @@ function CalibratingView(p: Props) {
       <div className="rep-chips" style={{ marginTop: 14 }}>
         {s.calibrationReps.map((r) => (
           <span className="rep-chip" key={r.index}>
-            #{r.index} · {s.exercise === 'squat' ? `depth ${((r.features.values.depth ?? 0) * 100).toFixed(0)}%` : `jump ${((r.features.values.jumpHeight ?? 0) * 100).toFixed(0)}%`} · {(r.tEnd - r.tStart).toFixed(1)}s
+            #{r.index} · {s.exercise === 'cmj' ? `jump ${((r.features.values.jumpHeight ?? 0) * 100).toFixed(0)}%` : `depth ${((r.features.values.depth ?? 0) * 100).toFixed(0)}%`} · {(r.tEnd - r.tStart).toFixed(1)}s
           </span>
         ))}
         {!s.calibrationReps.length && <span className="muted" style={{ fontSize: 12.5 }}>Waiting for the first rep…</span>}
@@ -310,6 +317,7 @@ function MonitorView(p: Props) {
   const frozen = s.breakpointContributors;
   const devs = frozen ?? lastScored?.drift?.ranked ?? [];
   const mode = s.config.mode;
+  const pattern = state !== 'STABLE' ? sessionPattern(s.exercise, s.monitorReps, s.onsetRep ?? s.firstWarnRep, s.baseline?.reference.sigma0, p.launch.patternLabels) : null;
   const triggerText =
     mode === 'ewma'
       ? `Triggers when smoothed drift (EWMA) crosses ${fmt(th?.breakpointLevel)} after ≥${s.config.minimumPersistentReps} elevated reps`
@@ -329,6 +337,12 @@ function MonitorView(p: Props) {
         <div className="eyebrow">Movement state {last ? `· rep ${last.index}` : ''}</div>
         <div className="state-label">{state === 'BREAKPOINT' ? 'BREAKING POINT DETECTED' : STATE_LABEL[state]}</div>
         <div className="state-sub">{sub}</div>
+        {pattern && (
+          <div className="pattern-line" title={pattern.explain}>
+            <span className="k">Movement pattern</span>
+            <span className="pattern-tag">{pattern.label}</span>
+          </div>
+        )}
       </div>
 
       <div className="panel">
@@ -373,6 +387,8 @@ function MonitorView(p: Props) {
         <Contributors devs={devs} exercise={s.exercise} />
       </div>
 
+      <FocusPanel snap={s} launch={p.launch} />
+
       {p.mode === 'live' && (
         <button className="btn danger block" onClick={p.onEndSet} disabled={!s.monitorReps.length}>
           End set & view summary
@@ -382,8 +398,37 @@ function MonitorView(p: Props) {
   );
 }
 
+/** Sport-featured metrics for the latest scored rep (display only; ranking above stays by |z|). */
+function FocusPanel({ snap, launch }: { snap: Snapshot; launch: LaunchContext }) {
+  const L = useLabels(snap.exercise);
+  const last = [...snap.monitorReps].reverse().find((r) => r.drift?.score !== null && r.drift?.score !== undefined);
+  return (
+    <div className="panel">
+      <div className="panel-title">
+        <span>{launch.contextName} focus metrics</span>
+        {last && <span className="dim">rep {last.index}</span>}
+      </div>
+      <div className="focus-grid">
+        {launch.focus.map((k) => {
+          const d = last?.drift?.deviations.find((x) => x.key === k);
+          const z = d?.used ? (d.zClipped ?? 0) : null;
+          return (
+            <div key={k} className="focus-cell">
+              <span className="fk">{L.short(k)}</span>
+              <span className="fz mono" style={{ color: z === null ? '#556072' : zColor(z) }}>
+                {z === null ? '—' : `${fmtSigma(z)} ${arrow(z)}`}
+              </span>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 function SummaryView(p: Props) {
   const s = p.snap;
+  const pattern = s.alarmRep !== null ? sessionPattern(s.exercise, s.monitorReps, s.onsetRep, s.baseline?.reference.sigma0, p.launch.patternLabels) : null;
   return (
     <>
       <div className={`state-card ${STATE_CLASS[s.state]}`}>
@@ -391,6 +436,12 @@ function SummaryView(p: Props) {
         <div className="state-label" style={{ fontSize: 30 }}>
           {s.alarmRep !== null ? `BREAKING POINT · REP ${s.alarmRep}` : 'NO BREAKING POINT'}
         </div>
+        {pattern && (
+          <div className="pattern-line" title={pattern.explain}>
+            <span className="k">Movement pattern</span>
+            <span className="pattern-tag">{pattern.label}</span>
+          </div>
+        )}
         <div className="state-sub">
           {s.alarmRep !== null ? 'Take a recovery period, then run a 3-rep recovery check against your original baseline.' : 'Movement stayed within your personal baseline.'}
         </div>

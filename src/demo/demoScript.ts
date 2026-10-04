@@ -19,6 +19,7 @@ export const DEMO_CALIBRATION_REPS = 6;
 export const DEMO_PRESETS: Record<ExerciseType, { seed: number; effect: number }> = {
   squat: { seed: 43, effect: 0.55 },
   cmj: { seed: 28, effect: 0.65 },
+  lunge: { seed: 1, effect: 0.6 },
 };
 export const DEMO_SEED = DEMO_PRESETS.squat.seed;
 export const DEMO_EFFECT = DEMO_PRESETS.squat.effect;
@@ -56,6 +57,28 @@ function cmjRep(f: number, rand: () => number): RepSpec {
   };
 }
 
+function lungeRep(f: number, rand: () => number): RepSpec {
+  const j = () => gaussian(rand);
+  return {
+    kind: 'lunge',
+    depth: (1 - 0.12 * f) * (1 + 0.015 * j()),
+    trunk: 9 * f + 0.7 * j(),
+    ecc: 0.95 * (1 + 0.03 * j()),
+    conc: 0.85 * (1 + 0.45 * f) * (1 + 0.03 * j()),
+    pause: 0.1 + 0.02 * j(),
+    rest: 0.8 + 0.08 * j(),
+    asym: Math.max(0, 0.05 * f + 0.004 * j()),
+    step: (1 - 0.06 * f) * (1 + 0.012 * j()),
+  };
+}
+
+/** Exposed for tests: build a single synthetic rep at a given fatigue level. */
+export const MAKE_REP: Record<ExerciseType, (f: number, rand: () => number) => RepSpec> = {
+  squat: squatRep,
+  cmj: cmjRep,
+  lunge: lungeRep,
+};
+
 export interface DemoPlan {
   calibration: RepSpec[];
   monitoring: RepSpec[];
@@ -65,7 +88,7 @@ export interface DemoPlan {
 /** `effect` scales how strongly fatigue changes the synthetic athlete's movement. */
 export function demoPlan(exercise: ExerciseType, seed = DEMO_PRESETS[exercise].seed, effect = DEMO_PRESETS[exercise].effect): DemoPlan {
   const rand = mulberry32(seed);
-  const make = exercise === 'squat' ? squatRep : cmjRep;
+  const make = MAKE_REP[exercise];
   return {
     calibration: Array.from({ length: DEMO_CALIBRATION_REPS }, () => make(0, rand)),
     monitoring: DEMO_FATIGUE.map((f) => make(f * effect, rand)),

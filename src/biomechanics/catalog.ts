@@ -1,6 +1,7 @@
 import catalogJson from '../../shared/feature_catalog.json';
 
-export type ExerciseType = 'squat' | 'cmj';
+/** Engine-level movement primitives that are implemented (see src/protocols/primitives.ts). */
+export type ExerciseType = 'squat' | 'cmj' | 'lunge';
 
 export interface FeatureSpec {
   key: string;

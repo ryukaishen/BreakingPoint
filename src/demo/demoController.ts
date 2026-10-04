@@ -26,10 +26,11 @@ export class DemoController {
     aspect = 16 / 9,
     seed = DEMO_PRESETS[exercise].seed,
     effect = DEMO_PRESETS[exercise].effect,
+    plan?: DemoPlan,
   ) {
     this.athlete = new SyntheticAthlete(seed, aspect);
     this.pipeline = new PosePipeline(engine, aspect);
-    this.plan = demoPlan(exercise, seed, effect);
+    this.plan = plan ?? demoPlan(exercise, seed, effect);
     engine.setCalibrationTarget(DEMO_CALIBRATION_REPS);
   }
 

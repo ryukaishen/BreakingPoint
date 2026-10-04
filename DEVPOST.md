@@ -2,8 +2,12 @@
 
 **Detect the rep where fatigue starts changing how you move and POINTS where you BREAK!**
 
-BreakingPoint uses ordinary camera video to learn an athlete's personal movement baseline and applies sequential
-change-point detection to identify the moment fatigue begins causing persistent biomechanical drift.
+**Your movement. Your baseline.** BreakingPoint is a personalized movement-monitoring platform for athletes. It uses
+ordinary camera video to learn an athlete's personal movement baseline and applies sequential change-point detection to
+identify the moment fatigue begins causing persistent biomechanical drift. Sports plug in through reusable movement
+protocols.
+
+> BreakingPoint doesn't ask whether you move like the ideal athlete. It asks whether you still move like yourself.
 
 Built for the University of Florida Dream Team Engineering Designathon 2026 — Software Competition.
 
@@ -33,16 +37,21 @@ risk-monitoring mindset (personal baseline, anomaly score, sequential detection)
 
 BreakingPoint turns a laptop or phone camera into a personalized movement-monitoring tool.
 
-1. **Calibrate.** The athlete does 5–8 fresh reps (bodyweight squat or countermovement jump), standing side-on.
-   BreakingPoint learns **their** baseline for every measurement: knee and hip range of motion, depth, trunk lean,
-   rep / descent / ascent time, extension velocity, and left/right asymmetry (CMJ: jump height, RSI-mod, flight time,
-   dip depth, landing flexion…).
+0. **What do you play?** The athlete picks a sport, and BreakingPoint recommends a repeatable movement protocol.
+   Examples: Soccer → *Explosive Fatigue Screen* (repeated countermovement jump); Volleyball → *Jump Consistency*;
+   Pickleball / Tennis / Badminton → *Forward Lunge Endurance*; Strength → *Bodyweight Squat*.
+1. **Calibrate.** The athlete does 5–8 fresh reps of that protocol. BreakingPoint learns **their** baseline for every
+   measurement: knee and hip range of motion, depth, trunk lean, rep / descent / ascent time, extension velocity, and
+   left/right asymmetry (CMJ: jump height, RSI-mod, flight time, dip depth, landing flexion; lunge: step length, lunge
+   depth, recovery time and velocity…).
 2. **Monitor.** During the set, every rep is detected automatically and scored with a transparent **Movement Drift
    Score**: how many standard deviations, on average, this rep sits from the athlete's own baseline.
 3. **Detect.** A sequential detector (EWMA with persistence; CUSUM tracks the onset) ignores one weird rep but fires
    when drift **persists**. The screen moves from STABLE to DRIFT EMERGING to **BREAKING POINT DETECTED — Rep 10**.
-4. **Explain.** "Why did you flag me?" BreakingPoint ranks what changed: *right knee ROM −4.5σ ↓, trunk lean +3.5σ ↑,
-   velocity −3.5σ ↓*. On the skeleton it highlights the segments that changed.
+4. **Explain.** "Why did you flag me?" BreakingPoint ranks what changed, in the sport's own terms, and names the
+   pattern. Soccer demo: **EXPLOSIVE FATIGUE**: *explosive velocity (RSI-mod) −4.9σ ↓, jump height −3.5σ ↓, flight
+   time −2.9σ ↓*. Pickleball demo: **RECOVERY SLOWING**: *push-back speed −3.8σ ↓, trunk lean +2.2σ ↑*. Pattern
+   labels describe movement change and are never diagnoses. On the skeleton it highlights the segments that changed.
 5. **Report and recover.** A session summary (stable reps, post-breaking-point reps, average drift before and after,
    largest mechanical drift), JSON/CSV export, and a **recovery check**: after rest, three reps are compared with the
    original baseline. Example: "Movement has returned 83 % toward baseline."
@@ -52,7 +61,23 @@ normal band, warning and breaking-point levels, a smoothed EWMA line, a CUSUM ev
 for the estimated drift onset and the detected breaking point.
 
 A deterministic **Demo Mode** (clearly labeled "Demo dataset · synthetic athlete") runs a synthetic athlete's
-landmarks through the exact same pipeline, so the judging demo never depends on camera conditions.
+landmarks through the exact same pipeline, so the judging demo never depends on camera conditions. Demo contexts:
+Soccer (repeated CMJ), Volleyball (repeated jump), Strength (squat) and Pickleball (forward lunge, beta), each with an
+athlete card (sport · protocol · session).
+
+### A platform: many sports, few primitives, one detector
+
+| | status | what it means |
+|---|---|---|
+| **Bodyweight Squat** (`SQUAT`) | **IMPLEMENTED** · ready | reference protocol (Strength) |
+| **Repeated Countermovement Jump** (`JUMP_AND_LAND`) | **IMPLEMENTED** · ready | Soccer · Basketball · Volleyball · Gymnastics · Field sports |
+| **Forward Lunge** (`FORWARD_LUNGE`) | **BETA** | Pickleball · Tennis · Badminton · Fencing · Strength. Works end to end on deterministic data and in tests; real-camera reliability is still being validated |
+| Single-leg hop / landing, change-of-direction, defensive shuffle, approach jump, landing screen, lateral & deep lunge, split-step, deadlift, kendo fumikomi / forward attack, repeated kick | **FUTURE** (coming soon) | listed in the protocol library; cannot be launched |
+| Running gait (consistency, stride asymmetry, repeated steps) | **FUTURE** | needs longer continuous temporal modelling than discrete reps |
+| **Create your own protocol** | **FUTURE** | a coach records clean reps of any repeatable movement; BreakingPoint learns the athlete's distribution |
+
+The sport changes which repeatable movement is monitored, which metrics are featured, and what the UI calls things.
+The personal baseline, drift score and sequential detector stay the same, with the same validated parameters.
 
 ## How we built it
 
@@ -62,8 +87,12 @@ landmarks through the exact same pipeline, so the judging demo never depends on 
 - **MediaPipe Pose Landmarker** (WASM/WebGL, GPU with CPU fallback). Model and runtime ship with the app, so it works
   offline.
 - **One Euro filter** landmark smoothing; aspect-corrected 2D kinematics; per-frame capture quality.
+- **Sport → protocol → primitive layer** (`src/protocols/`): centralized sport profiles, protocol definitions with
+  READY / BETA / COMING_SOON / FUTURE status, and a single launch resolver that refuses roadmap protocols and never
+  touches detector parameters.
 - **Rep segmentation**: a debounced state machine on hip drop normalized by the athlete's own leg length
-  (STANDING → DESCENDING → BOTTOM → ASCENDING). CMJ adds takeoff/flight/landing detection.
+  (STANDING → DESCENDING → BOTTOM → ASCENDING). The forward lunge reuses it (READY → DESCENT → BOTTOM → RECOVERY,
+  plus step tracking). CMJ adds takeoff/flight/landing detection.
 - **Per-rep features with quality scores**; low-confidence features are dropped, and reps with too little usable
   signal are *not scored* rather than reported with false precision.
 - **Personal baseline** (median + robust scale with camera noise floors) and an **athlete-specific in-control
@@ -95,9 +124,10 @@ The architecture deliberately separates **real-time inference** (on-device, low 
 hardware or connectivity) from **large-scale offline validation** (HPC, CPU-parallel, reproducible).
 
 ```
+Sport profile → movement protocol → movement primitive (selects segmenter + features; terminology for the UI)
 Camera / Demo landmarks → One Euro smoothing → frame kinematics → rep segmentation → per-rep features (+quality)
       → personal baseline (median, robust scale, LOO reference) → Movement Drift Score → EWMA/CUSUM detector
-      → state · explanations · Form Drawdown · summary · recovery
+      → state · movement pattern · explanations · Form Drawdown · summary · recovery
 
 Synthetic athletes (8 scenarios) → vectorized baseline + drift → 25,280 detector configs (Slurm array shards)
       → merge · selection rule · held-out metrics · robustness · figures → breakingpoint_detector_config.json → app
@@ -106,6 +136,10 @@ Synthetic athletes (8 scenarios) → vectorized baseline + drift → 25,280 dete
 One feature catalog (`shared/feature_catalog.json`) drives both languages, and a **cross-language parity test**
 replays Lab sessions through the app's TypeScript and requires identical results, so the Lab validates exactly the
 detector the athlete runs.
+
+The detector is calibrated at the movement-signal level, while individual sport protocols determine which repeatable
+movement and features are monitored. Current validation evaluates detector behaviour under controlled synthetic
+movement drift; it does not clinically validate any listed sport. Sport-specific clinical validation is future work.
 
 ## Statistical methodology
 
@@ -163,6 +197,10 @@ athlete entered a persistently different movement regime?"**
   divergence.
 - **A demo that can't fail.** We built a procedural synthetic athlete that emits real landmark streams, so the demo
   exercises the full pipeline deterministically.
+- **Going multi-sport without faking it.** A sport list is easy to fake. We built a configuration layer where only
+  READY/BETA protocols on implemented primitives can launch (tested), kept detector parameters out of sport profiles
+  (tested), and added the forward lunge as a real primitive. Its synthetic athlete uses inverse kinematics on a separate
+  code path, so the existing squat/CMJ demos stayed byte-identical.
 
 ## Accomplishments that we're proud of
 
@@ -174,7 +212,9 @@ athlete entered a persistently different movement regime?"**
   detection rate with a personal baseline.
 - Exact, mergeable HPC shards (counts and integer histograms), seeded per Slurm array index, which tolerate task
   failures.
-- 45 automated tests, including cross-language parity and an end-to-end demo-story test.
+- One validated detector serving three movement primitives and over a dozen sport contexts, with no per-sport models.
+- 70 automated tests (53 TypeScript + 17 Python), including cross-language parity, end-to-end demo stories for squat, jump
+  and lunge, and guards that roadmap protocols cannot launch.
 - Scientific restraint: clear limits on what we do and don't claim.
 
 ## What we learned
@@ -189,6 +229,11 @@ athlete entered a persistently different movement regime?"**
 
 ## What's next
 
+- **More primitives** for the roadmap protocols: lateral movement / change-of-direction, single-leg hop and landing,
+  gait cycle (running), hip hinge (deadlift), strike step (kendo), kick (kickboxing). Also: harden the forward lunge
+  from beta to ready with real recordings.
+- **Create your own protocol:** a coach records several clean reps of any repeatable movement; BreakingPoint segments
+  them, learns the athlete's movement distribution, and monitors for persistent drift.
 - **Longitudinal fatigue model:** combine movement with wearable HR/HRV, training load, sleep, athlete-reported RPE,
   and prior sessions.
 - **Team / coach dashboard:** "Adam is reaching his breaking point significantly earlier than his 14-day baseline."
@@ -207,8 +252,8 @@ detector's statistical behaviour under controlled conditions. Video never leaves
 
 ```bash
 npm install            # installs deps, copies the MediaPipe runtime, downloads the pose model
-npm run dev            # http://localhost:5173  (demo: http://localhost:5173/?demo=1)
-npm test               # 28 TypeScript tests (detector, TS↔Python parity, demo story)
+npm run dev            # http://localhost:5173  (demos: ?demo=soccer | volleyball | strength | pickleball)
+npm test               # 53 TypeScript tests (detector, parity, demo stories, sport/protocol layer, lunge)
 ```
 
 BreakingPoint Lab:

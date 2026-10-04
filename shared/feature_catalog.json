@@ -22,13 +22,29 @@
       "features": [
         { "key": "jumpHeight", "label": "Jump height (hip rise)", "short": "Jump height", "unit": "% leg", "displayScale": 100, "decimals": 1, "group": "output", "weight": 1.0, "absFloor": 0.015, "relFloor": 0.05, "upWord": "higher jump", "downWord": "lower jump" },
         { "key": "rsiMod", "label": "Reactive strength index (modified)", "short": "RSI-mod", "unit": "", "displayScale": 1, "decimals": 2, "group": "output", "weight": 1.0, "absFloor": 0.02, "relFloor": 0.06, "upWord": "more explosive", "downWord": "less explosive" },
-        { "key": "flightTime", "label": "Flight time", "short": "Flight", "unit": "s", "displayScale": 1, "decimals": 3, "group": "output", "weight": 0.5, "absFloor": 0.02, "relFloor": 0.04, "upWord": "longer flight", "downWord": "shorter flight" },
+        { "key": "flightTime", "label": "Flight time", "short": "Flight time", "unit": "s", "displayScale": 1, "decimals": 3, "group": "output", "weight": 0.5, "absFloor": 0.02, "relFloor": 0.04, "upWord": "longer flight", "downWord": "shorter flight" },
         { "key": "countermovementDepth", "label": "Countermovement depth", "short": "CM depth", "unit": "% leg", "displayScale": 100, "decimals": 1, "group": "strategy", "weight": 0.75, "absFloor": 0.02, "relFloor": 0.05, "upWord": "deeper dip", "downWord": "shallower dip" },
         { "key": "eccentricDuration", "label": "Unweighting + braking duration", "short": "Dip time", "unit": "s", "displayScale": 1, "decimals": 2, "group": "strategy", "weight": 0.5, "absFloor": 0.04, "relFloor": 0.05, "upWord": "slower dip", "downWord": "faster dip" },
         { "key": "concentricDuration", "label": "Propulsion duration", "short": "Propulsion", "unit": "s", "displayScale": 1, "decimals": 2, "group": "strategy", "weight": 0.5, "absFloor": 0.03, "relFloor": 0.05, "upWord": "slower push", "downWord": "faster push" },
         { "key": "trunkLean", "label": "Peak trunk lean", "short": "Trunk lean", "unit": "°", "displayScale": 1, "decimals": 1, "group": "strategy", "weight": 0.75, "absFloor": 2.0, "relFloor": 0.05, "upWord": "more forward lean", "downWord": "more upright" },
         { "key": "landingKneeFlex", "label": "Landing knee flexion", "short": "Landing flex", "unit": "°", "displayScale": 1, "decimals": 0, "group": "landing", "weight": 0.75, "absFloor": 3.0, "relFloor": 0.04, "upWord": "softer landing", "downWord": "stiffer landing" },
         { "key": "asymmetry", "label": "L/R knee ROM asymmetry", "short": "L/R asymmetry", "unit": "°", "displayScale": 1, "decimals": 1, "group": "symmetry", "weight": 0.5, "absFloor": 2.0, "relFloor": 0.0, "upWord": "more asymmetric", "downWord": "more symmetric" }
+      ]
+    },
+    "lunge": {
+      "label": "Forward Lunge",
+      "features": [
+        { "key": "kneeRomL", "label": "Left knee flexion ROM", "short": "L knee ROM", "unit": "°", "displayScale": 1, "decimals": 0, "group": "depth", "weight": 0.5, "absFloor": 2.5, "relFloor": 0.03, "upWord": "more knee bend", "downWord": "less knee bend" },
+        { "key": "kneeRomR", "label": "Right knee flexion ROM", "short": "R knee ROM", "unit": "°", "displayScale": 1, "decimals": 0, "group": "depth", "weight": 0.5, "absFloor": 2.5, "relFloor": 0.03, "upWord": "more knee bend", "downWord": "less knee bend" },
+        { "key": "hipRom", "label": "Lead hip flexion ROM", "short": "Hip ROM", "unit": "°", "displayScale": 1, "decimals": 0, "group": "depth", "weight": 0.5, "absFloor": 2.5, "relFloor": 0.03, "upWord": "more hip flexion", "downWord": "less hip flexion" },
+        { "key": "depth", "label": "Lunge depth (hip drop)", "short": "Lunge depth", "unit": "% leg", "displayScale": 100, "decimals": 1, "group": "depth", "weight": 0.5, "absFloor": 0.02, "relFloor": 0.05, "upWord": "deeper", "downWord": "shallower" },
+        { "key": "stepLength", "label": "Step length", "short": "Step length", "unit": "% leg", "displayScale": 100, "decimals": 0, "group": "depth", "weight": 0.5, "absFloor": 0.03, "relFloor": 0.04, "upWord": "longer step", "downWord": "shorter step" },
+        { "key": "trunkLean", "label": "Peak trunk lean", "short": "Trunk lean", "unit": "°", "displayScale": 1, "decimals": 1, "group": "trunk", "weight": 1.0, "absFloor": 2.0, "relFloor": 0.05, "upWord": "more forward lean", "downWord": "more upright" },
+        { "key": "repDuration", "label": "Rep duration", "short": "Rep time", "unit": "s", "displayScale": 1, "decimals": 2, "group": "tempo", "weight": 0.5, "absFloor": 0.08, "relFloor": 0.04, "upWord": "slower rep", "downWord": "faster rep" },
+        { "key": "eccentricDuration", "label": "Descent duration", "short": "Descent", "unit": "s", "displayScale": 1, "decimals": 2, "group": "tempo", "weight": 0.5, "absFloor": 0.06, "relFloor": 0.05, "upWord": "slower descent", "downWord": "faster descent" },
+        { "key": "concentricDuration", "label": "Recovery duration", "short": "Recovery time", "unit": "s", "displayScale": 1, "decimals": 2, "group": "tempo", "weight": 0.5, "absFloor": 0.06, "relFloor": 0.05, "upWord": "slower recovery", "downWord": "faster recovery" },
+        { "key": "recoveryVelocity", "label": "Peak recovery velocity (hip rise)", "short": "Recovery velocity", "unit": "leg/s", "displayScale": 1, "decimals": 2, "group": "tempo", "weight": 0.5, "absFloor": 0.05, "relFloor": 0.06, "upWord": "faster push-back", "downWord": "slower push-back" },
+        { "key": "asymmetry", "label": "L/R knee ROM difference", "short": "L/R difference", "unit": "°", "displayScale": 1, "decimals": 1, "group": "symmetry", "weight": 0.75, "absFloor": 2.0, "relFloor": 0.0, "upWord": "larger L/R difference", "downWord": "smaller L/R difference" }
       ]
     }
   }

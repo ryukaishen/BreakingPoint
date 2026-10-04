@@ -121,3 +121,71 @@ export function cmjFeatures(w: RepWindow): RepFeatures {
     },
   };
 }
+
+/** Peak rate of hip rise during recovery, in leg lengths per second (from the normalized hip-drop series). */
+function peakRiseVelocity(w: RepWindow): [number | null, number] {
+  const pts = w.frames.map((f, i) => ({ t: f.t, d: w.depth[i] })).filter((p) => p.t >= w.tBottom - 0.05);
+  if (pts.length < 5) return [null, 0];
+  const v: number[] = [];
+  for (let i = 1; i < pts.length - 1; i++) {
+    const dt = pts[i + 1].t - pts[i - 1].t;
+    if (dt > 0) v.push(-(pts[i + 1].d - pts[i - 1].d) / dt);
+  }
+  const sm = v.map((_, i) => meanOf(v.slice(Math.max(0, i - 1), i + 2)));
+  return [Math.max(...sm), 1];
+}
+
+/**
+ * Forward lunge (BETA). Lead leg = the foot that travels during the rep. Step length is
+ * the maximum ankle separation normalized by leg length; recovery velocity is the peak
+ * hip-rise rate on the way back to the ready position.
+ */
+export function lungeFeatures(w: RepWindow): RepFeatures {
+  const f = w.frames;
+  const visL = meanOf(f.map((x) => x.visL));
+  const visR = meanOf(f.map((x) => x.visR));
+  const visT = meanOf(f.map((x) => x.visTrunk));
+  const q = meanOf(f.map((x) => x.quality));
+  const [kL, qL] = rom(f, 'kneeFlexL', visL);
+  const [kR, qR] = rom(f, 'kneeFlexR', visR);
+  const xRange = (key: 'ankleLX' | 'ankleRX') => {
+    const xs = f.map((x) => x[key]).filter((v): v is number => v !== null);
+    return xs.length ? Math.max(...xs) - Math.min(...xs) : 0;
+  };
+  const leadLeft = xRange('ankleLX') >= xRange('ankleRX');
+  const [hip, qHip] = rom(f, leadLeft ? 'hipFlexL' : 'hipFlexR', Math.min(leadLeft ? visL : visR, visT));
+  const seps = f
+    .filter((x) => x.ankleLX !== null && x.ankleRX !== null)
+    .map((x) => Math.abs((x.ankleLX as number) - (x.ankleRX as number)) / w.legLength);
+  const sepCoverage = f.length ? seps.length / f.length : 0;
+  const trunk = series(f, 'trunkLean');
+  const [vel, vq] = peakRiseVelocity(w);
+  return {
+    values: {
+      kneeRomL: kL,
+      kneeRomR: kR,
+      hipRom: hip,
+      depth: w.maxDepth,
+      stepLength: sepCoverage >= MIN_COVERAGE ? Math.max(...seps) : null,
+      trunkLean: trunk.coverage >= MIN_COVERAGE ? Math.max(...trunk.vals) : null,
+      repDuration: w.tEnd - w.tStart,
+      eccentricDuration: w.tBottom - w.tStart,
+      concentricDuration: w.tEnd - w.tBottom,
+      recoveryVelocity: vel,
+      asymmetry: kL !== null && kR !== null ? Math.abs(kL - kR) : null,
+    },
+    quality: {
+      kneeRomL: qL,
+      kneeRomR: qR,
+      hipRom: qHip,
+      depth: q,
+      stepLength: Math.min(visL, visR) * Math.min(1, sepCoverage / 0.9),
+      trunkLean: visT * Math.min(1, trunk.coverage / 0.9),
+      repDuration: q,
+      eccentricDuration: q,
+      concentricDuration: q,
+      recoveryVelocity: vq * q,
+      asymmetry: Math.min(qL, qR),
+    },
+  };
+}

@@ -2,102 +2,98 @@
 
 **Setup before you start**
 
-- Tab 1: `http://localhost:5173/?demo=1&speed=2`, opened but **paused** (press `Space` as soon as it loads).
-- Tab 2: `http://localhost:5173/?panel=lab` (Lab validation panel with figures).
-- Optional Tab 3: live camera (`?live=1`), with a teammate ready to squat side-on. **Only use it if the room
+- Tab 1: `http://localhost:5173/?demo=soccer&speed=2`, opened but **paused** (press `Space` as soon as it loads).
+  This is the one primary demo: **Soccer · Explosive Fatigue Screen** (repeated countermovement jump).
+- Tab 2: `http://localhost:5173/?panel=library` (movement protocol library), used for ~10 seconds to show scale.
+- Tab 3: `http://localhost:5173/?panel=lab` (Lab validation panel with figures).
+- Backup demo if needed: `?demo=strength` (squat) or `?demo=pickleball` (forward lunge, beta).
+- Optional live camera (`?sport=soccer` → Start live camera), with a teammate ready. **Only use it if the room
   lighting and space are good. The demo dataset is the default.**
 - Presenter keys (demo tab): `Space` pause/resume · `1` `2` `4` speed · `S` skip to the end of the stage.
-- Timing at 2×: calibration ≈ 10 s, monitored set ≈ 25 s. Total ≈ 40 s of playback.
+- Timing at 2×: calibration ≈ 12 s, monitored set ≈ 30 s.
 
-Spoken lines are in plain text; *[stage directions are in brackets]*. About 430 words, roughly 2:50 at a calm pace.
+Spoken lines are in plain text; *[stage directions are in brackets]*. About 450 words, roughly 2:55 at a calm pace.
+**Don't navigate ten sports on stage. Demo one protocol well, then use the library to show scale.**
 
 ---
 
-### 0:00–0:25 · Hook
+### 0:00–0:20 · Hook
 
-*[Landing page on screen.]*
+*[Landing page: "Your movement. Your baseline."]*
 
-Most injury-prevention and form apps ask one question: *is your form correct?* But fatigue doesn't suddenly make an
-athlete forget how to squat. Their mechanics **drift**: a little less depth, a little more trunk lean, a slower drive.
-Every rep still counts, so nobody notices until form has already broken.
+Most training and form apps ask: *do you move like the ideal athlete?* But fatigue doesn't suddenly make an athlete
+forget how to jump or squat. Their mechanics **drift**: a little less height, a slower push-off, a little more trunk
+lean. Every rep still counts, so nobody notices until form has already broken.
 
-### 0:25–0:45 · Core insight
+### 0:20–0:35 · Core insight
 
-We don't ask, "Does this look like the perfect squat?" We ask, **"Does this still look like *your* squat?"**
-BreakingPoint first learns how *you* move while fresh. Then it watches for the moment your movement becomes
-*persistently* different from your own baseline.
+BreakingPoint asks a different question: **are you still moving like yourself?** It learns how *you* move while fresh,
+then watches for the moment your movement becomes *persistently* different from your own baseline.
 
-### 0:45–1:45 · Demo
+### 0:35–1:30 · Demo: Soccer, Explosive Fatigue Screen
 
-*[Switch to Tab 1, press `Space`.]*
+*[Switch to Tab 1, press `Space`. Point at the athlete card: Adam · Soccer · Repeated CMJ · Late-training screen.]*
 
-This is our demo dataset: a synthetic athlete whose landmarks run through exactly the same pipeline as the live camera.
+This is a soccer explosive-fatigue screen on our demo dataset: a synthetic athlete whose landmarks run through exactly
+the same pipeline as the live camera.
 
-*[Calibration reps play; right panel says "Learning Adam's baseline…".]*
+*[Calibration jumps play; "Learning Adam's baseline…".]* Six fresh jumps. For each one we measure jump height, explosive
+velocity, flight time, push-off time, landing depth, trunk lean and left/right differences. That becomes *Adam's*
+baseline. It's his baseline, not "ideal form".
 
-First, six fresh reps. For every rep we extract knee and hip range of motion, depth, trunk lean, tempo, velocity, and
-left/right symmetry, and build *Adam's* baseline. *[Baseline table appears.]* Notice it says "your baseline", not
-"ideal human form".
+*[Monitored set; bars fill the Form Drawdown chart.]* Now the set. Every jump gets a Movement Drift Score: how far it
+sits from Adam's own baseline. Jumps one to six: stable. Seven and eight: drift rising, but one or two odd reps
+aren't enough. *[Rep 9 amber.]* Nine: **drift emerging**. *[Rep 10: red flash.]* Ten: **breaking point**.
 
-*[Monitored set starts; bars appear on the Form Drawdown chart.]*
+*[Point at the state card and contributors.]* It names the pattern, **explosive fatigue**, and says why: explosive
+velocity is down almost five standard deviations, jump height is down three and a half, and flight time is down three.
+*[Point at the chart.]* This is our Form Drawdown, borrowed from quant risk dashboards. The dashed line marks where
+drift actually began, rep seven, and the red line marks where we became confident.
 
-Now the working set. Every rep gets a Movement Drift Score: how many standard deviations it sits from Adam's own
-baseline. Reps one to six: stable. Seven and eight: drift starts rising, but one or two odd reps aren't enough.
-*[Rep 9 turns amber.]* Rep nine: **drift emerging**. *[Rep 10: red flash.]* Rep ten: **breaking point detected**.
+### 1:30–1:55 · One platform, many sports
 
-*[Point at the right panel.]* And it answers "why did you flag me?": right knee range of motion is down 4.5 standard
-deviations, trunk lean is up 3.5, and velocity is down 3.5. *[Point at the chart.]* This is our **Form Drawdown**,
-borrowed from quant risk dashboards. The dashed line marks where the drift actually began, rep seven, and the red
-line marks where we became confident. Afterwards, a recovery check tells the athlete how far they've returned toward
-baseline.
+*[Switch to Tab 2: protocol library. Gesture at the primitive map.]*
 
-### 1:45–2:15 · Technical
+We started with squats and repeated jumps because they're reliable movements to capture from a single camera. But
+BreakingPoint isn't a squat classifier. Underneath the interface, sports map onto reusable movement protocols. Soccer,
+basketball and volleyball can all use our jump-and-land primitive. Pickleball, tennis and badminton share a lunge
+protocol, which is in beta today. The sport changes which movement we monitor and which metrics matter. The personal
+baseline and the sequential change detector stay the same.
 
-*[Switch to Tab 2: Lab validation.]*
+### 1:55–2:25 · Technical and validation
 
-Under the hood: on-device pose estimation, rep segmentation, a personal baseline with robust statistics, a
-multivariate drift score, and sequential EWMA and CUSUM change detection.
+*[Switch to Tab 3: Lab validation.]*
 
-BreakingPoint's live inference runs locally, so athletes don't need specialized hardware or cloud connectivity.
-But sequential detectors have a sensitivity problem. Make them too aggressive and a single bad rep creates a false
-warning. Make them too conservative and real drift is caught too late. We treated that like a quantitative
-backtesting problem.
+Under the hood: on-device pose estimation, rep segmentation, a robust personal baseline, a multivariate drift score,
+and sequential EWMA and CUSUM change detection. A detector like this has a sensitivity problem: too aggressive and one
+bad rep is a false alarm, too conservative and real drift is caught late. So we treated it like a backtesting problem.
 
 > **Say version A only if the HiPerGator run has completed** (numbers from `results/VALIDATION_REPORT.md` of that run):
 >
-> Using UF's HiPerGator supercomputer, we simulated **[N_HPC]** individualized athlete sessions with known change
-> points, varying drift severity, sensor noise, outliers, missing landmarks, and baseline variability. We swept the
-> detector's EWMA and CUSUM parameters across **25,280** configurations and measured false-positive rate, miss rate,
-> and detection delay. The configuration BreakingPoint uses was selected from those experiments, not chosen by hand.
-> On held-out sessions it raised false alarms in **[FPR_HPC]** of no-change sessions and caught **[TPR_HPC]** of drift,
-> a median of **[DELAY_HPC]** reps after it began.
+> On UF's HiPerGator supercomputer we simulated **[N_HPC]** individualized athlete sessions with known change points —
+> varying drift, sensor noise, outliers, missing landmarks and natural variability — and swept **25,280** detector
+> configurations. The detector BreakingPoint uses was selected from those experiments: on held-out sessions it raised
+> false alarms in **[FPR_HPC]** of no-change sessions and caught **[TPR_HPC]** of drift.
 >
 > **Version B (true today, from the completed local run):**
 >
-> We built a simulator of individualized athlete sessions with known change points, varying drift severity, sensor
-> noise, outliers, missing landmarks, and baseline variability, and swept **25,280** detector configurations. In a
-> **50,000-session** backtest, the selected configuration had a **2.2 %** false-positive rate on held-out no-change
-> sessions and caught **89 %** of drift, a median of **4 reps** after it began. The same pipeline is packaged as a Slurm
-> array for UF's HiPerGator, so we can scale it to a million sessions. The configuration BreakingPoint uses came from
-> these experiments, not from hand-tuning.
+> We simulated individualized athlete sessions with known change points and swept **25,280** detector configurations.
+> In a **50,000-session** backtest, the selected configuration had a **2.2 %** false-positive rate on held-out no-change
+> sessions and caught **89 %** of drift. The same pipeline is packaged as a Slurm array for UF's HiPerGator. The detector
+> is calibrated at the movement-signal level and shared by every protocol; sport-specific validation is next.
 
-*[Point at the personal-vs-population figure.]* And this is why personalization matters: the same detector using
-population norms instead of your own baseline had eight times more false alarms and caught less than half the drift.
-
-### 2:15–2:40 · Impact
+### 2:25–2:45 · Impact
 
 No force plate. No markers. No wearable. Any laptop or phone camera, and the video never leaves the device. That
-puts within-athlete fatigue monitoring in reach of recreational and collegiate athletes, strength coaches, and
-physical-therapy return-to-play settings. And we're careful about what we claim: BreakingPoint provides training
-information, not a diagnosis, and it does not predict injuries.
+puts within-athlete fatigue monitoring in reach of recreational and collegiate athletes, coaches, and return-to-play
+settings. We're careful about what we claim: this is training information, not a diagnosis, and it does not predict
+injuries.
 
-### 2:40–3:00 · Close
+### 2:45–3:00 · Close
 
-Next, we combine movement with heart rate, training load, sleep, and RPE across sessions, so a coach can see that an
-athlete is reaching their breaking point earlier than their two-week baseline.
-
-In finance, we monitor systems for regime changes before risk compounds. **BreakingPoint applies the same principle
-to the athlete: don't wait until form fails. Detect when it starts changing.**
+Long term, a coach could define any repeatable movement and BreakingPoint could learn that athlete's movement signature.
+In finance, we monitor systems for regime changes before risk compounds. **BreakingPoint doesn't ask whether you move
+like the ideal athlete. It asks whether you still move like yourself.**
 
 ---
 
@@ -106,10 +102,11 @@ to the athlete: don't wait until form fails. Detect when it starts changing.**
 | question | answer |
 |---|---|
 | Isn't this just MediaPipe? | MediaPipe extracts the signal. Our contribution is the individualized temporal model: personal baseline, LOO-calibrated drift score, and sequential detection, validated by simulation. |
-| Why not a machine-learning classifier? | There are no labels for "this athlete's fatigue onset", and a classifier would compare you to other people. A transparent statistical model calibrated to *you* is explainable and needs only 6 reps. |
-| How do you avoid false alarms from one bad rep? | Per-rep input is winsorized at 2.5σ and the alarm needs ≥ 2 consecutive elevated reps plus the smoothed drift above 2σ. In the backtest, isolated bad reps triggered in 3.9 % of sessions. |
-| Why EWMA and not CUSUM? | We tested both, plus EWMA+CUSUM and a naive rule. Under our selection rule EWMA won narrowly; CUSUM is still used to estimate when drift began. |
-| Monocular camera accuracy? | Not lab-grade, which is why we only compare an athlete with themselves from the same setup. Systematic projection bias cancels, and poor-quality reps are not scored. |
-| What if the camera moves mid-session? | Our stress test shows false alarms rise if noise increases after calibration. That's why we show capture quality and advise recalibrating. |
-| Injury prediction? | No. We detect fatigue-associated movement drift. Validating against force plates and real fatigue protocols is next. |
+| Do you train a model per sport? | No. Fatigue detection here is change detection against your own baseline, so there's nothing sport-specific to train. A sport picks a protocol on a reusable primitive (squat, jump-and-land, lunge) plus terminology and featured metrics. |
+| Is every sport in the library working? | No, and the UI says so. Squat and repeated jump are ready, forward lunge is beta, and everything else is roadmap and cannot be launched. Tests enforce that. |
+| Did the HPC study validate soccer / pickleball? | No. The Lab validates the detector's statistical behaviour under controlled synthetic drift. It's calibrated at the movement-signal level; sport-specific clinical validation is future work. |
+| Does the sport change the detector? | No. Sport profiles contain no detector parameters, and a test checks that every protocol runs with the identical exported config. |
+| How do you avoid false alarms from one bad rep? | Per-rep input is winsorized and the alarm needs consecutive elevated reps plus the smoothed drift above threshold. In the backtest, isolated bad reps triggered in 3.9 % of sessions; for the lunge, a test shows one malformed rep doesn't trigger. |
+| What do labels like "explosive fatigue" mean? | They name the movement family with the largest standardized changes (explosive output, recovery speed, range of motion, asymmetry…). They describe movement change and are never diagnoses. |
+| Monocular camera accuracy? | Not lab-grade, which is why we only compare an athlete with themselves from the same setup. Poor-quality reps are not scored. |
 | Is the demo faked? | The demo athlete is synthetic, and labeled as such, but its landmarks go through the full real pipeline. When the breaking point fires is decided by the real detector at runtime. |

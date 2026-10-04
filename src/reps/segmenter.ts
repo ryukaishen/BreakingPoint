@@ -7,6 +7,8 @@
 // reference adapts slowly while the athlete stands still.
 //
 // Squat:  STANDING → DESCENDING → (BOTTOM) → ASCENDING → STANDING  = one rep
+// Lunge:  READY → DESCENT → (BOTTOM) → RECOVERY → READY             = one rep
+//         (same state machine as the squat; forward step + hip drop)
 // CMJ:    STANDING → DIP → PROPULSION → FLIGHT → LANDING → STANDING = one jump
 //
 // Debouncing: the descent must persist for 2 frames above START, the rep must
@@ -137,15 +139,40 @@ abstract class BaseSegmenter {
   protected abstract step(m: FrameMetrics, d: number, a: number): RepWindow | null;
 }
 
+export interface DescentThresholds {
+  start: number;
+  cross: number;
+  minDepth: number;
+  minDur: number;
+  maxDur: number;
+  bottomHyst: number;
+}
+
+/** Squat defaults — the reference implementation; do not change (demo + tests depend on them). */
+export const SQUAT_THRESHOLDS: DescentThresholds = {
+  start: START, cross: CROSS, minDepth: MIN_DEPTH, minDur: MIN_DUR, maxDur: MAX_DUR, bottomHyst: BOTTOM_HYST,
+};
+
+/** Forward lunge: same hip-drop state machine, slightly longer minimum rep (step out + back). */
+export const LUNGE_THRESHOLDS: DescentThresholds = { ...SQUAT_THRESHOLDS, minDur: 0.8 };
+
 export class SquatSegmenter extends BaseSegmenter {
+  protected th: DescentThresholds;
+
+  constructor(thresholds: DescentThresholds = SQUAT_THRESHOLDS) {
+    super();
+    this.th = thresholds;
+  }
+
   protected step(m: FrameMetrics, d: number): RepWindow | null {
+    const th = this.th;
     switch (this.phase) {
       case 'standing': {
         this.updateStanding(m, d);
-        this.above = d > START ? this.above + 1 : 0;
+        this.above = d > th.start ? this.above + 1 : 0;
         if (this.above >= 2) {
           this.phase = 'descending';
-          this.tStart = this.crossingBefore(this.buf.length - 1, CROSS);
+          this.tStart = this.crossingBefore(this.buf.length - 1, th.cross);
           this.maxD = d;
           this.tBottom = m.t;
         }
@@ -157,19 +184,19 @@ export class SquatSegmenter extends BaseSegmenter {
           this.maxD = d;
           this.tBottom = m.t;
           this.phase = 'descending';
-        } else if (this.phase === 'descending' && d < this.maxD - BOTTOM_HYST) {
+        } else if (this.phase === 'descending' && d < this.maxD - th.bottomHyst) {
           this.phase = 'ascending';
         }
-        if (m.t - this.tStart > MAX_DUR) {
+        if (m.t - this.tStart > th.maxDur) {
           // Athlete probably moved / sat down: re-acquire the standing reference.
           this.recalibrate();
           return null;
         }
-        if (this.phase === 'ascending' && d < CROSS) {
+        if (this.phase === 'ascending' && d < th.cross) {
           const prev = this.buf[this.buf.length - 2];
-          const tEnd = prev && prev.d !== d ? prev.m.t + ((CROSS - prev.d) / (d - prev.d)) * (m.t - prev.m.t) : m.t;
+          const tEnd = prev && prev.d !== d ? prev.m.t + ((th.cross - prev.d) / (d - prev.d)) * (m.t - prev.m.t) : m.t;
           const dur = tEnd - this.tStart;
-          const valid = this.maxD >= MIN_DEPTH && dur >= MIN_DUR && dur <= MAX_DUR;
+          const valid = this.maxD >= th.minDepth && dur >= th.minDur && dur <= th.maxDur;
           const win = this.windowFrom(this.tStart, tEnd);
           const out: RepWindow | null = valid
             ? { frames: win.map((s) => s.m), depth: win.map((s) => s.d), tStart: this.tStart, tBottom: this.tBottom, tEnd, maxDepth: this.maxD, legLength: this.legLen as number }
@@ -185,6 +212,13 @@ export class SquatSegmenter extends BaseSegmenter {
         this.phase = 'standing';
         return null;
     }
+  }
+}
+
+/** Forward lunge (lead with the same leg each rep). Shares the squat's descent/recovery state machine. */
+export class LungeSegmenter extends SquatSegmenter {
+  constructor() {
+    super(LUNGE_THRESHOLDS);
   }
 }
 

@@ -32,6 +32,11 @@ function Method({ c }: { c: DetectorConfig }) {
         BreakingPoint is not a form classifier. MediaPipe extracts the signal; BreakingPoint's contribution is the <b>individualized temporal model</b>{' '}
         operating on that signal. The question is not "is this frame abnormal?" but <b>"has this athlete entered a persistently different movement regime?"</b>
       </p>
+      <h3>0 · Sport → protocol → primitive</h3>
+      <p>
+        A sport selects a repeatable movement protocol built on a reusable movement primitive — squat, jump-and-land (countermovement jump) or forward lunge
+        (beta). Only segmentation and feature extraction depend on the primitive; the baseline, drift score and detector below are shared by every sport.
+      </p>
       <h3>1 · Pose → per-rep features</h3>
       <p>
         33 body landmarks per frame (MediaPipe Pose Landmarker, on-device), smoothed with a One Euro filter. Reps are segmented from hip drop normalized by
@@ -154,6 +159,14 @@ function Lab({ c }: { c: DetectorConfig }) {
           change points (no change, isolated bad reps, gradual and sudden drift, camera noise, landmark dropout, high variability, recovery), sweep the
           detector's hyper-parameters, and pick the operating point with a transparent rule. Synthetic sessions test the detector's <i>statistical</i> behaviour
           — they are not clinical data.
+        </p>
+        <p>
+          The detector is calibrated at the movement-signal level, while individual sport protocols determine which repeatable movement and features are
+          monitored. The same validated detector engine is shared by every protocol (squat, jump-and-land, forward lunge).
+        </p>
+        <p className="dim" style={{ fontSize: 12.5 }}>
+          Scope: current validation evaluates detector behaviour under controlled synthetic movement drift. It does not clinically validate any listed sport;
+          sport-specific clinical validation is future work.
         </p>
       </div>
       <div className="kpis">

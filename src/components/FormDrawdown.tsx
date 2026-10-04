@@ -3,7 +3,8 @@
 // smoothed EWMA line, CUSUM evidence strip and the detected change point.
 
 import { useMemo, useState } from 'react';
-import { specFor, type ExerciseType } from '../biomechanics/catalog';
+import type { ExerciseType } from '../biomechanics/catalog';
+import { useLabels } from '../protocols/labels';
 import type { DriftThresholds } from '../detection/detector';
 import type { RepRecord } from '../session/engine';
 import { arrow, fmt, fmtSigma, STATE_COLOR, STATE_LABEL } from '../utils/format';
@@ -31,6 +32,7 @@ export function FormDrawdown({
   const cusumTriggers = mode === 'cusum' || mode === 'combined';
   const [ref, size] = useSize<HTMLDivElement>();
   const [hover, setHover] = useState<number | null>(null);
+  const L = useLabels(exercise);
   const W = Math.max(280, size.width || 600);
   const H = height;
   const pad = { l: 40, r: 14, t: 12, b: 22 };
@@ -242,7 +244,7 @@ export function FormDrawdown({
           <div className="r"><span>CUSUM</span><span className="mono">{fmt(hr.step?.cusum)}</span></div>
           {hr.drift?.ranked.slice(0, 3).map((d) => (
             <div className="r" key={d.key}>
-              <span>{specFor(exercise, d.key)?.short ?? d.key}</span>
+              <span>{L.short(d.key)}</span>
               <span className="mono">{fmtSigma(d.zClipped)} {arrow(d.zClipped ?? 0)}</span>
             </div>
           ))}

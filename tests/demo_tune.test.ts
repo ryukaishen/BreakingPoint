@@ -8,7 +8,7 @@ import { DemoController } from '../src/demo/demoController';
 
 it.skipIf(!process.env.DEMO_TUNE)('search demo seeds', () => {
   const cfg = parseDetectorConfig(JSON.parse(readFileSync('public/breakingpoint_detector_config.json', 'utf8')));
-  for (const ex of ['squat', 'cmj'] as const) {
+  for (const ex of ['squat', 'cmj', 'lunge'] as const) {
     const found: string[] = [];
     for (const effect of [0.35, 0.45, 0.55, 0.65, 0.8, 1.0]) {
       for (let seed = 1; seed <= 60; seed++) {

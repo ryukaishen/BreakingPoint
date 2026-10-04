@@ -5,7 +5,32 @@ the system end to end. Code references are relative to the repository root.
 
 ## 1. System overview
 
-BreakingPoint is two cooperating components that share one statistical core:
+BreakingPoint is a personalized movement-monitoring platform. Sports map onto reusable movement protocols and
+primitives (§11–12); one statistical core and one validated detector serve all of them.
+
+```
+             BREAKINGPOINT
+                   |
+            SPORT PROFILE
+                   |
+          MOVEMENT PROTOCOL
+                   |
+             POSE SIGNAL
+                   |
+            FEATURE VECTOR
+                   |
+          PERSONAL BASELINE
+                   |
+           DRIFT DETECTION
+                   |
+             BREAKINGPOINT
+                   ^
+                   |
+        HiPerGator-calibrated            (BreakingPoint Lab; the currently shipped parameters come from a
+         detector parameters              completed 50,000-session local run of the same pipeline)
+```
+
+It consists of two cooperating components that share one statistical core:
 
 - **BreakingPoint Edge** (`src/`) — a React + TypeScript single-page app. All inference is on-device:
   MediaPipe Pose Landmarker runs in WebAssembly/WebGL, and everything downstream is plain TypeScript.
@@ -271,16 +296,89 @@ reps 1–8 stable, rep 9 drift emerging, BreakingPoint at rep 10, onset 6–8, r
 
 ## 10. Testing
 
-- `npm test` — 28 tests: detector behaviour (constant reps, single outlier, progressive drift, detection
-  location, missing/low-confidence features, all modes, explanations, config parsing, recovery), TS↔Python parity,
-  end-to-end demo story for squat and CMJ, determinism.
+- `npm test` — 53 tests:
+  - `detector.test.ts`: constant reps, single outlier, progressive drift, detection location, missing/low-confidence
+    features, all modes, explanations, config parsing, recovery
+  - `parity.test.ts`: TS↔Python parity
+  - `demo.test.ts`: end-to-end demo story for squat and CMJ, determinism
+  - `sports.test.ts`: sport configs load; READY entries resolve to implemented engines; roadmap protocols cannot launch;
+    soccer/basketball/volleyball share the jump primitive; sport selection never changes detector parameters; every demo
+    context fires at rep 10; the Lab-exported config drives the thresholds; pattern labels derive from data
+  - `lunge.test.ts`: lunge segmentation on deterministic data, one malformed lunge does not trigger, progressive lunge
+    drift triggers, "recovery slowing" pattern
 - `cd lab && python -m unittest discover -s tests` — 17 tests: detector behaviour, simulator ground truth and
   reproducibility, vectorized == scalar, exact shard merging, selection rule, worker-count independence,
   corrupt-shard handling, end-to-end finalize smoke test.
 
-## 11. Known limitations
+## 11. Sport profile abstraction
+
+BreakingPoint is organized as **SPORT → PROTOCOL → PRIMITIVE → shared statistical core** (`src/protocols/`):
+
+| layer | file | what it defines | what it must NOT define |
+|---|---|---|---|
+| Movement primitive | `primitives.ts` | segmentation phases, live phase labels, the engine (segmenter + feature extractor) if implemented | detector parameters |
+| Movement protocol | `protocols.ts` | a repeatable screen on one primitive: status (READY / BETA / COMING_SOON / FUTURE), camera placement, purpose, measured feature keys | detector parameters |
+| Sport profile | `sports.ts` | which protocols a sport recommends, sport-specific screen names, featured metrics, feature terminology, drift-pattern names, demo session labels | detector parameters, feature weights |
+| Launch | `launch.ts` | `resolveLaunch(sport, protocol, sub)`: the only path from a selection to a runnable engine; returns `null` for unknown or roadmap protocols | — |
+
+Design rules:
+
+- **One detector.** Every launch uses the single `DetectorConfig` loaded at startup (the Lab export). Sport profiles
+  contain no detector fields; a test fails if any sport config mentions EWMA, CUSUM, thresholds, alpha or clipping, and
+  another asserts that every launchable context runs with an identical config.
+- **Display-only customization.** Feature weights in the drift score are *not* changed per sport: the detector's
+  calibration assumes the catalog weights, and per-sport reweighting would invalidate it. Sports change only which
+  metrics are featured, what they are called, and how drift patterns are named. "What changed" is always ranked by
+  the true |z|.
+- **Status gates launch, not the primitive.** `canLaunch(p)` requires READY/BETA *and* an implemented primitive. Approach
+  Jump uses the implemented jump primitive but is COMING_SOON, so it cannot start; this is tested.
+- **Same primitive, same pipeline.** Soccer and volleyball demos produce identical drift sequences (tested); only the
+  context (labels, featured metrics, athlete card) differs.
+
+Drift-pattern labels (`patterns.ts`): each feature of each primitive maps to a movement family and a direction that
+counts as drift for that family (e.g. CMJ jump height ↓ → explosive; lunge recovery velocity ↓ → recovery; trunk lean ↑ →
+technique; asymmetry ↑ → asymmetry). Over the reps since the estimated onset, each family scores the mean of its two
+largest directional |mean z|; the top family names the pattern if its score ≥ 1.5. Otherwise, if the last five drift
+scores vary more than 2 σ₀, the pattern is *movement variability increasing*. A secondary family is reported when it
+scores ≥ 75 % of the top one. Sports may rename a family (basketball: *jump consistency drift*; volleyball: *landing
+mechanics drift*) but cannot change which family the data selects. Labels are descriptive and non-medical.
+
+## 12. Movement primitives
+
+| primitive | status | segmentation | features |
+|---|---|---|---|
+| `SQUAT` | implemented (reference) | hip-drop state machine (§2.3) | §2.4 |
+| `JUMP_AND_LAND` | implemented | dip → propulsion → flight → landing from ankle lift (§2.3) | §2.4 |
+| `FORWARD_LUNGE` | **beta** | the squat's hip-drop state machine with `LUNGE_THRESHOLDS` (min rep 0.8 s): ready → descent → bottom → recovery | L/R knee ROM, lead-hip ROM (lead leg = the foot that travels), lunge depth, step length (max ankle separation ÷ leg length), trunk lean, rep / descent / recovery duration, peak recovery velocity (hip-rise rate, leg lengths/s), L/R difference |
+| `LATERAL_MOVEMENT`, `SINGLE_LEG_HOP`, `GAIT_CYCLE`, `HIP_HINGE`, `STRIKE_STEP`, `KICK` | roadmap | — | — |
+
+**Why this avoids a model per sport.** Fatigue detection here is not classification. It is change detection relative
+to the athlete's own baseline, so there is nothing sport-specific to train. What differs between sports is *which
+repeatable movement* is observed. A small set of primitives covers many sports: the jump primitive serves soccer,
+basketball, volleyball, gymnastics and field sports; the lunge primitive serves pickleball, tennis, badminton, fencing and
+strength. Adding a sport is a configuration change. Adding a primitive means adding a segmenter, a feature extractor,
+catalog entries with measurement floors, a synthetic demo generator and tests; the baseline, drift score and detector are
+reused unchanged.
+
+**Lunge implementation and validation status.** The synthetic lunge athlete plants both feet and solves each leg with
+two-link inverse kinematics (knees flex anteriorly). The lead foot steps out, the hip drops, and the rear heel rises.
+It uses a separate code path, so the squat/CMJ demo random sequences are byte-identical to before (their story tests are
+unchanged). Through the full pipeline it segments all 6 + 14 + 3 demo reps, a single malformed lunge does not trigger,
+and progressive drift fires at rep 10 with pattern *recovery slowing*. Real-camera reliability (alternating legs, rear-foot
+occlusion, frontal drift) has not been established, so it is labeled BETA.
+
+**Detector calibration scope.** The Lab calibrates the detector at the movement-signal level, on simulated squat feature
+vectors. The standardized, athlete-calibrated drift score (LOO reference) is what makes the detector transferable across
+primitives. Sport-specific and primitive-specific clinical validation is future work. The Lab pipeline was deliberately
+not modified to support UI sports.
+
+## 13. Known limitations
 
 - Monocular 2D kinematics: out-of-plane motion and far-limb occlusion; only within-person comparisons are made.
+- Forward lunge is beta: verified on deterministic synthetic data, not yet on a corpus of real camera recordings; the
+  protocol asks athletes to lead with the same leg every rep.
+- CMJ features do not include knee/hip ROM during the countermovement; adding them would change the validated CMJ drift
+  score composition, so it is deferred.
 - Capture changes after calibration (camera moved, lighting) look like drift; recalibrate.
 - Calibration is short (5–8 reps), so the baseline is uncertain; floors and the LOO reference mitigate this.
 - The Lab validates statistical behaviour on synthetic data. It does not establish clinical validity. The next

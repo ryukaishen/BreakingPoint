@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type RefObject } from 'react';
 import { containRect, drawPose, drawStudio, segmentsForFeatures } from '../pose/draw';
+import type { LaunchContext } from '../protocols/launch';
 import { LiveRunner, type Runner } from '../session/runners';
 import type { Snapshot } from '../session/engine';
 import { STATE_COLOR } from '../utils/format';
@@ -7,6 +8,7 @@ import { Lock, Pause, Play, Skip } from './Icons';
 
 interface Props {
   snap: Snapshot;
+  launch: LaunchContext;
   runner: Runner | null;
   videoRef: RefObject<HTMLVideoElement>;
   liveStatus: string;
@@ -93,8 +95,9 @@ export function CameraStage(p: Props) {
   const ctxLabel =
     s.phase === 'calibrating' ? `CALIBRATION · ${repCount}/${s.calibrationTarget}` : s.phase === 'recovery' || s.phase === 'recoveryDone' ? 'RECOVERY CHECK' : s.phase === 'monitoring' || s.phase === 'summary' ? 'MONITORED SET' : 'READY';
   const isDemo = p.runner?.kind === 'demo';
-  const baseDepth = s.baseline?.features[s.exercise === 'squat' ? 'depth' : 'countermovementDepth'];
-  const gaugeMax = s.exercise === 'squat' ? 0.75 : 0.45;
+  const baseDepth = s.baseline?.features[s.exercise === 'cmj' ? 'countermovementDepth' : 'depth'];
+  const gaugeMax = s.exercise === 'squat' ? 0.75 : s.exercise === 'lunge' ? 0.6 : 0.45;
+  const phaseText = p.launch.primitive.phaseLabels[live.repPhase] ?? PHASE_TEXT[live.repPhase] ?? live.repPhase;
   const depthNow = Math.max(0, Math.min(gaugeMax, live.depth));
 
   return (
@@ -110,7 +113,7 @@ export function CameraStage(p: Props) {
         </div>
         <div className="phase-pill">
           <span className="qdot" style={{ background: live.repPhase === 'standing' ? '#7f8b9d' : '#59d0ff' }} />
-          {PHASE_TEXT[live.repPhase] ?? live.repPhase}
+          {phaseText}
         </div>
       </div>
 
@@ -155,6 +158,23 @@ export function CameraStage(p: Props) {
       </div>
 
       <div className="ov ov-bl">
+        {isDemo && (
+          <div className="athlete-card">
+            <div className="ac-name">{s.athlete.toUpperCase()}</div>
+            <div className="ac-row">
+              <span>Sport</span>
+              <b>{p.launch.contextName}</b>
+            </div>
+            <div className="ac-row">
+              <span>Protocol</span>
+              <b>{p.launch.title}</b>
+            </div>
+            <div className="ac-row">
+              <span>Session</span>
+              <b>{p.launch.session}</b>
+            </div>
+          </div>
+        )}
         {isDemo ? (
           <div className="speed-ctl">
             <button className="btn sm" onClick={p.onDemoPause} title="Pause / resume (Space)">

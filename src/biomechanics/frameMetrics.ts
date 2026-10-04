@@ -29,6 +29,9 @@ export interface FrameMetrics {
   visL: number;
   visR: number;
   visTrunk: number;
+  /** Horizontal ankle positions (aspect-corrected), null when not visible — used by the lunge primitive. */
+  ankleLX: number | null;
+  ankleRX: number | null;
 }
 
 interface P {
@@ -76,7 +79,7 @@ const wavg = (a: P, b: P): P | null => {
 export function emptyFrame(t: number): FrameMetrics {
   return {
     t, present: false, quality: 0, inFrame: false, kneeFlexL: null, kneeFlexR: null, hipFlexL: null, hipFlexR: null,
-    trunkLean: null, hipY: null, ankleY: null, legLength: null, visL: 0, visR: 0, visTrunk: 0,
+    trunkLean: null, hipY: null, ankleY: null, legLength: null, visL: 0, visR: 0, visTrunk: 0, ankleLX: null, ankleRX: null,
   };
 }
 
@@ -122,6 +125,8 @@ export function computeFrameMetrics(pose: Pose | null, t: number, aspect: number
     visL,
     visR,
     visTrunk,
+    ankleLX: lA.v >= VIS_MIN ? lA.x : null,
+    ankleRX: rA.v >= VIS_MIN ? rA.x : null,
   };
 }
 

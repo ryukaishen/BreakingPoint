@@ -1,3 +1,6 @@
+import { useLabels } from '../protocols/labels';
+import type { LaunchContext } from '../protocols/launch';
+import { sessionPattern } from '../protocols/patterns';
 import type { Snapshot } from '../session/engine';
 import { exportCsv, exportJson } from '../session/export';
 import { arrow, fmt } from '../utils/format';
@@ -6,15 +9,18 @@ import { Close, Download } from './Icons';
 
 interface Props {
   snap: Snapshot;
+  launch: LaunchContext;
   onClose: () => void;
   onRecovery: () => void;
   onNewSet: () => void;
 }
 
-export function SummaryModal({ snap, onClose, onRecovery, onNewSet }: Props) {
+export function SummaryModal({ snap, launch, onClose, onRecovery, onNewSet }: Props) {
   const sm = snap.summary;
+  const L = useLabels(snap.exercise);
   if (!sm) return null;
   const top = sm.topChanges[0];
+  const pattern = sm.breakpointRep !== null ? sessionPattern(snap.exercise, snap.monitorReps, snap.onsetRep, snap.baseline?.reference.sigma0, launch.patternLabels) : null;
   return (
     <div className="modal-backdrop" onClick={onClose}>
       <div className="modal" onClick={(e) => e.stopPropagation()} role="dialog" aria-label="Session summary">
@@ -22,7 +28,7 @@ export function SummaryModal({ snap, onClose, onRecovery, onNewSet }: Props) {
           <div>
             <div className="eyebrow">Session summary · {snap.mode === 'demo' ? 'Demo dataset' : 'Live session'}</div>
             <h2>
-              {sm.athlete} · {snap.exercise === 'squat' ? 'Bodyweight squat' : 'Countermovement jump'}
+              {sm.athlete} · {launch.contextName} · {launch.title}
             </h2>
           </div>
           <button className="btn ghost" onClick={onClose} aria-label="Close">
@@ -65,10 +71,18 @@ export function SummaryModal({ snap, onClose, onRecovery, onNewSet }: Props) {
             </div>
             <div className="kpi" style={{ gridColumn: 'span 2' }}>
               <div className="k">Largest mechanical drift</div>
-              <div className="v" style={{ fontSize: 22 }}>{top ? `${top.label} ${arrow(top.meanZ)}` : '—'}</div>
+              <div className="v" style={{ fontSize: 22 }}>{top ? `${L.label(top.key)} ${arrow(top.meanZ)}` : '—'}</div>
               <div className="s">{top ? `${top.meanZ >= 0 ? '+' : '−'}${Math.abs(top.meanZ).toFixed(1)}σ average after the breaking point (${top.meanZ > 0 ? top.upWord : top.downWord})` : ''}</div>
             </div>
           </div>
+          {pattern && (
+            <div className="panel pattern-panel">
+              <span className="k">Movement pattern</span>
+              <span className="pattern-tag">{pattern.label}</span>
+              <span className="muted">{pattern.explain}</span>
+              {pattern.secondary && <span className="dim">· also {pattern.secondary.label.toLowerCase()}</span>}
+            </div>
+          )}
           <div className="panel chart-card">
             <div className="chart-head">
               <h2>Form drawdown</h2>
@@ -90,7 +104,7 @@ export function SummaryModal({ snap, onClose, onRecovery, onNewSet }: Props) {
               <div className="row" style={{ flexWrap: 'wrap', gap: 8 }}>
                 {sm.topChanges.map((c) => (
                   <span key={c.key} className="chip" style={{ borderColor: Math.abs(c.meanZ) >= 2 ? 'rgba(255,77,94,0.5)' : undefined }}>
-                    {c.short} {arrow(c.meanZ)} <span className="mono">{c.meanZ >= 0 ? '+' : '−'}{Math.abs(c.meanZ).toFixed(1)}σ</span>
+                    {L.short(c.key)} {arrow(c.meanZ)} <span className="mono">{c.meanZ >= 0 ? '+' : '−'}{Math.abs(c.meanZ).toFixed(1)}σ</span>
                   </span>
                 ))}
               </div>
@@ -105,7 +119,7 @@ export function SummaryModal({ snap, onClose, onRecovery, onNewSet }: Props) {
                 Run recovery check
               </button>
             )}
-            <button className="btn" onClick={() => exportJson(snap)}>
+            <button className="btn" onClick={() => exportJson(snap, launch)}>
               <Download size={15} /> Export JSON
             </button>
             <button className="btn" onClick={() => exportCsv(snap)}>
@@ -116,7 +130,9 @@ export function SummaryModal({ snap, onClose, onRecovery, onNewSet }: Props) {
               New set
             </button>
           </div>
-          <div className="disclaimer">{sm.disclaimer} Exports contain derived numeric features only — never video.</div>
+          <div className="disclaimer">
+            {sm.disclaimer} Movement-pattern labels describe changes in movement only. Exports contain derived numeric features only — never video.
+          </div>
         </div>
       </div>
     </div>

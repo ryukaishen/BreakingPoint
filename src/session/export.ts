@@ -1,5 +1,6 @@
 import { featureSpecs } from '../biomechanics/catalog';
 import { serializeDetectorConfig } from '../detection/config';
+import type { LaunchContext } from '../protocols/launch';
 import type { Snapshot } from './engine';
 
 function download(name: string, text: string, type: string) {
@@ -16,13 +17,16 @@ function download(name: string, text: string, type: string) {
 
 const stamp = () => new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
 
-export function sessionToJson(s: Snapshot) {
+export function sessionToJson(s: Snapshot, launch?: LaunchContext) {
   return {
     app: 'BreakingPoint Edge',
     exportedAt: new Date().toISOString(),
     mode: s.mode,
     athlete: s.athlete,
     exercise: s.exercise,
+    context: launch
+      ? { sport: launch.sport.id, subSport: launch.subSport?.id ?? null, protocol: launch.protocol.id, primitive: launch.primitive.id, status: launch.status }
+      : null,
     note: 'Derived numeric movement features only. No video is recorded or stored.',
     detectorConfig: serializeDetectorConfig(s.config),
     baseline: s.baseline,
@@ -46,8 +50,8 @@ export function sessionToJson(s: Snapshot) {
   };
 }
 
-export function exportJson(s: Snapshot) {
-  download(`breakingpoint-${s.exercise}-${stamp()}.json`, JSON.stringify(sessionToJson(s), null, 2), 'application/json');
+export function exportJson(s: Snapshot, launch?: LaunchContext) {
+  download(`breakingpoint-${s.exercise}-${stamp()}.json`, JSON.stringify(sessionToJson(s, launch), null, 2), 'application/json');
 }
 
 export function sessionToCsv(s: Snapshot): string {

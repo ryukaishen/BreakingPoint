@@ -6,12 +6,12 @@
 import { buildBaseline, MIN_CALIBRATION_REPS, type Baseline } from '../baseline/baseline';
 import { featureSpecs, type ExerciseType, type RepFeatures } from '../biomechanics/catalog';
 import { primaryKneeFlex, qualityLabel, type FrameMetrics, type QualityLabel } from '../biomechanics/frameMetrics';
-import { cmjFeatures, squatFeatures } from '../biomechanics/repFeatures';
+import { cmjFeatures, lungeFeatures, squatFeatures } from '../biomechanics/repFeatures';
 import type { DetectorConfig } from '../detection/config';
 import { driftScore, type DriftResult, type FeatureDeviation } from '../detection/driftScore';
 import { SequentialDetector, type DetectorStep, type DriftThresholds, type MovementState } from '../detection/detector';
 import { assessRecovery, type RecoveryAssessment } from '../detection/recovery';
-import { CmjSegmenter, SquatSegmenter, type RepPhase, type RepWindow } from '../reps/segmenter';
+import { CmjSegmenter, LungeSegmenter, SquatSegmenter, type RepPhase, type RepWindow } from '../reps/segmenter';
 import { buildSummary, type SessionSummary } from './summary';
 
 export type SessionPhase = 'idle' | 'calibrating' | 'baseline' | 'monitoring' | 'summary' | 'recovery' | 'recoveryDone';
@@ -83,6 +83,7 @@ export class SessionEngine {
   private listeners = new Set<() => void>();
   private snap: Snapshot;
   private segmenter: SquatSegmenter | CmjSegmenter;
+  private extract: (w: RepWindow) => RepFeatures;
   private detector: SequentialDetector | null = null;
   private qualityEma = 0;
   private lastLiveEmit = 0;
@@ -90,7 +91,9 @@ export class SessionEngine {
   private windowQuality: number[] = [];
 
   constructor(exercise: ExerciseType, config: DetectorConfig, athlete: string, mode: SourceMode = 'live') {
-    this.segmenter = exercise === 'squat' ? new SquatSegmenter() : new CmjSegmenter();
+    // One engine for every protocol: only segmentation + feature extraction depend on the movement primitive.
+    this.segmenter = exercise === 'squat' ? new SquatSegmenter() : exercise === 'lunge' ? new LungeSegmenter() : new CmjSegmenter();
+    this.extract = exercise === 'squat' ? squatFeatures : exercise === 'lunge' ? lungeFeatures : cmjFeatures;
     this.snap = {
       version: 0, mode, phase: 'idle', exercise, athlete, config, calibrationTarget: CALIBRATION_TARGET,
       calibrationReps: [], monitorReps: [], recoveryReps: [], baseline: null, thresholds: null, state: 'STABLE',
@@ -222,7 +225,7 @@ export class SessionEngine {
   private onRep(win: RepWindow) {
     const phase = this.snap.phase;
     if (phase !== 'calibrating' && phase !== 'monitoring' && phase !== 'recovery') return;
-    const features = this.snap.exercise === 'squat' ? squatFeatures(win) : cmjFeatures(win);
+    const features = this.extract(win);
     const quality = win.frames.reduce((s, f) => s + f.quality, 0) / Math.max(1, win.frames.length);
     const base = { features, tStart: win.tStart, tBottom: win.tBottom, tEnd: win.tEnd, quality };
 
