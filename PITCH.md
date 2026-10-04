@@ -42,11 +42,13 @@ velocity, flight time, push-off time, landing depth, trunk lean and left/right d
 baseline. It's his baseline, not "ideal form".
 
 *[Monitored set; bars fill the Form Drawdown chart.]* Now the set. Every jump gets a Movement Drift Score: how far it
-sits from Adam's own baseline. Jumps one to six: stable. Seven and eight: drift rising, but one or two odd reps
-aren't enough. *[Rep 9 amber.]* Nine: **drift emerging**. *[Rep 10: red flash.]* Ten: **breaking point**.
+sits from Adam's own baseline. Jumps one to seven: stable, even when one jump is a little off.
+*[Reps 8–9 amber.]* Eight and nine: **drift emerging**, and it keeps building. *[Rep 10: red flash.]* Ten: **breaking
+point**.
 
 *[Point at the state card and contributors.]* It names the pattern, **explosive fatigue**, and says why: explosive
-velocity is down almost five standard deviations, jump height is down three and a half, and flight time is down three.
+velocity is down four and a half standard deviations, jump height is down three and a half, and push-off time is
+slower by two.
 *[Point at the chart.]* This is our Form Drawdown, borrowed from quant risk dashboards. The dashed line marks where
 drift actually began, rep seven, and the red line marks where we became confident.
 

@@ -49,8 +49,8 @@ BreakingPoint turns a laptop or phone camera into a personalized movement-monito
 3. **Detect.** A sequential detector (EWMA with persistence; CUSUM tracks the onset) ignores one weird rep but fires
    when drift **persists**. The screen moves from STABLE to DRIFT EMERGING to **BREAKING POINT DETECTED — Rep 10**.
 4. **Explain.** "Why did you flag me?" BreakingPoint ranks what changed, in the sport's own terms, and names the
-   pattern. Soccer demo: **EXPLOSIVE FATIGUE**: *explosive velocity (RSI-mod) −4.9σ ↓, jump height −3.5σ ↓, flight
-   time −2.9σ ↓*. Pickleball demo: **RECOVERY SLOWING**: *push-back speed −3.8σ ↓, trunk lean +2.2σ ↑*. Pattern
+   pattern. Soccer demo: **EXPLOSIVE FATIGUE**: *explosive velocity (RSI-mod) −4.6σ ↓, jump height −3.6σ ↓, push-off
+   time +2.2σ ↑*. Pickleball demo: **RECOVERY SLOWING**: *push-back speed −3.8σ ↓, trunk lean +2.2σ ↑*. Pattern
    labels describe movement change and are never diagnoses. On the skeleton it highlights the segments that changed.
 5. **Report and recover.** A session summary (stable reps, post-breaking-point reps, average drift before and after,
    largest mechanical drift), JSON/CSV export, and a **recovery check**: after rest, three reps are compared with the

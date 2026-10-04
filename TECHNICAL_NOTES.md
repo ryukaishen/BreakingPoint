@@ -292,7 +292,10 @@ frames enter the same `PosePipeline` → `SessionEngine` as camera frames, so se
 drift and detection are all real. Playback speed only changes how many simulated frames are processed per
 timer tick, so results are independent of frame rate. Fatigue presets (`DEMO_PRESETS`) were chosen with
 `tests/demo_tune.test.ts` so that the shipped detector tells the intended story. `tests/demo.test.ts` locks it:
-reps 1–8 stable, rep 9 drift emerging, BreakingPoint at rep 10, onset 6–8, recovery check > 50 %.
+reps 1–7 stable, reps 8–9 drift emerging, BreakingPoint at rep 10, onset 6–8, recovery check > 50 %. (Under the
+HiPerGator config — warning 1.0σ, BreakingPoint 2.0σ, α 0.4, clip 2.5 — the EWMA can rise at most
+`0.4·2.5 + 0.6·Z` per rep, so from a stable rep (Z ≤ 1.0) it needs at least three reps to exceed 2.0σ:
+"1–8 stable, 9 drift, 10 BreakingPoint" is unreachable for any data, and the demo tells the closest story.)
 
 ## 10. Testing
 

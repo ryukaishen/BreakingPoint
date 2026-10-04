@@ -17,8 +17,8 @@ export const DEMO_CALIBRATION_REPS = 6;
  * script after installing a new Lab config:  DEMO_TUNE=1 npx vitest run tests/demo_tune.test.ts
  */
 export const DEMO_PRESETS: Record<ExerciseType, { seed: number; effect: number }> = {
-  squat: { seed: 43, effect: 0.55 },
-  cmj: { seed: 28, effect: 0.65 },
+  squat: { seed: 73, effect: 0.65 },
+  cmj: { seed: 26, effect: 0.65 },
   lunge: { seed: 1, effect: 0.6 },
 };
 export const DEMO_SEED = DEMO_PRESETS.squat.seed;

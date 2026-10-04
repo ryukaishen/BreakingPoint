@@ -280,7 +280,7 @@ HiPerGator: see **[hpc/README_HIPERGATOR.md](hpc/README_HIPERGATOR.md)** (`bash 
 
 The demo never depends on camera conditions. It is clearly labeled **DEMO DATASET · SYNTHETIC ATHLETE**,
 and its frames go through exactly the same code path as camera frames. Story: 6 calibration reps →
-reps 1–6 stable → 7–8 drift rising → 9 drift emerging → **10 BreakingPoint** → 11–14 persistent drift →
+reps 1–7 stable → 8–9 drift emerging → **10 BreakingPoint** (onset ≈ rep 7) → 11–14 persistent drift →
 recovery check. (When the alarm fires is decided by the real detector at runtime; `tests/demo.test.ts`,
 `tests/sports.test.ts` and `tests/lunge.test.ts` lock the story for the shipped config.)
 

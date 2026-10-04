@@ -29,9 +29,12 @@ describe.each(['squat', 'cmj'] as const)('demo dataset (%s)', (exercise) => {
     expect(s.baseline?.reference.source).toBe('loo');
   });
 
-  it('tells the story: 1-8 stable, 9 drift emerging, 10 BreakingPoint, onset ≈ 7', () => {
+  // Under the HiPerGator config (warning 1.0σ, BreakingPoint 2.0σ, α 0.4, clip 2.5) the smoothed drift needs at
+  // least three reps to climb from a STABLE rep past 2.0σ, so the story is: 1-7 stable, 8-9 drift, 10 BreakingPoint.
+  it('tells the story: 1-7 stable, 8-9 drift emerging, 10 BreakingPoint, onset ≈ 7', () => {
     const states = s.monitorReps.map((r) => r.step!.state);
-    expect(states.slice(0, 8).every((x) => x === 'STABLE')).toBe(true);
+    expect(states.slice(0, 7).every((x) => x === 'STABLE')).toBe(true);
+    expect(states[7]).toBe('DRIFT');
     expect(states[8]).toBe('DRIFT');
     expect(s.alarmRep).toBe(10);
     expect(states.slice(9).every((x) => x === 'BREAKPOINT')).toBe(true);
