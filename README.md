@@ -307,7 +307,7 @@ Demo contexts (same primitive ⇒ same real pipeline; only the sport context dif
 
 - Pose estimation runs locally (WebAssembly/WebGL); no backend, no uploads.
 - Video is never recorded. Only derived numeric features are kept, in memory.
-- The personal baseline is stored only in this browser's localStorage; Reset Baseline deletes it.
+- Athlete profiles, personal baselines (per athlete and protocol) and set history are stored only in this browser's localStorage; Reset Baseline deletes that athlete's baseline for the protocol. The synthetic sample athlete lives in memory and never touches stored records.
 - The model and runtime are served from the app, so live mode also works offline.
 
 ## Limitations (deliberately stated)

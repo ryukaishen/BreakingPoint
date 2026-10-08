@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import type { LaunchContext } from '../protocols/launch';
 import { RECOVERY_REPS, type Snapshot } from '../session/engine';
 import { Book, Flask, LogoMark, Reset } from './Icons';
@@ -8,11 +9,11 @@ interface Props {
   snap: Snapshot | null;
   mode: 'demo' | 'live';
   launch: LaunchContext;
-  athlete: string;
+  /** Athlete switcher (owned by the app, which knows about profiles and the sample athlete). */
+  athleteSlot: ReactNode;
   onHome: () => void;
   onChangeProtocol: () => void;
   onLibrary: () => void;
-  onAthlete: (name: string) => void;
   onResearch: () => void;
   onLab: () => void;
   onResetBaseline: () => void;
@@ -104,10 +105,7 @@ export function Header(p: Props) {
             {p.mode === 'demo' ? 'Demo' : 'Live'}
           </span>
         )}
-        <label className="row hide-sm" style={{ gap: 2 }} title="Athlete name (stored only on this device)">
-          <span className="visually-hidden">Athlete name</span>
-          <input className="name-input" value={p.athlete} maxLength={18} onChange={(e) => p.onAthlete(e.target.value)} />
-        </label>
+        {p.athleteSlot}
         <span className="header-sep" aria-hidden />
         <button className="btn ghost sm hide-sm" onClick={p.onLibrary} title="Movement protocol library">
           Protocols

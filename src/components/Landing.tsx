@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import type { DetectorConfig } from '../detection/config';
 import { DemoController } from '../demo/demoController';
-import { heldReps } from '../progress/records';
+import { heldReps } from '../data/progress';
 import { makeLabeler } from '../protocols/labels';
 import { DEMO_CONTEXTS, protocolRefs, resolveDemo } from '../protocols/launch';
 import { sessionPattern } from '../protocols/patterns';

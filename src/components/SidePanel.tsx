@@ -1,7 +1,7 @@
 import type { Baseline } from '../baseline/baseline';
 import { featureSpecs, formatFeatureValue, formatWithUnit, type ExerciseType } from '../biomechanics/catalog';
 import type { FeatureDeviation } from '../detection/driftScore';
-import { heldReps, stillHolding } from '../progress/records';
+import { heldReps, stillHolding } from '../data/progress';
 import { useLabels } from '../protocols/labels';
 import type { LaunchContext } from '../protocols/launch';
 import { sessionPattern } from '../protocols/patterns';

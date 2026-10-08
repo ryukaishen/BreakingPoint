@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
-import type { HeldRecord } from '../progress/records';
-import { heldReps } from '../progress/records';
+import type { HeldOutcome } from '../data/progress';
+import { heldReps } from '../data/progress';
 import { useLabels } from '../protocols/labels';
 import type { LaunchContext } from '../protocols/launch';
 import { sessionPattern } from '../protocols/patterns';
@@ -14,8 +14,8 @@ import { Check, Close, Download } from './Icons';
 interface Props {
   snap: Snapshot;
   launch: LaunchContext;
-  /** Personal-best comparison for this set; null for demo runs. */
-  heldRecord: HeldRecord | null;
+  /** How this set compares with the athlete's earlier comparable sets. */
+  outcome: HeldOutcome | null;
   onClose: () => void;
   onRecovery: () => void;
   onNewSet: () => void;
@@ -41,7 +41,7 @@ function RecordTile({ state, label, value, sub, children }: { state: TileState; 
   );
 }
 
-export function SummaryModal({ snap, launch, heldRecord, onClose, onRecovery, onNewSet }: Props) {
+export function SummaryModal({ snap, launch, outcome, onClose, onRecovery, onNewSet }: Props) {
   const sm = snap.summary;
   const L = useLabels(snap.exercise);
   const dialogRef = useDialog<HTMLDivElement>(onClose);
@@ -50,14 +50,15 @@ export function SummaryModal({ snap, launch, heldRecord, onClose, onRecovery, on
   const pattern = sm.breakpointRep !== null ? sessionPattern(snap.exercise, snap.monitorReps, snap.onsetRep, snap.baseline?.reference.sigma0, launch.patternLabels) : null;
   const held = heldReps(snap.monitorReps);
   const rec = snap.recovery;
-  const heldSub =
-    snap.mode === 'demo'
-      ? 'Personal bests are saved from live sessions only'
-      : heldRecord?.isNewBest
-        ? `New personal best (previous ${heldRecord.previousBest})`
-        : heldRecord?.previousBest !== null && heldRecord?.previousBest !== undefined
-          ? `Personal best ${heldRecord.previousBest}`
-          : 'First recorded set for this movement';
+  const heldSub = !outcome
+    ? 'Not saved'
+    : outcome.kind === 'new-record'
+      ? `New record (previous best ${outcome.previousBest})`
+      : outcome.kind === 'first-record'
+        ? 'First recorded set: this is the line to beat'
+        : outcome.kind === 'not-eligible'
+          ? `Not counted toward records: ${outcome.reasons[0]?.toLowerCase() ?? 'conditions not comparable'}`
+          : `Your best is ${outcome.previousBest}`;
   return (
     <div className="modal-backdrop" onClick={onClose}>
       <div className="modal sys-window" onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true" aria-labelledby="summary-title" tabIndex={-1} ref={dialogRef}>
@@ -82,7 +83,7 @@ export function SummaryModal({ snap, launch, heldRecord, onClose, onRecovery, on
               value={snap.baseline ? `${snap.baseline.nReps} reps` : '—'}
               sub="fresh calibration reps"
             />
-            <RecordTile state={heldRecord?.isNewBest ? 'done' : 'plain'} label="Held at baseline" value={`${held} rep${held === 1 ? '' : 's'}`} sub={heldSub} />
+            <RecordTile state={outcome?.kind === 'new-record' ? 'done' : 'plain'} label="Held at baseline" value={`${held} rep${held === 1 ? '' : 's'}`} sub={heldSub} />
             <RecordTile
               state={sm.breakpointRep !== null ? 'alert' : 'plain'}
               label="Breaking point"

@@ -240,7 +240,11 @@ function Privacy() {
       <ul>
         <li>Pose estimation runs in your browser (WebAssembly / WebGL). No frames are uploaded; there is no backend.</li>
         <li>Video is not recorded. Only derived numeric movement features (angles, durations, quality scores) are kept in memory.</li>
-        <li>Your baseline is stored only in this browser (localStorage) so you can skip calibration next time. "Reset baseline" deletes it.</li>
+        <li>
+          Athlete profiles, baselines and set history are stored only in this browser (localStorage), separately for each athlete. "Reset baseline"
+          deletes that athlete's baseline for the current protocol; saved sets are kept.
+        </li>
+        <li>The sample athlete is synthetic example data held in memory. Nothing done while exploring it is saved or affects real records.</li>
         <li>Exports (JSON / CSV) are generated locally and contain numbers only.</li>
         <li>The pose model and runtime are bundled with the app, so live mode also works offline.</li>
       </ul>
