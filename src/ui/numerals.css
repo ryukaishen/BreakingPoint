@@ -1,0 +1,38 @@
+/* Numerals: two roles, never mixed.
+
+   HERO  (.num-hero)  Anybody italic. The one big number a screen is about: reps held,
+                      the rep count mid-set, a record. 32px or larger, tabular figures.
+                      At most one per screen, so the peak reads as a peak.
+   DATA  (.num)       Mona Sans with tabular figures. Everything else that is a number:
+                      table cells, deltas, dates, labels, split values, axis ticks.
+
+   Why: condensed black italic is unreadable small. The approved board's own risk note
+   puts the limit near 28px; the floor here is 32px so there is margin. Tabular figures
+   stop live digits from shifting width as they change (measured on Anybody at 100px:
+   "1111" is 241px and "8888" is 257px by default, both 273px with tabular-nums).
+
+   tests/typography.test.ts fails the build if any rule uses --font-num below 32px or
+   without tabular figures. Display words (the state plate, NEW RECORD) may use it at
+   display size under the same two conditions; body text, labels and data never may. */
+
+:root {
+  --num-hero-min: 32px;
+}
+
+.num-hero {
+  font-family: var(--font-num);
+  font-style: italic;
+  /* Condensed black italic, as on the approved board (weight 900, stretch 55 to 62%). The imported face has both axes. */
+  font-weight: 900;
+  font-stretch: 58%;
+  font-variant-numeric: tabular-nums lining-nums;
+  /* Callers set --num-hero-size; the clamp keeps it from ever dropping below the floor. */
+  font-size: clamp(32px, var(--num-hero-size, 64px), 320px);
+  line-height: 0.9;
+  letter-spacing: -0.01em;
+}
+
+.num {
+  font-family: var(--font);
+  font-variant-numeric: tabular-nums lining-nums;
+}

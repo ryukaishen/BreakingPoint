@@ -1,0 +1,59 @@
+/* Record staircase. Every session is readable: counted sessions are outlined or solid at
+   full contrast (outline colour --stable is about 6:1 on the page, well past the 3:1 a
+   graphic needs), sessions that did not count are dashed, and every bar has a text value.
+   Palette-agnostic: semantic tokens only (--sys, --stable, --ice, --muted, --lime). */
+
+.rs { margin: 0; display: grid; gap: 14px; }
+.rs-head { display: grid; gap: 4px; }
+.rs h2, .rs h3 { margin: 0; font-size: 20px; line-height: 1.2; }
+.rs-summary { margin: 0; font-size: 14px; color: var(--text-2); }
+.rs-empty { margin: 0; color: var(--text-2); }
+
+.rs-scroll { overflow-x: auto; }
+.rs-svg { display: block; width: 100%; height: auto; overflow: visible; }
+
+.rs-grid { stroke: var(--line); stroke-width: 1; }
+.rs-axis { stroke: var(--line-2); stroke-width: 1.5; }
+.rs-ytick { fill: var(--muted); font-size: 12px; }
+.rs-xlabel { fill: var(--muted); font-size: 12px; }
+.rs-val { fill: var(--text); font-size: 13px; font-weight: 600; }
+.rs-mark.is-record .rs-val, .rs-mark.is-first .rs-val { font-weight: 800; font-size: 14px; }
+.rs-record-label { fill: var(--ice); font-size: 13px; font-weight: 600; }
+.rs-record-label .num { font-weight: 800; }
+
+/* A session that raised the record, or the first that counts: solid with a cap and a diamond. */
+.rs-bar.is-record .rs-body, .rs-bar.is-first .rs-body { fill: var(--sys); }
+.rs-cap { fill: var(--ice); }
+.rs-diamond { fill: var(--ice); stroke: var(--ink, #05070d); stroke-width: 1.5; }
+/* Counted but not above the line: outlined and lightly tinted, at full contrast. */
+.rs-bar.is-held .rs-body { fill: var(--stable); fill-opacity: 0.35; stroke: var(--stable); stroke-width: 2; }
+/* Did not count: dashed outline, no fill. Shown and labelled, never able to raise the line. */
+.rs-bar.is-void .rs-body { fill: none; stroke: var(--muted); stroke-width: 2; stroke-dasharray: 5 4; }
+.rs-mark.is-void .rs-val { fill: var(--muted); }
+
+/* The newest session, when it is a genuine new record: the only lime in the chart. */
+.rs-bar.is-new .rs-body { fill: var(--lime, #c8ff2e); }
+.rs-bar.is-new .rs-cap { fill: var(--on-lime, #05070d); fill-opacity: 0.35; }
+.rs-mark.is-new .rs-diamond { fill: var(--lime, #c8ff2e); }
+.rs-mark.is-new .rs-val { fill: var(--lime, #c8ff2e); }
+
+/* The staircase itself: the one line, in the interaction colour. */
+.rs-line { stroke: var(--ice); stroke-width: 2.5; stroke-linejoin: miter; stroke-linecap: butt; }
+
+.rs-legend { display: flex; flex-wrap: wrap; gap: 8px 22px; margin: 0; padding: 0; list-style: none; font-size: 13px; color: var(--text-2); }
+.rs-legend li { display: inline-flex; align-items: center; gap: 8px; }
+.rs-sw { display: inline-block; width: 18px; height: 14px; box-sizing: border-box; transform: skewX(-12deg); }
+.rs-sw.is-record { background: var(--sys); border-top: 4px solid var(--ice); }
+.rs-sw.is-record.is-new { background: var(--lime, #c8ff2e); border-top-color: var(--on-lime, #05070d); }
+.rs-sw.is-held { background: color-mix(in srgb, var(--stable) 35%, transparent); border: 2px solid var(--stable); }
+.rs-sw.is-void { border: 2px dashed var(--muted); }
+.rs-sw-line { height: 0; width: 22px; border-top: 3px solid var(--ice); transform: none; }
+
+/* Bars rise in order, then the line appears. Transform and opacity only; none of it under reduced motion. */
+@keyframes rs-rise { from { opacity: 0; transform: scaleY(0.2); } to { opacity: 1; transform: none; } }
+@keyframes rs-fade { from { opacity: 0; } to { opacity: 1; } }
+.rs-bar { transform-box: fill-box; transform-origin: 50% 100%; animation: rs-rise 320ms cubic-bezier(0.2, 0.8, 0.2, 1) both; animation-delay: calc(var(--i) * 45ms); }
+.rs-line { animation: rs-fade 400ms ease-out both; animation-delay: 450ms; }
+@media (prefers-reduced-motion: reduce) {
+  .rs-bar, .rs-line { animation: none; }
+}
