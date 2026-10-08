@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { DetectorConfig } from '../detection/config';
 import { fmt, pct } from '../utils/format';
+import { useDialog } from '../utils/hooks';
 import { Close } from './Icons';
 
 export type ResearchTab = 'method' | 'science' | 'lab' | 'privacy';
@@ -138,6 +139,18 @@ function Science() {
 function Lab({ c }: { c: DetectorConfig }) {
   const v = c.validation as Record<string, unknown> | undefined;
   const [zoom, setZoom] = useState<string | null>(null);
+  // Escape closes the zoomed figure before the dialog (capture phase runs first).
+  useEffect(() => {
+    if (!zoom) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.stopPropagation();
+        setZoom(null);
+      }
+    };
+    window.addEventListener('keydown', onKey, true);
+    return () => window.removeEventListener('keydown', onKey, true);
+  }, [zoom]);
   if (!v || !Number.isFinite(c.validation?.numSessions)) {
     return (
       <div className="prose">
@@ -178,13 +191,13 @@ function Lab({ c }: { c: DetectorConfig }) {
         </div>
         <div className="kpi">
           <div className="k">False-positive rate</div>
-          <div className="v c-stable">{pct(c.validation?.falsePositiveRate)}</div>
-          <div className="s">{fprCi ? `95% CI ${pct(fprCi[0])}–${pct(fprCi[1])}` : ''} · held-out</div>
+          <div className="v">{pct(c.validation?.falsePositiveRate)}</div>
+          <div className="s">{fprCi ? `95% CI ${pct(fprCi[0])}–${pct(fprCi[1])}, held-out` : 'held-out'}</div>
         </div>
         <div className="kpi">
           <div className="k">Drift detected</div>
           <div className="v">{pct(c.validation?.truePositiveRate)}</div>
-          <div className="s">{tprCi ? `95% CI ${pct(tprCi[0])}–${pct(tprCi[1])}` : ''} · miss {pct(c.validation?.missRate)}</div>
+          <div className="s">{tprCi ? `95% CI ${pct(tprCi[0])}–${pct(tprCi[1])}, ` : ''}miss {pct(c.validation?.missRate)}</div>
         </div>
         <div className="kpi">
           <div className="k">Median delay</div>
@@ -193,7 +206,7 @@ function Lab({ c }: { c: DetectorConfig }) {
         </div>
       </div>
       <div className="panel prose" style={{ fontSize: 13 }}>
-        <b>Configurations evaluated:</b> {Number(v.num_configs_evaluated ?? 0).toLocaleString()} · <b>selected:</b> <code>{c.configId ?? c.mode}</code>{' '}
+        <b>Configurations evaluated:</b> {Number(v.num_configs_evaluated ?? 0).toLocaleString()}. <b>Selected:</b> <code>{c.configId ?? c.mode}</code>{' '}
         (mode {c.mode}, α {c.ewmaAlpha}, k {c.cusumK}, h {c.cusumH}, warning {c.warningThreshold}σ, breaking point {c.breakpointThreshold}σ, persistence{' '}
         {c.minimumPersistentReps}, clip {c.outlierClip ?? 'none'}, {c.featureWeighting}, missing → {c.missingHandling})
         <br />
@@ -202,8 +215,10 @@ function Lab({ c }: { c: DetectorConfig }) {
       {figs.length > 0 && (
         <div className="fig-grid">
           {FIGURES.filter(([f]) => figs.includes(`${f}.png`)).map(([f, cap]) => (
-            <figure key={f} onClick={() => setZoom(f)}>
-              <img src={`/lab/figures/${f}.png`} alt={cap} loading="lazy" />
+            <figure key={f}>
+              <button className="fig-btn" onClick={() => setZoom(f)} aria-label={`Enlarge: ${cap}`}>
+                <img src={`/lab/figures/${f}.png`} alt={cap} loading="lazy" />
+              </button>
               <figcaption>{cap}</figcaption>
             </figure>
           ))}
@@ -211,7 +226,7 @@ function Lab({ c }: { c: DetectorConfig }) {
       )}
       {zoom && (
         <div className="modal-backdrop" onClick={() => setZoom(null)} style={{ zIndex: 70 }}>
-          <img src={`/lab/figures/${zoom}.png`} alt={zoom} style={{ maxWidth: '96vw', maxHeight: '92vh', borderRadius: 12, background: '#fff' }} />
+          <img src={`/lab/figures/${zoom}.png`} alt={zoom} style={{ maxWidth: '96vw', maxHeight: '92vh', borderRadius: 6, background: '#fff' }} />
         </div>
       )}
     </div>
@@ -235,19 +250,20 @@ function Privacy() {
 
 export function ResearchModal({ config, initialTab = 'method', onClose }: Props) {
   const [tab, setTab] = useState<ResearchTab>(initialTab);
+  const dialogRef = useDialog<HTMLDivElement>(onClose);
   return (
     <div className="modal-backdrop" onClick={onClose}>
-      <div className="modal" onClick={(e) => e.stopPropagation()} role="dialog" aria-label="Research and validation">
+      <div className="modal sys-window" onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true" aria-labelledby="research-title" tabIndex={-1} ref={dialogRef}>
         <div className="modal-header">
           <div>
-            <div className="eyebrow">Research · validation · limitations</div>
-            <h2>How BreakingPoint works — and what it doesn't claim</h2>
+            <div className="eyebrow">Research, validation and limitations</div>
+            <h2 id="research-title">How BreakingPoint works, and what it doesn't claim</h2>
           </div>
           <button className="btn ghost" onClick={onClose} aria-label="Close">
             <Close />
           </button>
         </div>
-        <div className="tabs">
+        <div className="tabs" role="tablist" aria-label="Research sections">
           {(
             [
               ['method', 'Method'],
@@ -256,7 +272,7 @@ export function ResearchModal({ config, initialTab = 'method', onClose }: Props)
               ['privacy', 'Privacy'],
             ] as [ResearchTab, string][]
           ).map(([k, l]) => (
-            <button key={k} className={tab === k ? 'active' : ''} onClick={() => setTab(k)}>
+            <button key={k} role="tab" aria-selected={tab === k} className={tab === k ? 'active' : ''} onClick={() => setTab(k)}>
               {l}
             </button>
           ))}

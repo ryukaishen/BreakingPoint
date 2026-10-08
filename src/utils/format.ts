@@ -1,9 +1,10 @@
 import type { MovementState } from '../detection/detector';
+import { C } from '../ui/theme';
 
 export const STATE_COLOR: Record<MovementState, string> = {
-  STABLE: '#2ee59d',
-  DRIFT: '#ffb020',
-  BREAKPOINT: '#ff4d5e',
+  STABLE: C.stable,
+  DRIFT: C.drift,
+  BREAKPOINT: C.break,
 };
 
 export const STATE_LABEL: Record<MovementState, string> = {

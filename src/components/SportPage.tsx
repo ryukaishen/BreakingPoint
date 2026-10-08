@@ -3,7 +3,7 @@ import { getSubSport, protocolRefs, resolveLaunch, type LaunchContext } from '..
 import { PRIMITIVES } from '../protocols/primitives';
 import { PROTOCOLS, STATUS_LABEL, type ProtocolStatus } from '../protocols/protocols';
 import type { SportProfile } from '../protocols/sports';
-import { Camera, Play } from './Icons';
+import { Camera, Lock, Play } from './Icons';
 import { SportIcon } from './SportIcons';
 
 interface Props {
@@ -24,24 +24,24 @@ export function SportPage({ sport, subSportId, onSubSport, onBack, onDemo, onLiv
   const contextName = sub?.name ?? sport.name;
   return (
     <div className="landing">
-      <section className="sport-page">
+      <section className="section sport-page">
         <button className="btn ghost sm" onClick={onBack}>
-          ← All sports
+          <span aria-hidden>‹</span> All sports
         </button>
         <div className="sport-hero">
-          <span className="sport-icon big">
-            <SportIcon id={sport.icon} size={40} />
+          <span className="sport-icon big" aria-hidden>
+            <SportIcon id={sport.icon} size={38} />
           </span>
           <div>
-            <div className="eyebrow">{sport.name}{sub ? ` · ${sub.name}` : ''}</div>
+            {sub && <div className="eyebrow">{sport.name}</div>}
             <h1>{contextName}</h1>
-            <p className="muted">Recommended movement screens · {sport.descriptor.toLowerCase()}</p>
+            <p>Recommended movement screens for {sport.descriptor.toLowerCase()}.</p>
           </div>
         </div>
         {sport.subSports && sport.subSports.length > 0 && (
           <div className="seg subsport-seg" role="tablist" aria-label="Discipline">
             {sport.subSports.map((s) => (
-              <button key={s.id} className={s.id === sub?.id ? 'active' : ''} onClick={() => onSubSport(s.id)}>
+              <button key={s.id} role="tab" aria-selected={s.id === sub?.id} className={s.id === sub?.id ? 'active' : ''} onClick={() => onSubSport(s.id)}>
                 {s.name}
               </button>
             ))}
@@ -49,7 +49,7 @@ export function SportPage({ sport, subSportId, onSubSport, onBack, onDemo, onLiv
         )}
         {(sub?.note ?? sport.note) && <div className="panel note-panel">{sub?.note ?? sport.note}</div>}
 
-        <div className="proto-grid">
+        <ol className="briefings">
           {refs.map((ref) => {
             const p = PROTOCOLS[ref.protocolId];
             const ctx = resolveLaunch(sport.id, p.id, sub?.id);
@@ -57,54 +57,61 @@ export function SportPage({ sport, subSportId, onSubSport, onBack, onDemo, onLiv
             const labels = ctx ? makeLabeler(ctx.exercise, ctx.featureLabels) : null;
             const metrics = ctx ? (ref.focus ?? p.metrics).map((k) => labels!.short(k)) : p.plannedMetrics ?? [];
             return (
-              <div key={p.id} className={`proto-card ${ctx ? '' : 'disabled'}`}>
-                <div className="row" style={{ justifyContent: 'space-between' }}>
-                  <span className={`status-badge ${STATUS_CLASS[p.status]}`}>{STATUS_LABEL[p.status]}</span>
-                  <span className="prim-tag" title={prim.description}>
-                    {prim.id.replace(/_/g, ' ')} primitive
-                  </span>
-                </div>
-                <h3>{ref.title ?? p.name}</h3>
-                {ref.tagline && <div className="proto-tagline">{ref.tagline}</div>}
-                <p className="proto-purpose">{ref.purpose ?? p.purpose}</p>
-                <div className="proto-camera">
-                  <Camera size={13} /> {p.camera}
-                </div>
-                <div className="proto-metrics-label">{ctx ? 'Measures' : 'Planned metrics'}</div>
-                <div className="metric-chips">
-                  {metrics.map((m) => (
-                    <span key={m} className={`metric-chip ${ctx ? '' : 'muted'}`}>
-                      {m}
+              <li key={p.id} className={`panel briefing ${ctx ? '' : 'locked'}`}>
+                <div>
+                  <div className="b-head">
+                    <span className={`status-badge ${STATUS_CLASS[p.status]}`}>
+                      {!ctx && <Lock size={10} />}
+                      {STATUS_LABEL[p.status]}
                     </span>
-                  ))}
+                    <span className="prim-tag" title={prim.description}>
+                      {prim.name} primitive
+                    </span>
+                  </div>
+                  <h3>{ref.title ?? p.name}</h3>
+                  {ref.tagline && <div className="proto-tagline">{ref.tagline}</div>}
+                  <p className="proto-purpose">{ref.purpose ?? p.purpose}</p>
+                  <div className="proto-camera">
+                    <Camera size={13} /> {p.camera}
+                  </div>
+                </div>
+                <div>
+                  <div className="proto-metrics-label">{ctx ? 'Measures' : 'Planned metrics'}</div>
+                  <div className="metric-chips">
+                    {metrics.map((m) => (
+                      <span key={m} className={`metric-chip ${ctx ? '' : 'muted'}`}>
+                        {m}
+                      </span>
+                    ))}
+                  </div>
                 </div>
                 <div className="proto-actions">
                   {ctx ? (
                     <>
                       <button className="btn primary" onClick={() => onDemo(ctx)}>
-                        <Play size={13} /> Run demo
+                        <Play size={12} /> Run demo
                       </button>
                       <button className="btn" onClick={() => onLive(ctx)}>
                         <Camera size={14} /> Start live camera
                       </button>
                     </>
                   ) : (
-                    <button className="btn" disabled>
-                      {STATUS_LABEL[p.status]}
-                    </button>
+                    <span className="proto-locked">
+                      <Lock size={13} /> Not launchable yet
+                    </span>
                   )}
                 </div>
-                {p.status === 'BETA' && ctx && <div className="proto-foot">Beta · shared {prim.name.toLowerCase()} primitive; real-camera reliability is still being validated.</div>}
-              </div>
+                {p.status === 'BETA' && ctx && <div className="proto-foot">Beta: shared {prim.name.toLowerCase()} primitive. Real-camera reliability is still being validated.</div>}
+              </li>
             );
           })}
-        </div>
+        </ol>
 
         <div className="shared-note">
-          <b>One detector for every protocol.</b> The sport changes which repeatable movement is monitored and how it is described — the personal baseline and
-          the Lab-calibrated sequential detector (BreakingPoint Lab Monte-Carlo validation) stay the same.{' '}
+          <b>One detector for every protocol.</b> The sport changes which repeatable movement is monitored and how it is described. The personal baseline and the
+          Lab-calibrated sequential detector stay the same.{' '}
           <button className="link-btn" onClick={onLibrary}>
-            Explore all protocols →
+            Explore all protocols
           </button>
         </div>
       </section>

@@ -11,11 +11,13 @@ import { SidePanel } from './components/SidePanel';
 import { SportPage } from './components/SportPage';
 import { SummaryModal } from './components/SummaryModal';
 import { DEFAULT_DETECTOR_CONFIG, loadDetectorConfig, type DetectorConfig } from './detection/config';
+import { heldReps, loadBestHeld, recordHeld, type HeldRecord } from './progress/records';
 import { LabelProvider, makeLabeler } from './protocols/labels';
 import { DEFAULT_LAUNCH, getSport, launchForExercise, resolveDemo, resolveLaunch, type LaunchContext } from './protocols/launch';
 import { sessionPattern } from './protocols/patterns';
 import { SessionEngine } from './session/engine';
 import { DemoRunner, LiveRunner, type Runner } from './session/runners';
+import { C } from './ui/theme';
 import { arrow } from './utils/format';
 import { useEngine } from './utils/hooks';
 
@@ -42,6 +44,8 @@ export default function App() {
   const [toast, setToast] = useState<{ text: string; kind: string } | null>(null);
   const [demoSpeed, setDemoSpeed] = useState(2);
   const [demoPaused, setDemoPaused] = useState(false);
+  /** Personal-best comparison for the last finished live set (null in demo mode). */
+  const [heldRecord, setHeldRecord] = useState<HeldRecord | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const exercise = launch.exercise;
 
@@ -59,6 +63,7 @@ export default function App() {
     setSelectedRep(null);
     setShowSummary(false);
     setLibrary(false);
+    setHeldRecord(null);
     setSessionKey((k) => k + 1);
     setView('session');
   }, []);
@@ -155,7 +160,9 @@ export default function App() {
       setFlash(true);
       setTimeout(() => setFlash(false), 1700);
       setToast({ text: ev.message, kind: 'break' });
-    } else if (ev.type === 'baseline' || ev.type === 'recovery' || ev.type === 'discarded') {
+    } else if (ev.type === 'baseline' || ev.type === 'recovery') {
+      setToast({ text: ev.message, kind: 'milestone' });
+    } else if (ev.type === 'discarded') {
       setToast({ text: ev.message, kind: '' });
     }
     if (ev.type === 'baseline' && mode === 'live' && snap.baseline && snap.calibrationReps.length) saveBaseline(snap.baseline);
@@ -169,8 +176,13 @@ export default function App() {
 
   const prevPhase = useRef(snap.phase);
   useEffect(() => {
-    if (snap.phase === 'summary' && prevPhase.current === 'monitoring') setShowSummary(true);
+    if (snap.phase === 'summary' && prevPhase.current === 'monitoring') {
+      // Personal records come only from real camera sessions, never from the synthetic demo athlete.
+      setHeldRecord(mode === 'live' && snap.monitorReps.length ? recordHeld(exercise, heldReps(snap.monitorReps)) : null);
+      setShowSummary(true);
+    }
     prevPhase.current = snap.phase;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [snap.phase]);
 
   // Presenter keyboard shortcuts (demo): Space pause, 1/2/4 speed, S skip
@@ -198,6 +210,7 @@ export default function App() {
   const newSet = () => {
     setShowSummary(false);
     setSelectedRep(null);
+    setHeldRecord(null);
     if (mode === 'demo') setSessionKey((k) => k + 1);
     else engine.startMonitoring();
   };
@@ -219,6 +232,8 @@ export default function App() {
   const contrib = snap.breakpointContributors?.slice(0, 3) ?? [];
   const pattern = snap.alarmRep !== null ? sessionPattern(exercise, snap.monitorReps, snap.onsetRep, snap.baseline?.reference.sigma0, launch.patternLabels) : null;
   const sportForPage = getSport(sportView.sportId);
+  // Best before the current set, so the live comparison is against the previous record.
+  const bestHeld = mode === 'live' ? (heldRecord ? heldRecord.previousBest : loadBestHeld(exercise)) : null;
 
   return (
     <div className="app">
@@ -300,6 +315,7 @@ export default function App() {
                 selectedRep={selectedRep}
                 onSelectRep={setSelectedRep}
                 savedBaseline={mode === 'live' ? loadBaseline(exercise) : null}
+                bestHeld={bestHeld}
                 onStartCalibration={() => engine.startCalibration()}
                 onFinishCalibration={() => engine.finishCalibration()}
                 onUseSaved={() => {
@@ -318,17 +334,15 @@ export default function App() {
                 <div className="chart-head">
                   <h2>
                     Form drawdown
-                    <small>
-                      {launch.contextName} · {launch.title} · drift per rep vs {athlete}'s personal baseline
-                    </small>
+                    <small>Drift per rep vs {athlete}'s personal baseline</small>
                   </h2>
                   <div className="legend">
-                    <span><i className="box" style={{ background: 'rgba(46,229,157,0.35)' }} />your normal range</span>
-                    <span><i className="box" style={{ background: '#2ee59d', opacity: 0.6 }} />per-rep drift</span>
-                    <span><i style={{ background: '#e9eef6', height: 3 }} />smoothed drift (EWMA)</span>
-                    <span><i style={{ background: '#ffb020' }} />warning</span>
-                    <span><i style={{ background: '#ff4d5e' }} />breaking point</span>
-                    <span><i style={{ background: '#a594ff' }} />CUSUM evidence</span>
+                    <span><i className="box" style={{ background: C.stable, opacity: 0.3 }} />your normal range</span>
+                    <span><i className="box" style={{ background: C.stable, opacity: 0.65 }} />per-rep drift</span>
+                    <span><i style={{ background: C.text, height: 3 }} />smoothed drift (EWMA)</span>
+                    <span><i style={{ background: C.drift }} />warning</span>
+                    <span><i style={{ background: C.break }} />breaking point</span>
+                    <span><i style={{ background: C.violet }} />CUSUM evidence</span>
                   </div>
                 </div>
                 <FormDrawdown
@@ -361,27 +375,41 @@ export default function App() {
                     </>
                   ) : snap.monitorReps.length ? (
                     <span>
-                      No persistent drift yet · {snap.monitorReps.length} rep{snap.monitorReps.length > 1 ? 's' : ''} scored against your baseline.
+                      No persistent drift yet. {snap.monitorReps.length} rep{snap.monitorReps.length > 1 ? 's' : ''} scored against your baseline.
                     </span>
                   ) : (
                     <span className="muted">The chart fills in as monitored reps are completed. Hover or click a bar for its measurements.</span>
                   )}
                 </div>
-                <div style={{ marginTop: 6 }}>
-                  <RepTimeline reps={snap.monitorReps} alarmRep={snap.alarmRep} selected={selectedRep} onSelect={setSelectedRep} maxScore={maxScore} />
-                </div>
+                <RepTimeline reps={snap.monitorReps} alarmRep={snap.alarmRep} selected={selectedRep} onSelect={setSelectedRep} maxScore={maxScore} />
               </div>
             </section>
           </main>
           {showSummary && snap.summary && (
-            <SummaryModal snap={snap} launch={launch} onClose={() => setShowSummary(false)} onRecovery={startRecovery} onNewSet={newSet} />
+            <SummaryModal
+              snap={snap}
+              launch={launch}
+              heldRecord={heldRecord}
+              onClose={() => setShowSummary(false)}
+              onRecovery={startRecovery}
+              onNewSet={newSet}
+            />
           )}
         </LabelProvider>
       )}
 
       {library && <ProtocolLibrary onClose={() => setLibrary(false)} onOpenSport={openSport} />}
       {research && <ResearchModal config={config} initialTab={research} onClose={() => setResearch(null)} />}
-      {toast && <div className={`toast ${toast.kind}`}>{toast.text}</div>}
+      {toast && (
+        <div
+          className={`sys-window toned toast ${toast.kind} ${toast.kind === 'break' ? 'tone-break' : toast.kind === 'milestone' ? 'tone-violet' : ''}`}
+          role="status"
+          aria-live="polite"
+        >
+          <span className="toast-mark" aria-hidden />
+          {toast.text}
+        </div>
+      )}
     </div>
   );
 }

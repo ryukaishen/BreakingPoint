@@ -2,7 +2,8 @@ import { allProtocolEntries } from '../protocols/launch';
 import { PRIMITIVES, type PrimitiveId } from '../protocols/primitives';
 import { canLaunch, STATUS_GLYPH, type ProtocolStatus } from '../protocols/protocols';
 import { SPORTS, type SportContextDef, type SportProfile } from '../protocols/sports';
-import { Close } from './Icons';
+import { useDialog } from '../utils/hooks';
+import { Close, Lock } from './Icons';
 import { SportIcon } from './SportIcons';
 
 interface Props {
@@ -27,15 +28,16 @@ export function ProtocolLibrary({ onClose, onOpenSport }: Props) {
   const usage = new Set<PrimitiveId>([...active.keys(), ...planned.keys()]);
   const primitiveOrder: PrimitiveId[] = ['JUMP_AND_LAND', 'FORWARD_LUNGE', 'SQUAT', 'LATERAL_MOVEMENT', 'SINGLE_LEG_HOP', 'GAIT_CYCLE', 'HIP_HINGE', 'STRIKE_STEP', 'KICK'];
   type Ctx = { sport: SportProfile; sub?: SportContextDef };
+  const dialogRef = useDialog<HTMLDivElement>(onClose);
   const contexts = SPORTS.flatMap((sport): Ctx[] => (sport.subSports?.length ? sport.subSports.map((sub) => ({ sport, sub })) : [{ sport }]));
 
   return (
     <div className="modal-backdrop" onClick={onClose}>
-      <div className="modal" onClick={(e) => e.stopPropagation()} role="dialog" aria-label="Movement protocol library">
+      <div className="modal sys-window" onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true" aria-labelledby="library-title" tabIndex={-1} ref={dialogRef}>
         <div className="modal-header">
           <div>
-            <div className="eyebrow">Many sports · few primitives · one detector</div>
-            <h2>Movement protocol library</h2>
+            <div className="eyebrow">Many sports, a few movement primitives, one detector</div>
+            <h2 id="library-title">Movement protocol library</h2>
           </div>
           <div className="row">
             <span className="legend-glyphs">
@@ -63,10 +65,10 @@ export function ProtocolLibrary({ onClose, onOpenSport }: Props) {
                       </span>
                       <span className="prim-arrow">→</span>
                       <span className="prim-sports">
-                        {now.join(' · ')}
+                        {now.join(', ')}
                         {later.length > 0 && (
                           <span className="dim">
-                            {now.length ? '   ·   ' : ''}planned: {later.join(' · ')}
+                            {now.length ? ' / ' : ''}planned: {later.join(', ')}
                           </span>
                         )}
                       </span>
@@ -74,7 +76,7 @@ export function ProtocolLibrary({ onClose, onOpenSport }: Props) {
                   );
                 })}
             </div>
-            <div className="dim" style={{ fontSize: 12, marginTop: 8 }}>
+            <div className="muted" style={{ fontSize: 12.5, marginTop: 10 }}>
               A new sport does not mean a new model: a sport selects a protocol on a reusable primitive, plus terminology and featured metrics. The personal
               baseline and the sequential detector are shared.
             </div>
@@ -85,7 +87,7 @@ export function ProtocolLibrary({ onClose, onOpenSport }: Props) {
               <button key={`${sport.id}-${sub?.id ?? ''}`} className="lib-sport" onClick={() => onOpenSport(sport.id, sub?.id)}>
                 <div className="row" style={{ gap: 8 }}>
                   <SportIcon id={sport.icon} size={18} />
-                  <b>{(sub?.name ?? sport.name).toUpperCase()}</b>
+                  <b>{sub?.name ?? sport.name}</b>
                 </div>
                 {(sub ?? sport).protocols.map((ref) => {
                   const e = entries.find((x) => x.sport.id === sport.id && x.sub?.id === sub?.id && x.ref === ref)!;
@@ -100,21 +102,21 @@ export function ProtocolLibrary({ onClose, onOpenSport }: Props) {
             ))}
           </div>
 
-          <div className="custom-card wide">
-            <div className="row" style={{ justifyContent: 'space-between' }}>
-              <span className="eyebrow" style={{ color: '#a594ff' }}>
-                + Create your own protocol
+          <div className="locked-card">
+            <div className="lc-head">
+              <span className="lc-title">
+                <Lock size={14} /> Create your own protocol
               </span>
-              <span className="status-badge soon">Coming soon</span>
+              <span className="status-badge soon">Roadmap</span>
             </div>
-            <div className="explore-title">Teach BreakingPoint a repeatable movement.</div>
+            <p style={{ color: 'var(--text-2)' }}>Teach BreakingPoint a repeatable movement.</p>
             <ol className="custom-steps">
               <li>A coach records several clean repetitions of any repeatable movement.</li>
               <li>BreakingPoint segments the repetitions.</li>
               <li>It learns the athlete's personal movement distribution and builds a baseline.</li>
               <li>Future repetitions are monitored for persistent drift by the same validated detector.</li>
             </ol>
-            <div className="dim" style={{ fontSize: 12 }}>Not implemented yet — arbitrary movement learning is roadmap work.</div>
+            <p>Not implemented yet. Learning arbitrary movements is roadmap work.</p>
           </div>
           <div className="disclaimer">
             Detector validation (BreakingPoint Lab) evaluates detector behaviour under controlled synthetic movement drift. Sport-specific clinical validation is future

@@ -1,0 +1,675 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>BreakingPoint Directions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Anybody:ital,wdth,wght@0,50..150,400..900;1,50..150,400..900&family=Mona+Sans:ital,wdth,wght@0,75..125,300..900;1,75..125,300..900&display=swap" rel="stylesheet" />
+<style>
+/* ---------- shared foundation (pinned by the brief) ---------- */
+:root {
+  --ink: #05070d; --navy: #0a1124; --char: #101319; --panel: #0d1322; --panel-2: #121a2e; --line: #1c2740; --line-2: #2a3a5c;
+  --text: #eef2f8; --text-2: #a9b5c7; --muted: #7f8ca3;
+  --cobalt: #2f5bff; --cobalt-hi: #6b8cff; --ice: #8fe9ff; --lime: #c8ff2e; --amber: #ffb03a; --red: #ff3b57;
+  --mona: 'Mona Sans', system-ui, sans-serif; --any: 'Anybody', 'Mona Sans', system-ui, sans-serif;
+}
+* { box-sizing: border-box; }
+html { background: var(--ink); }
+body { margin: 0; background: var(--ink); color: var(--text); font-family: var(--mona); font-size: 15px; line-height: 1.55; -webkit-font-smoothing: antialiased; }
+::selection { background: rgba(47, 91, 255, 0.45); }
+:focus-visible { outline: 2px solid var(--ice); outline-offset: 2px; }
+a { color: var(--ice); }
+.doc { max-width: 1240px; margin: 0 auto; padding: 56px 24px 96px; }
+.doc > section { margin-top: 72px; }
+h1 { font-size: clamp(40px, 5vw, 64px); font-weight: 800; font-stretch: 88%; line-height: 0.98; letter-spacing: -0.02em; margin: 0 0 18px; text-wrap: balance; }
+h2 { font-size: 32px; font-weight: 800; font-stretch: 90%; line-height: 1.05; margin: 0 0 14px; letter-spacing: -0.01em; text-wrap: balance; }
+h3 { font-size: 19px; font-weight: 700; margin: 28px 0 8px; }
+p { margin: 0 0 12px; max-width: 72ch; text-wrap: pretty; color: var(--text-2); }
+p strong, li strong { color: var(--text); font-weight: 650; }
+ul, ol { color: var(--text-2); padding-left: 20px; max-width: 80ch; }
+li { margin: 5px 0; }
+.lede { font-size: 18px; color: var(--text); max-width: 64ch; }
+.note { font-size: 13px; color: var(--muted); }
+.cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 32px; }
+.cols-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line); vertical-align: top; color: var(--text-2); }
+th { color: var(--text); font-weight: 650; font-size: 13px; }
+td strong { color: var(--text); }
+.tag { display: inline-block; font-size: 12px; font-weight: 650; padding: 2px 8px; border-radius: 3px; border: 1px solid var(--line-2); color: var(--text-2); }
+.chips { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0 4px; }
+.chip { display: flex; flex-direction: column; gap: 4px; width: 112px; font-size: 12px; color: var(--muted); }
+.chip i { display: block; height: 44px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.08); }
+.chip b { color: var(--text); font-weight: 650; font-size: 12.5px; }
+.rule { border: 0; border-top: 1px solid var(--line); margin: 40px 0; }
+.score { font-family: var(--any); font-style: italic; font-weight: 900; font-stretch: 60%; font-size: 64px; line-height: 0.9; color: var(--text); }
+.issues { counter-reset: n; list-style: none; padding: 0; }
+.issues li { padding: 12px 0; border-top: 1px solid var(--line); display: grid; grid-template-columns: 56px 1fr; gap: 8px; }
+.issues li::before { counter-increment: n; content: 'P' attr(data-p); font-weight: 750; color: var(--text); }
+.ia { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; margin: 14px 0; }
+.ia div { padding: 16px; border-left: 1px solid var(--line); background: var(--panel); }
+.ia div:first-child { border-left: 0; }
+.ia b { display: block; font-size: 17px; color: var(--text); margin-bottom: 4px; }
+.ia span { font-size: 13.5px; color: var(--text-2); }
+
+/* ---------- screen frames ---------- */
+.screens { display: flex; flex-direction: column; gap: 28px; margin-top: 22px; }
+.frame { position: relative; width: 100%; }
+.frame figcaption { font-size: 13.5px; color: var(--muted); margin-top: 8px; max-width: 90ch; }
+.frame figcaption strong { color: var(--text); }
+.viewport { width: 100%; aspect-ratio: 1200 / 720; position: relative; overflow: hidden; border-radius: 8px; border: 1px solid var(--line); }
+.screen { position: absolute; top: 0; left: 0; width: 1200px; height: 720px; transform-origin: 0 0; }
+.synthetic { position: absolute; right: 10px; bottom: 8px; font-size: 11px; color: rgba(255,255,255,0.55); letter-spacing: 0.02em; z-index: 5; }
+
+/* ===================== DIRECTION A: ASCENT (refined) ===================== */
+.A { background: var(--char); color: var(--text); font-family: var(--mona); display: grid; grid-template-columns: 64px 1fr; height: 100%; }
+.A .rail { background: var(--navy); border-right: 1px solid var(--line); display: flex; flex-direction: column; align-items: center; padding: 16px 0; gap: 6px; }
+.A .rail .mark { width: 30px; height: 30px; margin-bottom: 18px; }
+.A .rail a { width: 44px; height: 44px; border-radius: 6px; display: grid; place-items: center; color: var(--muted); }
+.A .rail a.on { background: rgba(47, 91, 255, 0.16); color: var(--cobalt-hi); box-shadow: inset 2px 0 0 var(--cobalt); }
+.A .main { display: flex; flex-direction: column; min-width: 0; }
+.A .top { height: 56px; display: flex; align-items: center; gap: 18px; padding: 0 24px; border-bottom: 1px solid var(--line); }
+.A .top .title { font-weight: 700; font-size: 15px; }
+.A .top .title span { color: var(--muted); font-weight: 500; }
+.A .track { display: flex; align-items: center; gap: 10px; margin-left: auto; font-size: 13px; color: var(--muted); }
+.A .track i { width: 8px; height: 8px; border-radius: 50%; border: 1.5px solid var(--line-2); display: inline-block; margin-right: 6px; vertical-align: 1px; }
+.A .track .done i { background: var(--text-2); border-color: var(--text-2); }
+.A .track .on { color: var(--text); font-weight: 600; }
+.A .track .on i { background: var(--cobalt); border-color: var(--cobalt); }
+.A .track .sep { width: 18px; height: 1px; background: var(--line-2); }
+.A .btn { height: 36px; padding: 0 16px; border-radius: 6px; border: 1px solid var(--line-2); background: var(--panel-2); color: var(--text); font: 600 13.5px var(--mona); display: inline-flex; align-items: center; gap: 8px; }
+.A .btn.pri { background: var(--cobalt); border-color: var(--cobalt); color: #fff; }
+.A .btn.lg { height: 46px; padding: 0 22px; font-size: 15px; }
+.A .k { font-size: 12.5px; color: var(--muted); }
+/* A1 session */
+.A .session { flex: 1; display: grid; grid-template-columns: 1fr 400px; min-height: 0; }
+.A .stage { position: relative; background: #070a12; border-right: 1px solid var(--line); overflow: hidden; }
+.A .stage .band { position: absolute; left: 0; right: 0; top: 0; height: 4px; background: var(--cobalt-hi); }
+.A .stage .floor { position: absolute; left: 8%; right: 8%; bottom: 70px; height: 1px; background: rgba(107, 140, 255, 0.35); }
+.A .stage .cap { position: absolute; left: 24px; bottom: 22px; font-size: 13px; color: var(--text-2); }
+.A .focus { padding: 28px 28px 24px; display: flex; flex-direction: column; gap: 22px; background: var(--char); }
+.A .state { font-size: 104px; font-weight: 800; font-stretch: 82%; line-height: 0.86; letter-spacing: -0.02em; color: var(--cobalt-hi); }
+.A .state-line { font-size: 17px; color: var(--text); margin-top: 6px; }
+.A .reprow { display: flex; align-items: baseline; gap: 12px; }
+.A .rep { font-size: 88px; font-weight: 700; font-stretch: 80%; line-height: 0.85; font-variant-numeric: tabular-nums; }
+.A .held { border-top: 1px solid var(--line); padding-top: 18px; }
+.A .meter { position: relative; display: grid; grid-template-columns: repeat(12, 1fr); gap: 4px; margin-top: 34px; }
+.A .meter i { height: 14px; border-radius: 2px; background: var(--panel-2); }
+.A .meter i.on { background: var(--cobalt-hi); }
+.A .meter .best { position: absolute; top: -8px; bottom: -8px; width: 2px; background: var(--text); }
+.A .meter .best span { position: absolute; top: -20px; left: -16px; font-size: 12px; color: var(--text); white-space: nowrap; font-weight: 600; }
+.A .evidence { margin-top: auto; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--line); padding-top: 14px; font-size: 13px; color: var(--muted); }
+/* A2 debrief */
+.A .debrief { flex: 1; display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 28px; padding: 28px 32px; min-height: 0; }
+.A .result .big { font-size: 148px; font-weight: 800; font-stretch: 78%; line-height: 0.8; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
+.A .result .lead { font-size: 22px; font-weight: 650; margin: 8px 0 6px; }
+.A .record { display: inline-flex; align-items: center; gap: 10px; font-size: 14px; color: var(--text-2); }
+.A .record b { color: var(--lime); font-weight: 750; }
+.A .warn { margin-top: 26px; border: 1px solid rgba(255, 59, 87, 0.45); border-radius: 6px; padding: 16px 18px; background: rgba(255, 59, 87, 0.06); display: grid; grid-template-columns: 1fr auto; gap: 14px; align-items: center; }
+.A .warn h4 { margin: 0 0 4px; font-size: 16px; color: #ff8193; }
+.A .warn p { margin: 0; font-size: 14px; }
+.A .side h4 { font-size: 14px; margin: 0 0 10px; color: var(--text); font-weight: 650; }
+.A .cmp { width: 100%; font-size: 14px; }
+.A .cmp td, .A .cmp th { padding: 9px 0; border-bottom: 1px solid var(--line); color: var(--text-2); }
+.A .cmp td:last-child, .A .cmp th:last-child { text-align: right; }
+.A .cmp .up { color: var(--lime); font-weight: 650; }
+.A .chg { display: flex; flex-direction: column; gap: 8px; margin-top: 22px; }
+.A .chg div { display: flex; justify-content: space-between; font-size: 14px; color: var(--text-2); border-bottom: 1px solid var(--line); padding-bottom: 8px; }
+.A .chg div b { color: var(--text); font-weight: 600; }
+/* A3 progress */
+.A .prog { flex: 1; display: grid; grid-template-columns: 1fr 330px; grid-template-rows: auto 1fr; gap: 20px 28px; padding: 24px 32px 28px; min-height: 0; }
+.A .seg { display: inline-flex; border: 1px solid var(--line-2); border-radius: 6px; padding: 2px; gap: 2px; }
+.A .seg span { padding: 6px 12px; border-radius: 4px; font-size: 13px; color: var(--muted); }
+.A .seg span.on { background: rgba(47, 91, 255, 0.18); color: var(--text); }
+.A .card { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 18px 20px; }
+.A .rec { display: flex; justify-content: space-between; align-items: baseline; padding: 12px 0; border-bottom: 1px solid var(--line); }
+.A .rec:last-child { border-bottom: 0; }
+.A .rec .v { font-size: 30px; font-weight: 750; font-stretch: 82%; font-variant-numeric: tabular-nums; }
+.A .rec .v.new { color: var(--lime); }
+.A .weeks { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; margin-top: 12px; align-items: end; }
+.A .weeks div { display: flex; flex-direction: column; gap: 6px; align-items: center; font-size: 11.5px; color: var(--muted); }
+.A .weeks i { width: 100%; border-radius: 2px; background: var(--panel-2); display: block; }
+.A .weeks i.met { background: var(--cobalt); }
+.A .ms { display: flex; gap: 10px; align-items: flex-start; padding: 9px 0; border-bottom: 1px solid var(--line); font-size: 13.5px; color: var(--text-2); }
+.A .ms:last-child { border-bottom: 0; }
+.A .ms b { color: var(--text); font-weight: 650; display: block; }
+.A .ms .dot { width: 9px; height: 9px; border-radius: 50%; margin-top: 6px; flex: none; border: 1.5px solid var(--line-2); }
+.A .ms .dot.got { background: var(--cobalt-hi); border-color: var(--cobalt-hi); }
+
+/* ===================== DIRECTION B: BREAKAWAY (kinetic) ===================== */
+.B { --cut: 22px; background: var(--ink); color: var(--text); font-family: var(--mona); height: 100%; display: flex; flex-direction: column; }
+.B .disp { font-family: var(--any); font-style: italic; font-weight: 900; font-stretch: 62%; letter-spacing: -0.01em; }
+.B .top { height: 56px; display: flex; align-items: center; gap: 22px; padding: 0 24px; border-bottom: 1px solid var(--line); background: var(--ink); }
+.B .word { font-family: var(--any); font-style: italic; font-weight: 900; font-stretch: 75%; font-size: 21px; letter-spacing: 0; }
+.B .word b { color: var(--cobalt-hi); }
+.B .nav { display: flex; gap: 4px; }
+.B .nav span { padding: 8px 12px; font-size: 13.5px; color: var(--muted); font-weight: 600; border-bottom: 2px solid transparent; }
+.B .nav span.on { color: var(--text); border-bottom-color: var(--cobalt); }
+.B .track { margin-left: auto; display: flex; gap: 2px; }
+.B .track span { padding: 6px 14px 6px 12px; font-size: 12.5px; font-weight: 700; color: var(--muted); background: var(--panel); clip-path: polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%); }
+.B .track span.done { color: var(--text-2); background: var(--panel-2); }
+.B .track span.on { color: #fff; background: var(--cobalt); }
+.B .btn { height: 38px; padding: 0 18px; border: 0; color: #fff; background: var(--cobalt); font: 700 13.5px var(--mona); display: inline-flex; align-items: center; gap: 8px; clip-path: polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%); }
+.B .btn.ghost { background: var(--panel-2); color: var(--text); }
+.B .btn.lg { height: 48px; padding: 0 26px; font-size: 15px; }
+.B .k { font-size: 12.5px; color: var(--muted); font-weight: 600; }
+/* B1 session */
+.B .session { flex: 1; position: relative; min-height: 0; background: #060912; overflow: hidden; }
+.B .session .floor { position: absolute; left: 6%; right: 44%; bottom: 74px; height: 1px; background: rgba(107, 140, 255, 0.3); }
+.B .hud { position: absolute; top: 0; right: 0; bottom: 0; width: 470px; background: var(--ink); clip-path: polygon(64px 0, 100% 0, 100% 100%, 0 100%); padding: 30px 30px 26px 92px; display: flex; flex-direction: column; gap: 16px; border-left: 0; }
+.B .hud::before { content: ''; position: absolute; top: 0; bottom: 0; left: 0; width: 70px; background: var(--cobalt); clip-path: polygon(62px 0, 70px 0, 8px 100%, 0 100%); }
+.B .hstate { display: inline-block; align-self: flex-start; font-family: var(--any); font-style: italic; font-weight: 900; font-stretch: 70%; font-size: 44px; line-height: 1; padding: 6px 18px 4px 14px; background: var(--cobalt); color: #fff; clip-path: polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%); }
+.B .hrep { font-family: var(--any); font-style: italic; font-weight: 900; font-stretch: 55%; font-size: 200px; line-height: 0.78; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+.B .race { margin-top: auto; }
+.B .lane { position: relative; height: 34px; background: var(--panel); margin-top: 10px; clip-path: polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%); }
+.B .lane .fill { position: absolute; left: 0; top: 0; bottom: 0; background: var(--cobalt); clip-path: polygon(0 0, 100% 0, calc(100% - 10px) 100%, 0 100%); }
+.B .lane .ghost { position: absolute; top: -6px; bottom: -6px; width: 3px; background: var(--text); }
+.B .lane-lbl { display: flex; justify-content: space-between; font-size: 13px; color: var(--text-2); font-weight: 600; margin-top: 8px; }
+.B .lane-lbl b { color: var(--text); }
+/* B2 debrief */
+.B .debrief { flex: 1; display: grid; grid-template-columns: 1.2fr 0.8fr; grid-template-rows: auto 1fr; min-height: 0; }
+.B .slab { grid-column: 1 / -1; position: relative; background: var(--cobalt); color: #fff; padding: 22px 32px 26px; clip-path: polygon(0 0, 100% 0, 100% calc(100% - 34px), calc(100% - 300px) 100%, 0 100%); display: grid; grid-template-columns: auto 1fr auto; gap: 28px; align-items: end; }
+.B .slab .n { font-family: var(--any); font-style: italic; font-weight: 900; font-stretch: 55%; font-size: 176px; line-height: 0.76; }
+.B .slab .what { font-size: 20px; font-weight: 700; max-width: 26ch; line-height: 1.25; padding-bottom: 8px; }
+.B .slab .what small { display: block; font-size: 14px; font-weight: 500; opacity: 0.86; margin-top: 6px; }
+.B .newrec { justify-self: end; align-self: start; font-family: var(--any); font-style: italic; font-weight: 900; font-stretch: 70%; font-size: 30px; color: var(--ink); background: var(--lime); padding: 6px 18px 4px 14px; clip-path: polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%); }
+.B .newrec small { display: block; font-family: var(--mona); font-style: normal; font-size: 12px; font-weight: 700; font-stretch: 100%; }
+.B .left { padding: 22px 32px; display: flex; flex-direction: column; gap: 18px; min-height: 0; }
+.B .warn { border-top: 2px solid var(--red); background: var(--panel); padding: 14px 18px; display: grid; grid-template-columns: 1fr auto; gap: 16px; align-items: center; }
+.B .warn h4 { margin: 0 0 3px; font-size: 16px; color: #ff8193; }
+.B .warn p { margin: 0; font-size: 14px; }
+.B .splits { display: grid; grid-template-columns: 96px repeat(12, 1fr); gap: 3px; align-items: center; font-size: 12.5px; color: var(--muted); font-weight: 600; }
+.B .splits i { height: 22px; background: var(--panel-2); display: block; }
+.B .splits i.s { background: var(--cobalt); } .B .splits i.d { background: var(--amber); } .B .splits i.b { background: var(--red); }
+.B .splits i.s.old { background: #24356e; } .B .splits i.d.old { background: #6b5022; } .B .splits i.b.old { background: #6b2433; }
+.B .right { padding: 22px 32px 22px 8px; display: flex; flex-direction: column; gap: 10px; }
+.B .row { display: flex; justify-content: space-between; align-items: baseline; border-bottom: 1px solid var(--line); padding: 8px 0; font-size: 14px; color: var(--text-2); }
+.B .row b { font-family: var(--any); font-style: italic; font-weight: 900; font-stretch: 65%; font-size: 26px; color: var(--text); }
+.B .row b.up { color: var(--lime); }
+/* B3 progress */
+.B .prog { flex: 1; display: grid; grid-template-columns: 380px 1fr; min-height: 0; }
+.B .pb { background: var(--navy); padding: 26px 30px; display: flex; flex-direction: column; gap: 14px; position: relative; clip-path: polygon(0 0, 100% 0, calc(100% - 46px) 100%, 0 100%); }
+.B .pb .n { font-family: var(--any); font-style: italic; font-weight: 900; font-stretch: 55%; font-size: 168px; line-height: 0.78; }
+.B .pb .rec { display: flex; justify-content: space-between; align-items: baseline; border-top: 1px solid var(--line-2); padding-top: 10px; font-size: 13.5px; color: var(--text-2); padding-right: 40px; }
+.B .pb .rec b { font-family: var(--any); font-style: italic; font-weight: 900; font-stretch: 65%; font-size: 30px; color: var(--text); }
+.B .pr-main { padding: 24px 32px 24px 22px; display: flex; flex-direction: column; gap: 16px; min-height: 0; }
+.B .plates { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.B .plate { background: var(--panel); padding: 12px 14px 12px 16px; clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px); font-size: 12.5px; color: var(--text-2); min-height: 88px; }
+.B .plate b { display: block; color: var(--text); font-size: 14px; margin-bottom: 4px; }
+.B .plate.got { box-shadow: inset 0 2px 0 var(--cobalt-hi); }
+.B .plate.lock { background: transparent; outline: 1px dashed var(--line-2); outline-offset: -1px; }
+.B .weeks { display: flex; gap: 6px; align-items: flex-end; }
+.B .weeks div { flex: 1; font-size: 11.5px; color: var(--muted); font-weight: 600; text-align: center; }
+.B .weeks i { display: block; margin-bottom: 6px; background: var(--panel-2); clip-path: polygon(6px 0, 100% 0, calc(100% - 6px) 100%, 0 100%); }
+.B .weeks i.met { background: var(--cobalt); }
+
+/* motion demos on the board (respect reduced motion) */
+@keyframes wipe { from { clip-path: polygon(0 0, 0 0, -300px 100%, 0 100%); } }
+@keyframes slam { 0% { transform: scale(1.18); opacity: 0; } 60% { transform: scale(0.98); opacity: 1; } 100% { transform: none; } }
+@keyframes stepdraw { from { stroke-dashoffset: 900; } to { stroke-dashoffset: 0; } }
+.replay .B .slab { animation: wipe 520ms cubic-bezier(.2,.8,.2,1) both; }
+.replay .B .slab .n, .replay .B .newrec { animation: slam 420ms 380ms cubic-bezier(.2,.8,.2,1) both; }
+.replay .A .stepline { stroke-dasharray: 900; animation: stepdraw 1100ms cubic-bezier(.2,.8,.2,1) both; }
+.play { margin-top: 8px; background: none; border: 1px solid var(--line-2); color: var(--text); border-radius: 4px; padding: 6px 12px; font: 600 13px var(--mona); cursor: pointer; }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
+
+@media (max-width: 860px) {
+  .cols, .cols-3, .ia { grid-template-columns: 1fr; }
+  .ia div { border-left: 0; border-top: 1px solid var(--line); }
+  .ia div:first-child { border-top: 0; }
+  .doc > section { margin-top: 52px; }
+}
+</style>
+</head>
+<body>
+<main class="doc">
+
+<header>
+  <h1>BreakingPoint: two directions for the redesign</h1>
+  <p class="lede">Both directions share one product rethink built on the audit and your answers: athletes first, coaches second, long-term progression third. The breaking point is a warning, never an achievement. What we celebrate is sustainable improvement, measured from your own data. They differ in how loudly the interface speaks.</p>
+  <p class="note">All numbers in the mock screens are sample data for a synthetic athlete, labeled as such in each frame. Real records will come only from live sessions. Nothing here is implemented yet.</p>
+</header>
+
+<section aria-labelledby="audit">
+  <h2 id="audit">What the audit found</h2>
+  <div class="cols">
+    <div>
+      <p>Impeccable's design review scored the current interface <strong>25 / 40</strong> on Nielsen's heuristics: acceptable, with the weakest marks on real-world language, error prevention, flexibility and minimalism. It credits the workflow-as-navigation track, the honest data-backed claims and the Form drawdown chart. It also says the visual language reads as a generic dark sports-tech dashboard: the Solo Leveling cue barely registers and the Blue Lock energy is absent.</p>
+      <div class="score" aria-label="25 out of 40">25<span style="font-size:28px;color:var(--muted)"> / 40</span></div>
+      <p class="note" style="margin-top:20px" id="detector-note">Impeccable's mechanical detector agrees the surface is mostly clean: 2 findings in source (a 2px accent border on formula blocks, a height transition on the depth gauge). On the live session page it adds two glows on active indicators, depth-gauge and chart labels under 11 px, and a skipped heading level on sport pages. Four browser hits were false positives: deliberate status-code capitals, chart annotations and the rep label.</p>
+    </div>
+    <ol class="issues">
+      <li data-p="1"><span><strong>No athlete-at-distance view.</strong> From 3 m only the rep number and skeleton colour are readable; the athlete walks back to the laptop four times per session; there are no audio cues.</span></li>
+      <li data-p="1"><span><strong>The breaking point over-alarms and under-guides.</strong> About 12 surfaces turn red at once, the next step is below the fold, and "End set" is styled as destructive.</span></li>
+      <li data-p="1"><span><strong>Data-integrity traps.</strong> Baselines and personal bests are keyed by movement, not athlete; reset has no confirmation; the logo silently abandons a live set.</span></li>
+      <li data-p="2"><span><strong>Detector internals are the athlete's vocabulary.</strong> EWMA, CUSUM, σ RMS and μ₀ ± σ₀ appear by default, with two unit systems.</span></li>
+      <li data-p="2"><span><strong>The progression loop has no shape.</strong> No rest step, contradictory recovery copy, recovery reps never charted, no session-complete moment, no history.</span></li>
+    </ol>
+  </div>
+
+</section>
+
+<section aria-labelledby="rethink">
+  <h2 id="rethink">The product rethink both directions share</h2>
+  <p>The visual direction is the smaller decision. These changes come from the audit and your answers, and they apply whichever direction you pick.</p>
+  <div class="ia" role="list">
+    <div role="listitem"><b>Home</b><span>Your next session, current records, this week against your own weekly goal, recent sessions. First run is onboarding: pick a sport, calibrate.</span></div>
+    <div role="listitem"><b>Train</b><span>Sport → protocol → a session that runs hands-free: athlete view at distance, evidence for coaches one tap away.</span></div>
+    <div role="listitem"><b>Debrief</b><span>A full screen after the set replaces the summary modal: result, next step, comparison with last time, what changed, records earned.</span></div>
+    <div role="listitem"><b>Progress</b><span>Per protocol: records, history charts, consistency against your goal, milestones with their exact criteria.</span></div>
+  </div>
+  <div class="cols">
+    <div>
+      <h3>During the workout: quiet</h3>
+      <ul>
+        <li><strong>Athlete view.</strong> Stage-dominant layout, one state word large enough for 3 m, one instruction, and reps held at your baseline as the hero number with your best marked.</li>
+        <li><strong>Hands-free flow.</strong> Calibration auto-advances to the monitored set after a short countdown; optional spoken cues for baseline locked, drift, and "end the set and rest" (browser speech, no new dependency).</li>
+        <li><strong>One alarm, one instruction.</strong> At the breaking point a single red signal and a calm sentence; "End set" becomes the primary action, not a danger button.</li>
+        <li><strong>Rest is a stage.</strong> Recover shows rest time elapsed (no prescribed duration), then the 3-rep check, then one consistent result, plotted against your baseline.</li>
+        <li><strong>Evidence drawer.</strong> EWMA, CUSUM and the drift score move behind "Show evidence" for coaches; athletes see "margin to your line" in plain words.</li>
+      </ul>
+    </div>
+    <div>
+      <h3>After the workout: earned drama</h3>
+      <ul>
+        <li><strong>Records.</strong> Most reps held at baseline, best recovery return, tightest baseline (most consistent fresh reps). A record only counts when the set's capture quality and calibration pass a floor, so a sloppy baseline cannot inflate it.</li>
+        <li><strong>Comparisons.</strong> This set against your previous session on the same protocol: held reps, drift onset, recovery.</li>
+        <li><strong>Goals you set.</strong> A weekly session target that respects rest days. No daily streaks.</li>
+        <li><strong>Milestones with criteria.</strong> Baseline locked, new record, back to baseline (the engine's own "recovered" status), goal weeks met. Each shows exactly how it was earned.</li>
+        <li><strong>Never rewarded.</strong> Reaching the breaking point, reps after drift, volume, short rests, or anything that compares you with other people.</li>
+      </ul>
+    </div>
+  </div>
+  <h3>Foundations for later</h3>
+  <ul>
+    <li>Storage keyed by athlete × protocol, with an athlete switcher; confirmations on reset and on leaving a live set; baselines show whose they are and when they were made.</li>
+    <li>A versioned on-device session log (still no backend) that a later coach or squad layer can read without a rewrite.</li>
+    <li>Stable moves off green to the system blue, so acid lime means exactly one thing: you set a new record.</li>
+  </ul>
+</section>
+
+<hr class="rule" />
+
+<!-- ===================== A ===================== -->
+<section aria-labelledby="dir-a">
+  <h2 id="dir-a">Direction A: Ascent (refined)</h2>
+  <p class="lede">A precise training instrument with a single progression line running through it. Solo Leveling leads: calm system panels, clear status, the feeling of steady advancement. Blue Lock appears only as conviction in the type.</p>
+  <div class="cols">
+    <div>
+      <h3>Signature move: the ascent line</h3>
+      <p>Your record for reps held at baseline is drawn as a staircase. Every step up is a real new record, and the line is the same object everywhere: the Home hero, the Progress chart, and the small line in the debrief that grows one step when you beat your best. Steps never go down; a weaker session is a dot below the line, not a fall.</p>
+      <h3>Type and colour</h3>
+      <p><strong>Mona Sans</strong> only, upright. Condensed widths for numerals, normal widths for text; one family keeps the instrument feel. Colour strategy is restrained: a navy rail, charcoal work areas, cobalt for actions and your data, icy cyan only for focus, lime only on the record number.</p>
+    </div>
+    <div>
+      <div class="chips">
+        <div class="chip"><i style="background:#0a1124"></i><b>Navy</b>#0A1124 shell</div>
+        <div class="chip"><i style="background:#101319"></i><b>Charcoal</b>#101319 ground</div>
+        <div class="chip"><i style="background:#2f5bff"></i><b>Cobalt</b>#2F5BFF action</div>
+        <div class="chip"><i style="background:#6b8cff"></i><b>Cobalt light</b>#6B8CFF stable, data</div>
+        <div class="chip"><i style="background:#8fe9ff"></i><b>Ice</b>#8FE9FF focus</div>
+        <div class="chip"><i style="background:#c8ff2e"></i><b>Lime</b>#C8FF2E records only</div>
+      </div>
+      <h3>Motion</h3>
+      <p>Ordinary interactions change colour in 120 ms and nothing moves. State changes cross-fade the stage band. One authored moment: when you set a record, the ascent line draws its new step and the number counts up once. Reduced motion shows the final state.</p>
+      <h3>Honest risk</h3>
+      <p>It may feel too calm: the Blue Lock intensity you asked for is mostly absent, and a record night looks only modestly different from an ordinary one.</p>
+    </div>
+  </div>
+
+  <div class="screens">
+    <figure class="frame">
+      <div class="viewport"><div class="screen">
+        <div class="A">
+          <nav class="rail" aria-hidden="true">
+            <svg class="mark" viewBox="0 0 64 64"><path d="M1 1h50l12 12v50H1z" fill="#080c16" stroke="#2a3a5c" stroke-width="2"/><polyline points="9,41 18,39 26,42 33,37" fill="none" stroke="#6b8cff" stroke-width="5" stroke-linecap="round"/><polyline points="37,33 44,26 50,18 56,12" fill="none" stroke="#ff3b57" stroke-width="5" stroke-linecap="round"/></svg>
+            <a><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11l9-7 9 7v9H3z"/></svg></a>
+            <a class="on"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/></svg></a>
+            <a><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 18 9 18 9 12 15 12 15 6 21 6"/></svg></a>
+          </nav>
+          <div class="main">
+            <div class="top">
+              <div class="title">Explosive fatigue screen <span>· Soccer · Adam</span></div>
+              <div class="track"><span class="done"><i></i>Calibrate</span><span class="sep"></span><span class="on"><i></i>Monitor</span><span class="sep"></span><span><i></i>Detect</span><span class="sep"></span><span><i></i>Recover</span></div>
+              <button class="btn">End set</button>
+            </div>
+            <div class="session">
+              <div class="stage">
+                <div class="band"></div>
+                <svg viewBox="0 0 400 600" style="position:absolute;left:50%;top:40px;height:560px;transform:translateX(-50%)" aria-hidden="true">
+                  <g stroke="#6b8cff" stroke-width="9" stroke-linecap="round" fill="none"><circle cx="200" cy="70" r="30" fill="#070a12" stroke-width="6"/><line x1="200" y1="105" x2="196" y2="260"/><line x1="196" y1="260" x2="214" y2="390"/><line x1="214" y1="390" x2="204" y2="520"/><line x1="200" y1="130" x2="236" y2="210"/><line x1="236" y1="210" x2="250" y2="270"/><line x1="204" y1="520" x2="240" y2="524"/></g>
+                  <g stroke="#6b8cff" stroke-opacity=".4" stroke-width="8" stroke-linecap="round" fill="none"><line x1="196" y1="260" x2="184" y2="392"/><line x1="184" y1="392" x2="190" y2="520"/></g>
+                </svg>
+                <div class="floor"></div>
+                <div class="cap">Capture quality: good · camera side-on</div>
+              </div>
+              <div class="focus">
+                <div>
+                  <div class="state">Stable</div>
+                  <div class="state-line">Movement matches your baseline.</div>
+                </div>
+                <div class="reprow"><span class="rep">8</span><span class="k">rep in this set</span></div>
+                <div class="held">
+                  <div style="display:flex;justify-content:space-between;align-items:baseline"><strong style="font-size:17px">8 reps held at your baseline</strong></div>
+                  <div class="meter" aria-hidden="true">
+                    <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i><i></i><i></i>
+                    <span class="best" style="left:calc(66.66% - 3px)"><span>Best 8</span></span>
+                  </div>
+                </div>
+                <div class="evidence"><span>Margin to your line: comfortable</span><span style="color:var(--cobalt-hi)">Show evidence</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <span class="synthetic">Sample data · synthetic athlete</span>
+      </div></div>
+      <figcaption><strong>A1 · In the set (athlete view).</strong> The stage leads; the state word is about 100 px, readable at 3 m on a laptop. Reps held at baseline is the hero metric, with your best marked on the meter. Detector internals sit behind "Show evidence".</figcaption>
+    </figure>
+
+    <figure class="frame">
+      <div class="viewport"><div class="screen">
+        <div class="A">
+          <nav class="rail" aria-hidden="true">
+            <svg class="mark" viewBox="0 0 64 64"><path d="M1 1h50l12 12v50H1z" fill="#080c16" stroke="#2a3a5c" stroke-width="2"/><polyline points="9,41 18,39 26,42 33,37" fill="none" stroke="#6b8cff" stroke-width="5" stroke-linecap="round"/><polyline points="37,33 44,26 50,18 56,12" fill="none" stroke="#ff3b57" stroke-width="5" stroke-linecap="round"/></svg>
+            <a><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11l9-7 9 7v9H3z"/></svg></a>
+            <a class="on"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/></svg></a>
+            <a><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 18 9 18 9 12 15 12 15 6 21 6"/></svg></a>
+          </nav>
+          <div class="main">
+            <div class="top">
+              <div class="title">Debrief <span>· Explosive fatigue screen · Oct 8</span></div>
+              <div class="track"><span class="done"><i></i>Calibrate</span><span class="sep"></span><span class="done"><i></i>Monitor</span><span class="sep"></span><span class="done"><i></i>Detect</span><span class="sep"></span><span class="on"><i></i>Recover</span></div>
+            </div>
+            <div class="debrief">
+              <div class="result">
+                <div class="big">9</div>
+                <div class="lead">reps held at your baseline</div>
+                <div class="record"><b>New record</b> Previous best 8, set Oct 4</div>
+                <svg viewBox="0 0 520 120" style="width:100%;max-width:520px;height:auto;margin-top:18px" aria-label="Ascent line: record rose from 5 to 9 over nine sessions">
+                  <g fill="none" stroke-width="2"><polyline class="stepline" points="10,100 70,100 70,82 130,82 130,82 190,82 190,64 310,64 310,46 430,46 430,28 510,28" stroke="#6b8cff"/></g>
+                  <g fill="#6b8cff"><circle cx="10" cy="100" r="4"/><circle cx="70" cy="82" r="4"/><circle cx="130" cy="82" r="4"/><circle cx="190" cy="64" r="4"/><circle cx="250" cy="82" r="4" fill="#3a4a72"/><circle cx="310" cy="46" r="4"/><circle cx="370" cy="64" r="4" fill="#3a4a72"/><circle cx="430" cy="46" r="4"/></g>
+                  <circle cx="490" cy="28" r="6" fill="#c8ff2e"/>
+                  <text x="10" y="118" fill="#7f8ca3" font-size="11" font-family="Mona Sans">Sep 10</text><text x="470" y="118" fill="#7f8ca3" font-size="11" font-family="Mona Sans">Today</text>
+                </svg>
+                <div class="warn">
+                  <div><h4>Breaking point at rep 12</h4><p>Your movement changed from your baseline, starting around rep 10. End here and take a recovery period before the recovery check.</p></div>
+                  <button class="btn pri lg">Start recovery check</button>
+                </div>
+              </div>
+              <div class="side">
+                <h4>Compared with your last session (Oct 4)</h4>
+                <table class="cmp">
+                  <tr><td>Reps held at baseline</td><td><span class="up">9</span> · was 8</td></tr>
+                  <tr><td>Drift began</td><td>rep 10 · was rep 9</td></tr>
+                  <tr><td>Breaking point</td><td>rep 12 · was rep 11</td></tr>
+                  <tr><td>Recovery return</td><td>pending · was 83%</td></tr>
+                </table>
+                <div class="chg">
+                  <h4 style="margin:0">What changed at the breaking point</h4>
+                  <div><span><b>Explosive velocity</b> less explosive</span><span>much lower</span></div>
+                  <div><span><b>Jump height</b> (camera proxy) lower</span><span>lower</span></div>
+                  <div><span><b>Push-off time</b> slower</span><span>longer</span></div>
+                </div>
+                <p class="note" style="margin-top:16px">Training information, not a medical diagnosis.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <span class="synthetic">Sample data · synthetic athlete</span>
+      </div></div>
+      <figcaption><strong>A2 · Debrief.</strong> The achievement (held 9, a new record) and the warning (breaking point at 12, recover now) are separate objects with separate colours. The ascent line grows one step. Comparison is always with your own previous session.</figcaption>
+      <button class="play" data-replay="a2">Replay the record moment</button>
+    </figure>
+
+    <figure class="frame">
+      <div class="viewport"><div class="screen">
+        <div class="A">
+          <nav class="rail" aria-hidden="true">
+            <svg class="mark" viewBox="0 0 64 64"><path d="M1 1h50l12 12v50H1z" fill="#080c16" stroke="#2a3a5c" stroke-width="2"/><polyline points="9,41 18,39 26,42 33,37" fill="none" stroke="#6b8cff" stroke-width="5" stroke-linecap="round"/><polyline points="37,33 44,26 50,18 56,12" fill="none" stroke="#ff3b57" stroke-width="5" stroke-linecap="round"/></svg>
+            <a><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11l9-7 9 7v9H3z"/></svg></a>
+            <a><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/></svg></a>
+            <a class="on"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 18 9 18 9 12 15 12 15 6 21 6"/></svg></a>
+          </nav>
+          <div class="main">
+            <div class="top">
+              <div class="title">Progress <span>· Adam</span></div>
+              <div class="seg" style="margin-left:auto"><span class="on">Explosive fatigue screen</span><span>Bodyweight squat</span></div>
+            </div>
+            <div class="prog">
+              <div class="card" style="grid-row: 1 / span 2; display:flex; flex-direction:column">
+                <div style="display:flex;justify-content:space-between;align-items:baseline"><strong style="font-size:17px">Reps held at your baseline</strong><span class="k">9 sessions · Sep 10 – Oct 8</span></div>
+                <svg viewBox="0 0 700 330" style="width:100%;height:auto;margin-top:12px" aria-label="Record staircase from 5 to 9 reps">
+                  <g stroke="#1c2740"><line x1="40" x2="690" y1="40" y2="40"/><line x1="40" x2="690" y1="100" y2="100"/><line x1="40" x2="690" y1="160" y2="160"/><line x1="40" x2="690" y1="220" y2="220"/><line x1="40" x2="690" y1="280" y2="280"/></g>
+                  <g fill="#7f8ca3" font-size="12" font-family="Mona Sans" text-anchor="end"><text x="30" y="44">10</text><text x="30" y="104">8</text><text x="30" y="164">6</text><text x="30" y="224">4</text><text x="30" y="284">2</text></g>
+                  <polyline class="stepline" fill="none" stroke="#6b8cff" stroke-width="2.5" points="60,190 135,190 135,160 210,160 285,160 285,130 360,130 435,130 435,100 510,100 585,100 585,70 680,70"/>
+                  <g fill="#6b8cff"><circle cx="60" cy="190" r="5"/><circle cx="135" cy="160" r="5"/><circle cx="210" cy="160" r="5"/><circle cx="285" cy="130" r="5"/><circle cx="360" cy="160" r="5" fill="#33436b"/><circle cx="435" cy="100" r="5"/><circle cx="510" cy="130" r="5" fill="#33436b"/><circle cx="585" cy="100" r="5"/></g>
+                  <circle cx="660" cy="70" r="7" fill="#c8ff2e"/><text x="660" y="56" fill="#c8ff2e" font-size="13" font-weight="700" font-family="Mona Sans" text-anchor="middle">9</text>
+                  <g fill="#7f8ca3" font-size="11.5" font-family="Mona Sans" text-anchor="middle"><text x="60" y="306">Sep 10</text><text x="210" y="306">Sep 17</text><text x="360" y="306">Sep 24</text><text x="510" y="306">Oct 1</text><text x="660" y="306">Oct 8</text></g>
+                </svg>
+                <p class="note" style="margin:6px 0 0">Each step is a new record. Dots below the line are sessions that did not beat it. Records count only when capture quality and calibration pass the floor.</p>
+                <div style="margin-top:auto;display:grid;grid-template-columns:1fr 1fr;gap:24px;border-top:1px solid var(--line);padding-top:16px">
+                  <div><strong style="font-size:14px">Weekly goal: 2 sessions</strong><span class="k"> · you set this</span>
+                    <div class="weeks"><div><i class="met" style="height:30px"></i>Sep 8</div><div><i class="met" style="height:30px"></i>15</div><div><i class="met" style="height:30px"></i>22</div><div><i class="met" style="height:30px"></i>29</div><div><i class="met" style="height:45px"></i>Oct 6</div><div><i style="height:15px"></i>13</div></div>
+                  </div>
+                  <div><strong style="font-size:14px">Recovery return</strong><span class="k"> · after each set</span>
+                    <svg viewBox="0 0 280 70" style="width:100%;height:auto;margin-top:10px" aria-label="Recovery return rising from 61% to 83%"><polyline fill="none" stroke="#8fe9ff" stroke-width="2" points="5,60 38,52 71,46 104,49 137,40 170,31 203,34 236,24"/><g fill="#7f8ca3" font-size="11" font-family="Mona Sans"><text x="5" y="70">61%</text><text x="226" y="16">83%</text></g></svg>
+                  </div>
+                </div>
+              </div>
+              <div class="card">
+                <strong style="font-size:15px">Records</strong>
+                <div class="rec"><span class="k">Most reps held</span><span class="v new">9</span></div>
+                <div class="rec"><span class="k">Best recovery return</span><span class="v">83%</span></div>
+                <div class="rec"><span class="k">Tightest baseline</span><span class="v">±0.31</span></div>
+              </div>
+              <div class="card">
+                <strong style="font-size:15px">Milestones</strong>
+                <div class="ms"><span class="dot got"></span><span><b>Baseline locked</b>Calibrated this protocol · Sep 10</span></div>
+                <div class="ms"><span class="dot got"></span><span><b>Four goal weeks</b>Met your weekly goal 4 weeks running</span></div>
+                <div class="ms"><span class="dot"></span><span><b>Back to baseline</b>A recovery check rated "recovered" · best so far 83%</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <span class="synthetic">Sample data · synthetic athlete</span>
+      </div></div>
+      <figcaption><strong>A3 · Progress.</strong> The ascent line is the hero. Records, a weekly goal you set (rest days are fine), recovery trend and milestones with their criteria. One protocol at a time, because baselines are per protocol.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<hr class="rule" />
+
+<!-- ===================== B ===================== -->
+<section aria-labelledby="dir-b">
+  <h2 id="dir-b">Direction B: Breakaway (kinetic)</h2>
+  <p class="lede">A performance broadcast about one athlete. Blue Lock leads the energy: heavy italic numerals, cobalt slabs and a single 12° cut that runs through the whole system. Solo Leveling supplies the architecture: stages, records and earned milestones.</p>
+  <div class="cols">
+    <div>
+      <h3>Signature move: the record line</h3>
+      <p>Borrowed from the world-record line in swimming broadcasts. In the set, a thin ghost marker shows your best reps held at baseline on a lane that fills as you hold form. In the debrief, the set replays as rep-by-rep splits against your best session; when you beat it, the result slab breaks away on its 12° cut and the new number lands. The marker always means your own record, never anyone else's.</p>
+      <h3>Type and colour</h3>
+      <p><strong>Anybody</strong> in condensed black italic for numerals, state words and record headlines only; <strong>Mona Sans</strong> for every sentence, label and control so data stays legible. Colour strategy is committed: cobalt carries 30–50% of post-workout screens as slabs; black and navy hold the rest; lime appears only on a new record.</p>
+    </div>
+    <div>
+      <div class="chips">
+        <div class="chip"><i style="background:#05070d"></i><b>Ink</b>#05070D ground</div>
+        <div class="chip"><i style="background:#0a1124"></i><b>Navy</b>#0A1124 records</div>
+        <div class="chip"><i style="background:#2f5bff"></i><b>Cobalt</b>#2F5BFF slabs</div>
+        <div class="chip"><i style="background:#6b8cff"></i><b>Cobalt light</b>#6B8CFF stable, data</div>
+        <div class="chip"><i style="background:#8fe9ff"></i><b>Ice</b>#8FE9FF focus</div>
+        <div class="chip"><i style="background:#c8ff2e"></i><b>Lime</b>#C8FF2E new record</div>
+      </div>
+      <h3>Motion</h3>
+      <p>Quiet by default: hover and press change colour only. In the set, a state change sweeps the cut edge once (180 ms). After the set, one choreographed moment per earned record: the slab wipes in along the 12° cut, the numeral lands with a short settle, the lime tag follows. It never fires for the breaking point. Reduced motion shows the final state.</p>
+      <h3>Honest risk</h3>
+      <p>The most memorable direction, but the easiest to overdo. Italic condensed numerals lose legibility below about 28 px, so they stay out of tables. Angled cuts complicate responsive layouts and focus outlines. Without discipline it drifts toward a gaming skin.</p>
+    </div>
+  </div>
+
+  <div class="screens">
+    <figure class="frame">
+      <div class="viewport"><div class="screen">
+        <div class="B">
+          <div class="top">
+            <span class="word">Breaking<b>Point</b></span>
+            <div class="nav"><span>Home</span><span class="on">Train</span><span>Progress</span></div>
+            <div class="track"><span class="done">Calibrate</span><span class="on">Monitor 8</span><span>Detect</span><span>Recover</span></div>
+            <button class="btn ghost">End set</button>
+          </div>
+          <div class="session">
+            <svg viewBox="0 0 400 600" style="position:absolute;left:23%;top:30px;height:580px;transform:translateX(-50%)" aria-hidden="true">
+              <g stroke="#6b8cff" stroke-width="9" stroke-linecap="round" fill="none"><circle cx="200" cy="70" r="30" fill="#060912" stroke-width="6"/><line x1="200" y1="105" x2="196" y2="260"/><line x1="196" y1="260" x2="214" y2="390"/><line x1="214" y1="390" x2="204" y2="520"/><line x1="200" y1="130" x2="236" y2="210"/><line x1="236" y1="210" x2="250" y2="270"/><line x1="204" y1="520" x2="240" y2="524"/></g>
+              <g stroke="#6b8cff" stroke-opacity=".4" stroke-width="8" stroke-linecap="round" fill="none"><line x1="196" y1="260" x2="184" y2="392"/><line x1="184" y1="392" x2="190" y2="520"/></g>
+            </svg>
+            <div class="floor"></div>
+            <div style="position:absolute;left:24px;bottom:22px;font-size:13px;color:var(--text-2)">Capture quality: good · Soccer · Explosive fatigue screen</div>
+            <div class="hud">
+              <span class="hstate">STABLE</span>
+              <div style="font-size:16px;color:var(--text)">Movement matches your baseline.</div>
+              <div class="hrep" aria-label="Rep 8">08</div>
+              <div class="race">
+                <div class="lane-lbl"><span>Held at your baseline</span><b>8</b></div>
+                <div class="lane"><div class="fill" style="width:66.6%"></div><div class="ghost" style="left:66.6%"></div></div>
+                <div class="lane-lbl"><span>Your record line</span><span>Best 8 · Oct 4</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <span class="synthetic">Sample data · synthetic athlete</span>
+      </div></div>
+      <figcaption><strong>B1 · In the set (athlete view).</strong> The stage holds the athlete; a black HUD enters on the 12° cut. The rep numeral is about 200 px of condensed italic, and the state is a cobalt plate that turns amber or red. The lane fills as you hold form and the ghost marker is your record line.</figcaption>
+    </figure>
+
+    <figure class="frame">
+      <div class="viewport"><div class="screen">
+        <div class="B">
+          <div class="top">
+            <span class="word">Breaking<b>Point</b></span>
+            <div class="nav"><span>Home</span><span class="on">Train</span><span>Progress</span></div>
+            <div class="track"><span class="done">Calibrate</span><span class="done">Monitor</span><span class="done">Detect</span><span class="on">Recover</span></div>
+          </div>
+          <div class="debrief">
+            <div class="slab">
+              <div class="n">9</div>
+              <div class="what">reps held at your baseline<small>Explosive fatigue screen · Oct 8 · previous best 8</small></div>
+              <div class="newrec">NEW RECORD<small>+1 over your best</small></div>
+            </div>
+            <div class="left">
+              <div class="warn">
+                <div><h4>Breaking point at rep 12</h4><p>Your movement changed from your baseline around rep 10. End here, take a recovery period, then run the check.</p></div>
+                <button class="btn lg">Start recovery check</button>
+              </div>
+              <div>
+                <div class="k" style="margin-bottom:8px">Rep-by-rep against your best session</div>
+                <div class="splits">
+                  <span>Today</span><i class="s"></i><i class="s"></i><i class="s"></i><i class="s"></i><i class="s"></i><i class="s"></i><i class="s"></i><i class="s"></i><i class="s"></i><i class="d"></i><i class="d"></i><i class="b"></i>
+                  <span>Oct 4 best</span><i class="s old"></i><i class="s old"></i><i class="s old"></i><i class="s old"></i><i class="s old"></i><i class="s old"></i><i class="s old"></i><i class="s old"></i><i class="d old"></i><i class="d old"></i><i class="b old"></i><i></i>
+                </div>
+                <div class="k" style="margin-top:8px;font-weight:500">Blue: at your baseline · amber: drift · red: breaking point</div>
+              </div>
+            </div>
+            <div class="right">
+              <div class="row"><span>Drift began</span><b>Rep 10</b></div>
+              <div class="row"><span>Breaking point</span><b>Rep 12</b></div>
+              <div class="row"><span>Last time</span><b>Held 8</b></div>
+              <div class="row"><span>Largest change</span><span style="color:var(--text);font-weight:600">Explosive velocity, lower</span></div>
+              <p class="note" style="margin-top:8px">Training information, not a medical diagnosis.</p>
+            </div>
+          </div>
+        </div>
+        <span class="synthetic">Sample data · synthetic athlete</span>
+      </div></div>
+      <figcaption><strong>B2 · Debrief, record night.</strong> The cobalt slab carries the achievement and breaks away on its 12° cut; lime appears once, on the record. The breaking point sits below as a separate, serious card with the next step. Splits compare today with your own best session.</figcaption>
+      <button class="play" data-replay="b2">Replay the record moment</button>
+    </figure>
+
+    <figure class="frame">
+      <div class="viewport"><div class="screen">
+        <div class="B">
+          <div class="top">
+            <span class="word">Breaking<b>Point</b></span>
+            <div class="nav"><span>Home</span><span>Train</span><span class="on">Progress</span></div>
+            <div class="track" style="gap:6px"><span class="on">Explosive fatigue screen</span><span>Bodyweight squat</span></div>
+          </div>
+          <div class="prog">
+            <div class="pb">
+              <div class="k" style="color:var(--text-2)">Most reps held at your baseline</div>
+              <div class="n">9</div>
+              <div style="font-size:14px;color:var(--text-2)">Set Oct 8 · up from 5 on Sep 10</div>
+              <div class="rec"><span>Best recovery return</span><b>83%</b></div>
+              <div class="rec"><span>Tightest baseline</span><b>±0.31</b></div>
+              <div class="rec"><span>Goal weeks in a row</span><b>4</b></div>
+            </div>
+            <div class="pr-main">
+              <div>
+                <div style="display:flex;justify-content:space-between;align-items:baseline"><strong style="font-size:16px">Record line</strong><span class="k">9 sessions</span></div>
+                <svg viewBox="0 0 740 220" style="width:100%;height:auto;margin-top:8px" aria-label="Reps held per session with record steps">
+                  <g stroke="#1c2740"><line x1="30" x2="735" y1="20" y2="20"/><line x1="30" x2="735" y1="80" y2="80"/><line x1="30" x2="735" y1="140" y2="140"/><line x1="30" x2="735" y1="200" y2="200"/></g>
+                  <g fill="#7f8ca3" font-size="11.5" font-family="Mona Sans" text-anchor="end"><text x="22" y="24">9</text><text x="22" y="84">7</text><text x="22" y="144">5</text></g>
+                  <g transform="skewX(-12)">
+                    <rect x="62" y="140" width="40" height="60" fill="#2f5bff"/><rect x="142" y="110" width="40" height="90" fill="#2f5bff"/><rect x="222" y="110" width="40" height="90" fill="#24356e"/><rect x="302" y="80" width="40" height="120" fill="#2f5bff"/><rect x="382" y="110" width="40" height="90" fill="#24356e"/><rect x="462" y="50" width="40" height="150" fill="#2f5bff"/><rect x="542" y="80" width="40" height="120" fill="#24356e"/><rect x="622" y="50" width="40" height="150" fill="#24356e"/><rect x="702" y="20" width="40" height="180" fill="#c8ff2e"/>
+                  </g>
+                </svg>
+                <div class="k" style="font-weight:500">Bright bars set a new record; dim bars did not. Today in lime.</div>
+              </div>
+              <div>
+                <strong style="font-size:15px">Weekly goal: 2 sessions</strong> <span class="k">· you set this</span>
+                <div class="weeks" style="margin-top:10px"><div><i class="met" style="height:28px"></i>Sep 8</div><div><i class="met" style="height:28px"></i>Sep 15</div><div><i class="met" style="height:28px"></i>Sep 22</div><div><i class="met" style="height:28px"></i>Sep 29</div><div><i class="met" style="height:40px"></i>Oct 6</div><div><i style="height:14px"></i>Oct 13</div></div>
+              </div>
+              <div class="plates">
+                <div class="plate got"><b>Baseline locked</b>Calibrated this protocol, Sep 10</div>
+                <div class="plate got"><b>Record × 4</b>Each step on the record line</div>
+                <div class="plate got"><b>Four goal weeks</b>Weekly goal met 4 weeks running</div>
+                <div class="plate lock"><b>Back to baseline</b>A check rated "recovered". Best so far 83%</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <span class="synthetic">Sample data · synthetic athlete</span>
+      </div></div>
+      <figcaption><strong>B3 · Progress.</strong> The record is the hero on a navy slab that cuts into the page. Session bars lean on the system's 12° angle; only record-setting sessions are bright. Milestones are plates with their criteria; locked plates say exactly what earns them.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<hr class="rule" />
+
+<section aria-labelledby="choose">
+  <h2 id="choose">Choosing between them</h2>
+  <table>
+    <thead><tr><th style="width:22%"></th><th>A · Ascent</th><th>B · Breakaway</th></tr></thead>
+    <tbody>
+      <tr><td><strong>In the set</strong></td><td>Calm instrument, ~100 px state word, meter with best marked</td><td>Broadcast HUD, ~200 px italic numeral, lane with record line</td></tr>
+      <tr><td><strong>After the set</strong></td><td>Structured report; the ascent line grows a step</td><td>Cobalt slab breaks away; splits against your best</td></tr>
+      <tr><td><strong>Type</strong></td><td>Mona Sans only, upright</td><td>Anybody italic for numbers and headlines, Mona Sans for text</td></tr>
+      <tr><td><strong>Colour strategy</strong></td><td>Restrained: tinted neutrals, cobalt accent</td><td>Committed: cobalt slabs on 30–50% of post-workout screens</td></tr>
+      <tr><td><strong>Motion budget</strong></td><td>One moment: the step draws</td><td>One choreographed moment per record, plus a 180 ms state sweep</td></tr>
+      <tr><td><strong>Main risk</strong></td><td>Too calm for the intensity you asked for</td><td>Easy to overdo; harder responsive and focus work</td></tr>
+      <tr><td><strong>Build cost</strong></td><td>Lower</td><td>Higher (angle system, choreography, reduced-motion paths)</td></tr>
+    </tbody>
+  </table>
+  <h3>My recommendation</h3>
+  <p><strong>Direction B, held to A's discipline in the set.</strong> Its record line is the strongest expression of "you against your past self", and it gives the post-workout moments the intensity you asked for. To protect usability, the athlete view keeps B's type and colour but A's quietness: no slabs, one state plate, the lane, nothing else. The 12° angle is the only geometric motif, and condensed italic stays out of tables and body text.</p>
+</section>
+
+</main>
+<script>
+// Scale each 1200×720 mock to its frame width; replay buttons re-run the record moment.
+const fit = () => document.querySelectorAll('.viewport').forEach((v) => {
+  const s = v.querySelector('.screen');
+  if (s) s.style.transform = `scale(${v.clientWidth / 1200})`;
+});
+addEventListener('resize', fit);
+fit();
+document.querySelectorAll('[data-replay]').forEach((b) => b.addEventListener('click', () => {
+  const f = b.closest('figure');
+  f.classList.remove('replay');
+  void f.offsetWidth;
+  f.classList.add('replay');
+}));
+</script>
+</body>
+</html>

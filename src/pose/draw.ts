@@ -1,3 +1,4 @@
+import { C } from '../ui/theme';
 import { CONNECTIONS, LEFT_SIDE, LM, RIGHT_SIDE, type Pose } from './landmarks';
 
 export interface Rect {
@@ -61,10 +62,10 @@ export function drawPose(ctx: CanvasRenderingContext2D, pose: Pose, rect: Rect, 
     if (Math.min(pa.v, pb.v) < visMin) continue;
     const isHl = hl.has(`${a}-${b}`) || hl.has(`${b}-${a}`);
     const far = RIGHT_SIDE.has(a) && RIGHT_SIDE.has(b);
-    ctx.strokeStyle = isHl ? (o.highlightColor ?? '#ff4d5e') : o.color;
+    ctx.strokeStyle = isHl ? (o.highlightColor ?? C.break) : o.color;
     ctx.globalAlpha = far ? 0.45 : 0.95;
     ctx.lineWidth = (isHl ? 9 : 6) * scale;
-    ctx.shadowColor = isHl ? (o.highlightColor ?? '#ff4d5e') : o.color;
+    ctx.shadowColor = isHl ? (o.highlightColor ?? C.break) : o.color;
     ctx.shadowBlur = (isHl ? 22 : 12) * scale;
     ctx.beginPath();
     ctx.moveTo(pa.x, pa.y);
@@ -81,7 +82,7 @@ export function drawPose(ctx: CanvasRenderingContext2D, pose: Pose, rect: Rect, 
     const hy = nose.v >= visMin ? (ear.y * 2 + nose.y) / 3 : ear.y;
     const r = Math.max(6 * scale, Math.hypot(ear.x - sh.x, ear.y - sh.y) * 0.42);
     ctx.globalAlpha = 0.95;
-    ctx.fillStyle = '#0a0e14';
+    ctx.fillStyle = C.abyss;
     ctx.strokeStyle = o.color;
     ctx.lineWidth = 3 * scale;
     ctx.shadowColor = o.color;
@@ -98,7 +99,7 @@ export function drawPose(ctx: CanvasRenderingContext2D, pose: Pose, rect: Rect, 
     if (p.v < visMin) continue;
     const far = RIGHT_SIDE.has(i);
     ctx.globalAlpha = far ? 0.5 : 1;
-    ctx.fillStyle = '#0a0e14';
+    ctx.fillStyle = C.abyss;
     ctx.strokeStyle = o.color;
     ctx.lineWidth = 2.5 * scale;
     ctx.beginPath();
@@ -114,7 +115,7 @@ export function drawStudio(ctx: CanvasRenderingContext2D, rect: Rect, w: number,
   ctx.clearRect(0, 0, w, h);
   const floorY = rect.y + rect.h * 0.905;
   ctx.save();
-  ctx.strokeStyle = 'rgba(120, 150, 190, 0.07)';
+  ctx.strokeStyle = 'rgba(140, 180, 230, 0.06)';
   ctx.lineWidth = 1;
   const step = rect.h / 12;
   for (let x = rect.x + (rect.w / 2) % step; x < rect.x + rect.w; x += step) {
@@ -130,11 +131,11 @@ export function drawStudio(ctx: CanvasRenderingContext2D, rect: Rect, w: number,
     ctx.stroke();
   }
   const g = ctx.createLinearGradient(0, floorY, 0, rect.y + rect.h);
-  g.addColorStop(0, 'rgba(89, 208, 255, 0.10)');
-  g.addColorStop(1, 'rgba(89, 208, 255, 0)');
+  g.addColorStop(0, 'rgba(61, 184, 255, 0.08)');
+  g.addColorStop(1, 'rgba(61, 184, 255, 0)');
   ctx.fillStyle = g;
   ctx.fillRect(rect.x, floorY, rect.w, rect.y + rect.h - floorY);
-  ctx.strokeStyle = 'rgba(89, 208, 255, 0.35)';
+  ctx.strokeStyle = 'rgba(61, 184, 255, 0.35)';
   ctx.lineWidth = 2;
   ctx.beginPath();
   ctx.moveTo(rect.x + rect.w * 0.12, floorY);

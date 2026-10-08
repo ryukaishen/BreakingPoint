@@ -3,6 +3,7 @@ import { containRect, drawPose, drawStudio, segmentsForFeatures } from '../pose/
 import type { LaunchContext } from '../protocols/launch';
 import { LiveRunner, type Runner } from '../session/runners';
 import type { Snapshot } from '../session/engine';
+import { C } from '../ui/theme';
 import { STATE_COLOR } from '../utils/format';
 import { Lock, Pause, Play, Skip } from './Icons';
 
@@ -28,7 +29,7 @@ const PHASE_TEXT: Record<string, string> = {
   propulsion: 'Propulsion', flight: 'Flight', landing: 'Landing', lost: 'Tracking lost',
 };
 
-const QUALITY_COLOR: Record<string, string> = { Excellent: '#2ee59d', Good: '#59d0ff', Poor: '#ffb020', 'No athlete': '#ff4d5e' };
+const QUALITY_COLOR: Record<string, string> = { Excellent: C.stable, Good: C.sys, Poor: C.drift, 'No athlete': C.break };
 
 export function CameraStage(p: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -62,13 +63,13 @@ export function CameraStage(p: Props) {
           const s = snapRef.current;
           if (pose) {
             const inMonitor = s.phase === 'monitoring' || s.phase === 'summary';
-            const color = inMonitor ? STATE_COLOR[s.state] : s.phase === 'recovery' || s.phase === 'recoveryDone' ? '#a594ff' : '#59d0ff';
+            const color = inMonitor ? STATE_COLOR[s.state] : s.phase === 'recovery' || s.phase === 'recoveryDone' ? C.violet : C.sys;
             const top = s.state === 'BREAKPOINT' && s.breakpointContributors ? s.breakpointContributors.slice(0, 2).map((d) => d.key) : [];
             drawPose(ctx, pose, rect, {
               mirror: p.runner?.kind === 'live',
               color,
               highlight: segmentsForFeatures(top),
-              highlightColor: '#ff4d5e',
+              highlightColor: C.break,
             });
           }
         }
@@ -93,7 +94,7 @@ export function CameraStage(p: Props) {
         ? s.recoveryReps.length
         : s.monitorReps.length;
   const ctxLabel =
-    s.phase === 'calibrating' ? `CALIBRATION · ${repCount}/${s.calibrationTarget}` : s.phase === 'recovery' || s.phase === 'recoveryDone' ? 'RECOVERY CHECK' : s.phase === 'monitoring' || s.phase === 'summary' ? 'MONITORED SET' : 'READY';
+    s.phase === 'calibrating' ? `Calibration ${repCount}/${s.calibrationTarget}` : s.phase === 'recovery' || s.phase === 'recoveryDone' ? 'Recovery check' : s.phase === 'monitoring' || s.phase === 'summary' ? 'Monitored set' : 'Ready';
   const isDemo = p.runner?.kind === 'demo';
   const baseDepth = s.baseline?.features[s.exercise === 'cmj' ? 'countermovementDepth' : 'depth'];
   const gaugeMax = s.exercise === 'squat' ? 0.75 : s.exercise === 'lunge' ? 0.6 : 0.45;
@@ -104,22 +105,26 @@ export function CameraStage(p: Props) {
     <div className={`stage ${p.flash ? 'flash' : ''} ${s.state === 'BREAKPOINT' && s.phase === 'monitoring' ? 'breakpoint' : ''}`} ref={wrapRef}>
       <video ref={p.videoRef} muted playsInline style={{ display: p.runner?.kind === 'live' ? 'block' : 'none' }} />
       <canvas ref={canvasRef} />
+      <span className="vf tl" aria-hidden />
+      <span className="vf tr" aria-hidden />
+      <span className="vf bl" aria-hidden />
+      <span className="vf br" aria-hidden />
 
       <div className="ov ov-tl">
         <div className="rep-counter">
-          <span className="lbl">REP</span>
-          <span className="val mono" style={{ color: s.phase === 'monitoring' && s.monitorReps.length ? STATE_COLOR[s.state] : '#e9eef6' }}>{repCount}</span>
-          <span className="ctx">{ctxLabel}</span>
+          <span className="lbl code">Rep</span>
+          <span className="val" style={{ color: s.phase === 'monitoring' && s.monitorReps.length ? STATE_COLOR[s.state] : C.text }}>{repCount}</span>
+          <span className="ctx code">{ctxLabel}</span>
         </div>
         <div className="phase-pill">
-          <span className="qdot" style={{ background: live.repPhase === 'standing' ? '#7f8b9d' : '#59d0ff' }} />
+          <span className="qdot" style={{ background: live.repPhase === 'standing' ? C.muted : C.sys }} />
           {phaseText}
         </div>
       </div>
 
       {isDemo && (
         <div className="ov ov-tc">
-          <span className="demo-watermark" title="Synthetic landmarks go through exactly the same pipeline as camera frames">
+          <span className="demo-watermark code" title="Synthetic landmarks go through exactly the same pipeline as camera frames">
             Demo dataset · synthetic athlete
           </span>
         </div>
@@ -140,7 +145,7 @@ export function CameraStage(p: Props) {
           </div>
         )}
         <div className="depth-gauge" title="Live hip drop vs your baseline depth range">
-          <div className="lbl">DEPTH</div>
+          <div className="lbl">Depth</div>
           <div className="track">
             {baseDepth && (
               <div
@@ -153,14 +158,14 @@ export function CameraStage(p: Props) {
             )}
             <div className="fill" style={{ height: `${(depthNow / gaugeMax) * 100}%` }} />
           </div>
-          {baseDepth && <div className="lbl" style={{ color: '#2ee59d' }}>YOUR<br />RANGE</div>}
+          {baseDepth && <div className="lbl" style={{ color: C.stable }}>Your<br />range</div>}
         </div>
       </div>
 
       <div className="ov ov-bl">
         {isDemo && (
           <div className="athlete-card">
-            <div className="ac-name">{s.athlete.toUpperCase()}</div>
+            <div className="ac-name">{s.athlete}</div>
             <div className="ac-row">
               <span>Sport</span>
               <b>{p.launch.contextName}</b>
@@ -177,12 +182,12 @@ export function CameraStage(p: Props) {
         )}
         {isDemo ? (
           <div className="speed-ctl">
-            <button className="btn sm" onClick={p.onDemoPause} title="Pause / resume (Space)">
+            <button className="btn sm" onClick={p.onDemoPause} title="Pause / resume (Space)" aria-label={p.demoPaused ? 'Resume demo' : 'Pause demo'}>
               {p.demoPaused ? <Play size={13} /> : <Pause size={13} />}
             </button>
-            <div className="seg">
+            <div className="seg" role="group" aria-label="Demo speed">
               {[1, 2, 4].map((v) => (
-                <button key={v} className={p.demoSpeed === v ? 'active' : ''} onClick={() => p.onDemoSpeed(v)}>
+                <button key={v} className={p.demoSpeed === v ? 'active' : ''} aria-pressed={p.demoSpeed === v} onClick={() => p.onDemoSpeed(v)}>
                   {v}×
                 </button>
               ))}
@@ -192,10 +197,10 @@ export function CameraStage(p: Props) {
             </button>
           </div>
         ) : (
-          <span className="privacy-note mono" style={{ fontSize: 11 }}>
+          <span className="privacy-note mono">
             {p.runner instanceof LiveRunner
               ? p.runner.pose.status === 'ready'
-                ? `${p.runner.fps.toFixed(0)} fps · on-device pose model (${p.runner.pose.delegate})`
+                ? `${p.runner.fps.toFixed(0)} fps, on-device pose model (${p.runner.pose.delegate})`
                 : 'loading on-device pose model…'
               : ''}
           </span>
@@ -210,7 +215,7 @@ export function CameraStage(p: Props) {
 
       {p.runner?.kind === 'live' && (p.liveStatus || p.liveError) && (
         <div className="stage-center">
-          <div className="box">
+          <div className="box sys-window toned">
             {p.liveError ? (
               <>
                 <h3>Camera unavailable</h3>
