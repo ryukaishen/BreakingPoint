@@ -30,5 +30,7 @@ Thumbs.db
 .vscode/
 .idea/
 
-# local editor / agent tooling
-.claude/
+# local editor / agent tooling (the pinned audit skill and shared plugin policy are tracked)
+.claude/*
+!.claude/skills/
+!.claude/settings.json
