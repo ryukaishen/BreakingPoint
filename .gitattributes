@@ -1,0 +1,11 @@
+# Archived experiment artifacts are kept byte for byte: no line-ending conversion on
+# checkout or commit, so their SHA-256 checksums (results/provenance.json) verify the
+# exact original bytes on every operating system.
+results/VALIDATION_REPORT.md               -text
+results/hipergator_jobs.txt                -text
+results/breakingpoint_detector_config.json -text
+public/breakingpoint_detector_config.json  -text
+results/archive/**                         -text
+results/figures/**                         binary
+public/lab/figures/**                      binary
+results/provenance.json                    -text

@@ -284,9 +284,10 @@ Robustness: FPR stays ≈ 1–2 % as pose jitter grows to 5× when the jitter is
 17.3 % at 2×). This is reported as a limitation and is the reason for the capture-quality gate and recalibration
 advice. With isolated bad reps at 10 % of reps FPR is 5.7 %; with 30 % landmark dropout FPR is 1.1 % and detection 71 %.
 
-The earlier 50,000-session local run of the same pipeline gave consistent results (2.2 % FPR, 88.9 % detection).
-The per-configuration CSVs in `results/` (`summary.csv`, `config_results.csv`, …) are from that local run; the
-HiPerGator run's report, figures and exported config are the authoritative results.
+An earlier 50,000-session local run of the same pipeline selected different settings (warning 1.5, a 2-rep
+persistence rule) and reported 2.2 % FPR and 88.9 % detection. Its per-configuration CSVs are archived in
+`results/archive/2026-10-04_local_50k/`; they are not HiPerGator outputs. The HiPerGator run's report, figures and
+exported config are the authoritative results, and its own CSVs were not saved (see `results/PROVENANCE.md`).
 
 All numbers above come from `results/VALIDATION_REPORT.md` of the run that was actually executed; HiPerGator runs
 regenerate the same report at larger scale.
