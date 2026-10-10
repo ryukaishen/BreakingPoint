@@ -1,0 +1,123 @@
+{
+ "what": "Phase 4B protocol freeze: protocols, pre-analysis checks, inclusion lists, input code and data. Written before any outcome analysis with the real condition or correctness labels.",
+ "frozen_at": "2026-10-09T21:48:45-0400",
+ "protocol_files": {
+  "research/protocols/jump_fatigue_v04.md": {
+   "git_blob": "3d2e2e18d8edd6ebf59c6f6869f251a9df2fae16",
+   "sha256_raw": "e0699fcf120c48f93e94bb02d624707fa77c2b7185ba36c142accf7d4d27c31d"
+  },
+  "research/protocols/rehab24_6_v04.md": {
+   "git_blob": "5d8b8dcfbc5fb1372ba1c53a650eea4177099afc",
+   "sha256_raw": "3a2b8307ec367341acbc0e17dab9ab8f31e1c3e703992c3491fc0b26f8d67c2f"
+  },
+  "research/protocols/phase4b_preanalysis_checks.md": {
+   "git_blob": "b0d78c72f163f2b8d220e966c09208d333d585f2",
+   "sha256_raw": "e30fe0142714afa6df763e4ae0eb69cc743a61455a8006a4e16c69e78fc1922a"
+  },
+  "research/protocols/phase4b_inclusion_v04.json": {
+   "git_blob": "cf1b3528659387c00b89125dc20e30b57d63c9fe",
+   "sha256_raw": "d220ce4b3d45c5fbb1f7fbf2728f5f34f206ae2edbf6e7749471d2a8f7245c6d"
+  }
+ },
+ "code_files": {
+  "research/measurement/inclusion.py": {
+   "git_blob": "631eb09ac0ab8fe703453e6f7a55cda21b0a53f7",
+   "sha256_raw": "3a4eda32962d4398580a1d4e62ef0984ca8f6acf4a05e264a621a54cfe7a228f"
+  },
+  "research/measurement/build_streams.py": {
+   "git_blob": "8c95012aab260ea6d6703b2852125f9af7e3af1a",
+   "sha256_raw": "7caadd1532cee88465396f393077084fa7622206c074c1e8bffd4c3219beff73"
+  },
+  "research/measurement/variants.ts": {
+   "git_blob": "65e49e10142baf25e8e4cf1b8006e4aac3b25537",
+   "sha256_raw": "effc693edaee5a380e70e9246eaad828a8bfa0a56e6a5d840e270a29cf6664b8"
+  },
+  "research/measurement/run_variants.ts": {
+   "git_blob": "f46c1a9b9f104ba0c40ea42cdbd4da863f12973c",
+   "sha256_raw": "a571eea623579f9404a9dd4cb50e479464f6ee59f8c2162e3ae17dabc994a899"
+  },
+  "research/evaluation/offlinePipeline.ts": {
+   "git_blob": "0627737421c741c14614d78bc45451ffd23feef2",
+   "sha256_raw": "cf6b11eb91f366628c8b002689e35d5a40207bf2138a0cefdc1bafa3d4db91cc"
+  },
+  "src/pose/smoothing.ts": {
+   "git_blob": "c8c165a59b9cbfcc76f39172f4a01b504fe4ec60",
+   "sha256_raw": "0fb27bc23489530a0c2e3be4634571ed7d82834ef5b6a48dd0b14510e6d0cb67"
+  },
+  "src/biomechanics/frameMetrics.ts": {
+   "git_blob": "08a54f236f7cded37b6ba976827a13275cf8371a",
+   "sha256_raw": "96501bb5e37f7c979b770ef7f3f134bf97046648488c66d68eed65a650e13afd"
+  },
+  "src/reps/segmenter.ts": {
+   "git_blob": "2bff4e4988fa455f20bee94fad7ce035e8ed4471",
+   "sha256_raw": "1bf5fc552de02a4ac8d9625674326a9b7b6132a94adad26b961d4cf0ba924f11"
+  },
+  "src/biomechanics/repFeatures.ts": {
+   "git_blob": "e8dee21564c17b7580b2a3071863dfe23369a6ff",
+   "sha256_raw": "70b8d863d13f839302d2c51cd6553791a0fd04a9ddfdb31bd81ab3b27efecd53"
+  },
+  "src/biomechanics/catalog.ts": {
+   "git_blob": "5e2e37ac2f3748486432717acfd1c45aa47bbd08",
+   "sha256_raw": "25b7aff8746c3b8aee431c92108103dd8e645e066573556637b0d8be5d3b76c7"
+  },
+  "src/baseline/baseline.ts": {
+   "git_blob": "23ca81c8f79428b05ca20631a4e6c63e17702b78",
+   "sha256_raw": "2b7de6e0a5b3e0e2e52f35e3bb5aa5a990f13f321d27f0d0ffa8aff045c78193"
+  },
+  "src/detection/driftScore.ts": {
+   "git_blob": "f57f63e7a12801e3572dbd94a15be3c8eec32650",
+   "sha256_raw": "181c7afbb247108f71635412b879e7931f1bd7cf1cea9dfef008be665d11dd83"
+  },
+  "src/detection/config.ts": {
+   "git_blob": "7a85a76654b6670a41caf5ca22d9dd7fc53c4180",
+   "sha256_raw": "d02c8cd78c6f1048541b98f30ef32cfed6335344dd6faf826c9f73d7fcdf4f88"
+  },
+  "shared/feature_catalog.json": {
+   "git_blob": "7eb2c0a8041827654e5b429a46b0cbde9ad8aba9",
+   "sha256_raw": "fe2c846ad5050f20d256b5eff09611904857e4d7b00a627086386ac0eba54b12"
+  },
+  "public/breakingpoint_detector_config.json": {
+   "git_blob": "807af8c2ce628188f0dfefb6cf183c531d638edd",
+   "sha256_raw": "543798067d97f96efa6d98baf43d3aaabc49029cafb70cc537755af82d7e1b9e"
+  }
+ },
+ "data_files": {
+  "data/processed/measurement/references/jump.json": {
+   "sha256_raw": "cf1780abd7c75556c946f59f9d35a6553ea0c5d9e25ee2a79e17e9c96f3b2030"
+  },
+  "data/processed/measurement/references/participants.json": {
+   "sha256_raw": "8b80b91026e1ac0a6b653901721d3144cba32be692a86a97ddf405a03871e420"
+  },
+  "data/processed/measurement/runs/jump/az35_d3.5/production__s0__seed0.json": {
+   "sha256_raw": "89d57c7dffeed6518583d4cfc93fe6e57b18af6da0e0567503cdeaf93376075f"
+  },
+  "data/processed/measurement/runs/jump/az0_d3.5/production__s0__seed0.json": {
+   "sha256_raw": "69ee8a5ac2bf9b721812fb302b778dd126563cbec584f57daded7387e8841dcf"
+  },
+  "data/processed/measurement/runs/jump/az35_d3.5/dual_butter6__s0__seed0.json": {
+   "sha256_raw": "591d9176ef34845cf60007aa32237e3d6c5d3c4535fb7e91afc598f852e4fb9a"
+  },
+  "data/processed/measurement/runs/jump/az0_d3.5/dual_butter6__s0__seed0.json": {
+   "sha256_raw": "b230e1a8f2f2486d51b3dd1f0ac17bd1ce20b2880ab7557f0468edd662ec67c9"
+  },
+  "data/processed/landmarks/rehab/ex6_squat/oblique35/index.json": {
+   "sha256_raw": "724647438319ddad491a2d6de89195344fa03adf84a88b96fedaa62d2fcda990"
+  },
+  "data/processed/measurement/runs/rehab/ex6_squat/oblique35/production__s0__seed0.json": {
+   "sha256_raw": "6664a476b581193d60e02de0643b651514136b25653eab62fef20477487904c5"
+  },
+  "data/processed/landmarks/rehab/ex6_squat/side/index.json": {
+   "sha256_raw": "00097b8b42d23032e07f6677642a49c6a13fb4ad824ed9ae07dce277cce0a48d"
+  },
+  "data/processed/measurement/runs/rehab/ex6_squat/side/production__s0__seed0.json": {
+   "sha256_raw": "682a4db8baf3463a769c8b503cbaa5d149b9bb7c973c87d7ffca7bd09d70a6cf"
+  },
+  "data/processed/landmarks/rehab/ex5_lunge/side/index.json": {
+   "sha256_raw": "2feb09b04fc1d6388a44ac0db6af56f57e85d78b4262c59fa6341aa6becbbca5"
+  },
+  "data/processed/measurement/runs/rehab/ex5_lunge/side/production__s0__seed0.json": {
+   "sha256_raw": "de2cccc739faeddc75557153376c475205fea023af48e48c930f2e6748d50fd1"
+  }
+ },
+ "verification": "Files in git are checked by git blob id (git hash-object). Data files by raw SHA-256."
+}

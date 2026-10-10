@@ -1,0 +1,3259 @@
+{
+ "generated_by": "research/measurement/inclusion.py",
+ "reads_no_outcomes": true,
+ "jump_fatigue": {
+  "trials_with_data": 256,
+  "participants": 43,
+  "data_quality_exclusions": {
+   "sub15_f_CMJ_t3": "starts crouched (starting hip height 0.94 of the person's highest; threshold 0.95)",
+   "sub32_CMJ_t1": "starts crouched (starting hip height 0.8922 of the person's highest; threshold 0.95)",
+   "sub32_f_CMJ_t2": "starts crouched (starting hip height 0.7695 of the person's highest; threshold 0.95)",
+   "sub32_f_CMJ_t3": "starts crouched (starting hip height 0.7322 of the person's highest; threshold 0.95)",
+   "sub34_CMJ_t1": "starts crouched (starting hip height 0.9387 of the person's highest; threshold 0.95)",
+   "sub34_f_CMJ_t1": "starts crouched (starting hip height 0.9151 of the person's highest; threshold 0.95)",
+   "sub34_f_CMJ_t2": "starts crouched (starting hip height 0.7907 of the person's highest; threshold 0.95)",
+   "sub40_f_CMJ_t2": "starts crouched (starting hip height 0.7572 of the person's highest; threshold 0.95)",
+   "sub40_f_CMJ_t3": "starts crouched (starting hip height 0.7403 of the person's highest; threshold 0.95)"
+  },
+  "paths": {
+   "A": {
+    "label": "Path A: unchanged production pipeline",
+    "variant": "production",
+    "views": {
+     "advised": {
+      "stream": "az35_d3.5",
+      "trials_usable": 227,
+      "trials_not_found": [
+       "sub02_f_CMJ_t2",
+       "sub16_f_CMJ_t1",
+       "sub20_CMJ_t1",
+       "sub20_CMJ_t2",
+       "sub20_CMJ_t3",
+       "sub20_f_CMJ_t2",
+       "sub20_f_CMJ_t3",
+       "sub26_CMJ_t3",
+       "sub26_f_CMJ_t1",
+       "sub28_CMJ_t2",
+       "sub28_CMJ_t3",
+       "sub28_f_CMJ_t3",
+       "sub29_CMJ_t1",
+       "sub29_CMJ_t2",
+       "sub29_f_CMJ_t2",
+       "sub39_CMJ_t1",
+       "sub39_f_CMJ_t2",
+       "sub39_f_CMJ_t3",
+       "sub40_CMJ_t3",
+       "sub43_CMJ_t1"
+      ],
+      "not_found_by_group_condition": {
+       "ACL/fatigued": {
+        "missing": 5,
+        "of": 58
+       },
+       "ACL/non_fatigued": {
+        "missing": 8,
+        "of": 61
+       },
+       "control/fatigued": {
+        "missing": 4,
+        "of": 63
+       },
+       "control/non_fatigued": {
+        "missing": 3,
+        "of": 65
+       }
+      },
+      "samples": {
+       "primary_3_plus_3": {
+        "n": 30,
+        "by_group": {
+         "control": 16,
+         "ACL": 14
+        },
+        "by_sex": {
+         "female": 21,
+         "male": 9
+        },
+        "participants": [
+         "sub01",
+         "sub03",
+         "sub04",
+         "sub06",
+         "sub07",
+         "sub08",
+         "sub09",
+         "sub10",
+         "sub11",
+         "sub12",
+         "sub13",
+         "sub14",
+         "sub17",
+         "sub18",
+         "sub19",
+         "sub21",
+         "sub22",
+         "sub23",
+         "sub24",
+         "sub25",
+         "sub27",
+         "sub30",
+         "sub31",
+         "sub33",
+         "sub35",
+         "sub36",
+         "sub37",
+         "sub38",
+         "sub41",
+         "sub42"
+        ]
+       },
+       "at_least_2_plus_2": {
+        "n": 36,
+        "by_group": {
+         "control": 20,
+         "ACL": 16
+        },
+        "by_sex": {
+         "female": 23,
+         "male": 13
+        },
+        "participants": [
+         "sub01",
+         "sub02",
+         "sub03",
+         "sub04",
+         "sub06",
+         "sub07",
+         "sub08",
+         "sub09",
+         "sub10",
+         "sub11",
+         "sub12",
+         "sub13",
+         "sub14",
+         "sub15",
+         "sub16",
+         "sub17",
+         "sub18",
+         "sub19",
+         "sub21",
+         "sub22",
+         "sub23",
+         "sub24",
+         "sub25",
+         "sub26",
+         "sub27",
+         "sub30",
+         "sub31",
+         "sub33",
+         "sub35",
+         "sub36",
+         "sub37",
+         "sub38",
+         "sub41",
+         "sub42",
+         "sub43",
+         "sub44"
+        ]
+       },
+       "at_least_1_plus_1_person_means": {
+        "n": 42,
+        "by_group": {
+         "control": 22,
+         "ACL": 20
+        },
+        "by_sex": {
+         "female": 23,
+         "male": 19
+        },
+        "participants": [
+         "sub01",
+         "sub02",
+         "sub03",
+         "sub04",
+         "sub06",
+         "sub07",
+         "sub08",
+         "sub09",
+         "sub10",
+         "sub11",
+         "sub12",
+         "sub13",
+         "sub14",
+         "sub15",
+         "sub16",
+         "sub17",
+         "sub18",
+         "sub19",
+         "sub21",
+         "sub22",
+         "sub23",
+         "sub24",
+         "sub25",
+         "sub26",
+         "sub27",
+         "sub28",
+         "sub29",
+         "sub30",
+         "sub31",
+         "sub32",
+         "sub33",
+         "sub34",
+         "sub35",
+         "sub36",
+         "sub37",
+         "sub38",
+         "sub39",
+         "sub40",
+         "sub41",
+         "sub42",
+         "sub43",
+         "sub44"
+        ]
+       }
+      },
+      "usable_trials_by_participant": {
+       "sub01": {
+        "non_fatigued": [
+         "sub01_CMJ_t1",
+         "sub01_CMJ_t2",
+         "sub01_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub01_f_CMJ_t1",
+         "sub01_f_CMJ_t2",
+         "sub01_f_CMJ_t3"
+        ]
+       },
+       "sub02": {
+        "non_fatigued": [
+         "sub02_CMJ_t1",
+         "sub02_CMJ_t2",
+         "sub02_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub02_f_CMJ_t1",
+         "sub02_f_CMJ_t3"
+        ]
+       },
+       "sub03": {
+        "non_fatigued": [
+         "sub03_CMJ_t1",
+         "sub03_CMJ_t2",
+         "sub03_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub03_f_CMJ_t1",
+         "sub03_f_CMJ_t2",
+         "sub03_f_CMJ_t3"
+        ]
+       },
+       "sub04": {
+        "non_fatigued": [
+         "sub04_CMJ_t1",
+         "sub04_CMJ_t2",
+         "sub04_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub04_f_CMJ_t1",
+         "sub04_f_CMJ_t2",
+         "sub04_f_CMJ_t3"
+        ]
+       },
+       "sub06": {
+        "non_fatigued": [
+         "sub06_CMJ_t1",
+         "sub06_CMJ_t2",
+         "sub06_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub06_f_CMJ_t1",
+         "sub06_f_CMJ_t2",
+         "sub06_f_CMJ_t3"
+        ]
+       },
+       "sub07": {
+        "non_fatigued": [
+         "sub07_CMJ_t1",
+         "sub07_CMJ_t2",
+         "sub07_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub07_f_CMJ_t1",
+         "sub07_f_CMJ_t2",
+         "sub07_f_CMJ_t3"
+        ]
+       },
+       "sub08": {
+        "non_fatigued": [
+         "sub08_CMJ_t1",
+         "sub08_CMJ_t2",
+         "sub08_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub08_f_CMJ_t1",
+         "sub08_f_CMJ_t2",
+         "sub08_f_CMJ_t3"
+        ]
+       },
+       "sub09": {
+        "non_fatigued": [
+         "sub09_CMJ_t1",
+         "sub09_CMJ_t2",
+         "sub09_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub09_f_CMJ_t1",
+         "sub09_f_CMJ_t2",
+         "sub09_f_CMJ_t3"
+        ]
+       },
+       "sub10": {
+        "non_fatigued": [
+         "sub10_CMJ_t1",
+         "sub10_CMJ_t2",
+         "sub10_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub10_f_CMJ_t1",
+         "sub10_f_CMJ_t2",
+         "sub10_f_CMJ_t3"
+        ]
+       },
+       "sub11": {
+        "non_fatigued": [
+         "sub11_CMJ_t1",
+         "sub11_CMJ_t2",
+         "sub11_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub11_f_CMJ_t1",
+         "sub11_f_CMJ_t2",
+         "sub11_f_CMJ_t3"
+        ]
+       },
+       "sub12": {
+        "non_fatigued": [
+         "sub12_CMJ_t1",
+         "sub12_CMJ_t2",
+         "sub12_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub12_f_CMJ_t1",
+         "sub12_f_CMJ_t2",
+         "sub12_f_CMJ_t3"
+        ]
+       },
+       "sub13": {
+        "non_fatigued": [
+         "sub13_CMJ_t1",
+         "sub13_CMJ_t2",
+         "sub13_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub13_f_CMJ_t1",
+         "sub13_f_CMJ_t2",
+         "sub13_f_CMJ_t3"
+        ]
+       },
+       "sub14": {
+        "non_fatigued": [
+         "sub14_CMJ_t1",
+         "sub14_CMJ_t2",
+         "sub14_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub14_f_CMJ_t1",
+         "sub14_f_CMJ_t2",
+         "sub14_f_CMJ_t3"
+        ]
+       },
+       "sub15": {
+        "non_fatigued": [
+         "sub15_CMJ_t1",
+         "sub15_CMJ_t2",
+         "sub15_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub15_f_CMJ_t1",
+         "sub15_f_CMJ_t2"
+        ]
+       },
+       "sub16": {
+        "non_fatigued": [
+         "sub16_CMJ_t1",
+         "sub16_CMJ_t2",
+         "sub16_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub16_f_CMJ_t2",
+         "sub16_f_CMJ_t3"
+        ]
+       },
+       "sub17": {
+        "non_fatigued": [
+         "sub17_CMJ_t1",
+         "sub17_CMJ_t2",
+         "sub17_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub17_f_CMJ_t1",
+         "sub17_f_CMJ_t2",
+         "sub17_f_CMJ_t3"
+        ]
+       },
+       "sub18": {
+        "non_fatigued": [
+         "sub18_CMJ_t1",
+         "sub18_CMJ_t2",
+         "sub18_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub18_f_CMJ_t1",
+         "sub18_f_CMJ_t2",
+         "sub18_f_CMJ_t3"
+        ]
+       },
+       "sub19": {
+        "non_fatigued": [
+         "sub19_CMJ_t1",
+         "sub19_CMJ_t2",
+         "sub19_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub19_f_CMJ_t1",
+         "sub19_f_CMJ_t2",
+         "sub19_f_CMJ_t3"
+        ]
+       },
+       "sub20": {
+        "non_fatigued": [],
+        "fatigued": [
+         "sub20_f_CMJ_t1"
+        ]
+       },
+       "sub21": {
+        "non_fatigued": [
+         "sub21_CMJ_t1",
+         "sub21_CMJ_t2",
+         "sub21_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub21_f_CMJ_t1",
+         "sub21_f_CMJ_t2",
+         "sub21_f_CMJ_t3"
+        ]
+       },
+       "sub22": {
+        "non_fatigued": [
+         "sub22_CMJ_t1",
+         "sub22_CMJ_t2",
+         "sub22_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub22_f_CMJ_t1",
+         "sub22_f_CMJ_t2",
+         "sub22_f_CMJ_t3"
+        ]
+       },
+       "sub23": {
+        "non_fatigued": [
+         "sub23_CMJ_t1",
+         "sub23_CMJ_t2",
+         "sub23_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub23_f_CMJ_t1",
+         "sub23_f_CMJ_t2",
+         "sub23_f_CMJ_t3"
+        ]
+       },
+       "sub24": {
+        "non_fatigued": [
+         "sub24_CMJ_t1",
+         "sub24_CMJ_t2",
+         "sub24_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub24_f_CMJ_t1",
+         "sub24_f_CMJ_t2",
+         "sub24_f_CMJ_t3"
+        ]
+       },
+       "sub25": {
+        "non_fatigued": [
+         "sub25_CMJ_t1",
+         "sub25_CMJ_t2",
+         "sub25_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub25_f_CMJ_t1",
+         "sub25_f_CMJ_t2",
+         "sub25_f_CMJ_t3"
+        ]
+       },
+       "sub26": {
+        "non_fatigued": [
+         "sub26_CMJ_t1",
+         "sub26_CMJ_t2"
+        ],
+        "fatigued": [
+         "sub26_f_CMJ_t2",
+         "sub26_f_CMJ_t3"
+        ]
+       },
+       "sub27": {
+        "non_fatigued": [
+         "sub27_CMJ_t1",
+         "sub27_CMJ_t2",
+         "sub27_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub27_f_CMJ_t1",
+         "sub27_f_CMJ_t2",
+         "sub27_f_CMJ_t3"
+        ]
+       },
+       "sub28": {
+        "non_fatigued": [
+         "sub28_CMJ_t1"
+        ],
+        "fatigued": [
+         "sub28_f_CMJ_t1",
+         "sub28_f_CMJ_t2"
+        ]
+       },
+       "sub29": {
+        "non_fatigued": [
+         "sub29_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub29_f_CMJ_t1",
+         "sub29_f_CMJ_t3"
+        ]
+       },
+       "sub30": {
+        "non_fatigued": [
+         "sub30_CMJ_t1",
+         "sub30_CMJ_t2",
+         "sub30_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub30_f_CMJ_t1",
+         "sub30_f_CMJ_t2",
+         "sub30_f_CMJ_t3"
+        ]
+       },
+       "sub31": {
+        "non_fatigued": [
+         "sub31_CMJ_t1",
+         "sub31_CMJ_t2",
+         "sub31_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub31_f_CMJ_t1",
+         "sub31_f_CMJ_t2",
+         "sub31_f_CMJ_t3"
+        ]
+       },
+       "sub32": {
+        "non_fatigued": [
+         "sub32_CMJ_t2",
+         "sub32_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub32_f_CMJ_t1"
+        ]
+       },
+       "sub33": {
+        "non_fatigued": [
+         "sub33_CMJ_t1",
+         "sub33_CMJ_t2",
+         "sub33_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub33_f_CMJ_t1",
+         "sub33_f_CMJ_t2",
+         "sub33_f_CMJ_t3"
+        ]
+       },
+       "sub34": {
+        "non_fatigued": [
+         "sub34_CMJ_t2",
+         "sub34_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub34_f_CMJ_t3"
+        ]
+       },
+       "sub35": {
+        "non_fatigued": [
+         "sub35_CMJ_t1",
+         "sub35_CMJ_t2",
+         "sub35_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub35_f_CMJ_t1",
+         "sub35_f_CMJ_t2",
+         "sub35_f_CMJ_t3"
+        ]
+       },
+       "sub36": {
+        "non_fatigued": [
+         "sub36_CMJ_t1",
+         "sub36_CMJ_t2",
+         "sub36_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub36_f_CMJ_t1",
+         "sub36_f_CMJ_t2",
+         "sub36_f_CMJ_t3"
+        ]
+       },
+       "sub37": {
+        "non_fatigued": [
+         "sub37_CMJ_t1",
+         "sub37_CMJ_t2",
+         "sub37_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub37_f_CMJ_t1",
+         "sub37_f_CMJ_t2",
+         "sub37_f_CMJ_t3"
+        ]
+       },
+       "sub38": {
+        "non_fatigued": [
+         "sub38_CMJ_t1",
+         "sub38_CMJ_t2",
+         "sub38_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub38_f_CMJ_t1",
+         "sub38_f_CMJ_t2",
+         "sub38_f_CMJ_t3"
+        ]
+       },
+       "sub39": {
+        "non_fatigued": [
+         "sub39_CMJ_t2",
+         "sub39_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub39_f_CMJ_t1"
+        ]
+       },
+       "sub40": {
+        "non_fatigued": [
+         "sub40_CMJ_t1",
+         "sub40_CMJ_t2"
+        ],
+        "fatigued": [
+         "sub40_f_CMJ_t1"
+        ]
+       },
+       "sub41": {
+        "non_fatigued": [
+         "sub41_CMJ_t1",
+         "sub41_CMJ_t2",
+         "sub41_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub41_f_CMJ_t1",
+         "sub41_f_CMJ_t2",
+         "sub41_f_CMJ_t3"
+        ]
+       },
+       "sub42": {
+        "non_fatigued": [
+         "sub42_CMJ_t1",
+         "sub42_CMJ_t2",
+         "sub42_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub42_f_CMJ_t1",
+         "sub42_f_CMJ_t2",
+         "sub42_f_CMJ_t3"
+        ]
+       },
+       "sub43": {
+        "non_fatigued": [
+         "sub43_CMJ_t2",
+         "sub43_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub43_f_CMJ_t1",
+         "sub43_f_CMJ_t2",
+         "sub43_f_CMJ_t3"
+        ]
+       },
+       "sub44": {
+        "non_fatigued": [
+         "sub44_CMJ_t1",
+         "sub44_CMJ_t2"
+        ],
+        "fatigued": [
+         "sub44_f_CMJ_t1",
+         "sub44_f_CMJ_t2"
+        ]
+       }
+      }
+     },
+     "side": {
+      "stream": "az0_d3.5",
+      "trials_usable": 217,
+      "trials_not_found": [
+       "sub08_f_CMJ_t2",
+       "sub16_f_CMJ_t1",
+       "sub18_CMJ_t1",
+       "sub20_CMJ_t1",
+       "sub20_CMJ_t2",
+       "sub20_CMJ_t3",
+       "sub20_f_CMJ_t2",
+       "sub20_f_CMJ_t3",
+       "sub21_CMJ_t1",
+       "sub21_CMJ_t2",
+       "sub21_f_CMJ_t1",
+       "sub24_CMJ_t3",
+       "sub26_CMJ_t3",
+       "sub26_f_CMJ_t1",
+       "sub28_CMJ_t2",
+       "sub28_CMJ_t3",
+       "sub28_f_CMJ_t3",
+       "sub29_CMJ_t1",
+       "sub29_CMJ_t2",
+       "sub29_f_CMJ_t2",
+       "sub30_CMJ_t1",
+       "sub32_CMJ_t3",
+       "sub32_f_CMJ_t1",
+       "sub39_CMJ_t1",
+       "sub39_f_CMJ_t2",
+       "sub39_f_CMJ_t3",
+       "sub40_CMJ_t3",
+       "sub41_f_CMJ_t3",
+       "sub42_f_CMJ_t3",
+       "sub43_CMJ_t1"
+      ],
+      "not_found_by_group_condition": {
+       "ACL/fatigued": {
+        "missing": 8,
+        "of": 58
+       },
+       "ACL/non_fatigued": {
+        "missing": 10,
+        "of": 61
+       },
+       "control/fatigued": {
+        "missing": 5,
+        "of": 63
+       },
+       "control/non_fatigued": {
+        "missing": 7,
+        "of": 65
+       }
+      },
+      "samples": {
+       "primary_3_plus_3": {
+        "n": 24,
+        "by_group": {
+         "control": 13,
+         "ACL": 11
+        },
+        "by_sex": {
+         "female": 21,
+         "male": 3
+        },
+        "participants": [
+         "sub01",
+         "sub02",
+         "sub03",
+         "sub04",
+         "sub06",
+         "sub07",
+         "sub09",
+         "sub10",
+         "sub11",
+         "sub12",
+         "sub13",
+         "sub14",
+         "sub17",
+         "sub19",
+         "sub22",
+         "sub23",
+         "sub25",
+         "sub27",
+         "sub31",
+         "sub33",
+         "sub35",
+         "sub36",
+         "sub37",
+         "sub38"
+        ]
+       },
+       "at_least_2_plus_2": {
+        "n": 35,
+        "by_group": {
+         "control": 19,
+         "ACL": 16
+        },
+        "by_sex": {
+         "female": 23,
+         "male": 12
+        },
+        "participants": [
+         "sub01",
+         "sub02",
+         "sub03",
+         "sub04",
+         "sub06",
+         "sub07",
+         "sub08",
+         "sub09",
+         "sub10",
+         "sub11",
+         "sub12",
+         "sub13",
+         "sub14",
+         "sub15",
+         "sub16",
+         "sub17",
+         "sub18",
+         "sub19",
+         "sub22",
+         "sub23",
+         "sub24",
+         "sub25",
+         "sub26",
+         "sub27",
+         "sub30",
+         "sub31",
+         "sub33",
+         "sub35",
+         "sub36",
+         "sub37",
+         "sub38",
+         "sub41",
+         "sub42",
+         "sub43",
+         "sub44"
+        ]
+       },
+       "at_least_1_plus_1_person_means": {
+        "n": 41,
+        "by_group": {
+         "control": 22,
+         "ACL": 19
+        },
+        "by_sex": {
+         "female": 23,
+         "male": 18
+        },
+        "participants": [
+         "sub01",
+         "sub02",
+         "sub03",
+         "sub04",
+         "sub06",
+         "sub07",
+         "sub08",
+         "sub09",
+         "sub10",
+         "sub11",
+         "sub12",
+         "sub13",
+         "sub14",
+         "sub15",
+         "sub16",
+         "sub17",
+         "sub18",
+         "sub19",
+         "sub21",
+         "sub22",
+         "sub23",
+         "sub24",
+         "sub25",
+         "sub26",
+         "sub27",
+         "sub28",
+         "sub29",
+         "sub30",
+         "sub31",
+         "sub33",
+         "sub34",
+         "sub35",
+         "sub36",
+         "sub37",
+         "sub38",
+         "sub39",
+         "sub40",
+         "sub41",
+         "sub42",
+         "sub43",
+         "sub44"
+        ]
+       }
+      },
+      "usable_trials_by_participant": {
+       "sub01": {
+        "non_fatigued": [
+         "sub01_CMJ_t1",
+         "sub01_CMJ_t2",
+         "sub01_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub01_f_CMJ_t1",
+         "sub01_f_CMJ_t2",
+         "sub01_f_CMJ_t3"
+        ]
+       },
+       "sub02": {
+        "non_fatigued": [
+         "sub02_CMJ_t1",
+         "sub02_CMJ_t2",
+         "sub02_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub02_f_CMJ_t1",
+         "sub02_f_CMJ_t2",
+         "sub02_f_CMJ_t3"
+        ]
+       },
+       "sub03": {
+        "non_fatigued": [
+         "sub03_CMJ_t1",
+         "sub03_CMJ_t2",
+         "sub03_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub03_f_CMJ_t1",
+         "sub03_f_CMJ_t2",
+         "sub03_f_CMJ_t3"
+        ]
+       },
+       "sub04": {
+        "non_fatigued": [
+         "sub04_CMJ_t1",
+         "sub04_CMJ_t2",
+         "sub04_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub04_f_CMJ_t1",
+         "sub04_f_CMJ_t2",
+         "sub04_f_CMJ_t3"
+        ]
+       },
+       "sub06": {
+        "non_fatigued": [
+         "sub06_CMJ_t1",
+         "sub06_CMJ_t2",
+         "sub06_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub06_f_CMJ_t1",
+         "sub06_f_CMJ_t2",
+         "sub06_f_CMJ_t3"
+        ]
+       },
+       "sub07": {
+        "non_fatigued": [
+         "sub07_CMJ_t1",
+         "sub07_CMJ_t2",
+         "sub07_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub07_f_CMJ_t1",
+         "sub07_f_CMJ_t2",
+         "sub07_f_CMJ_t3"
+        ]
+       },
+       "sub08": {
+        "non_fatigued": [
+         "sub08_CMJ_t1",
+         "sub08_CMJ_t2",
+         "sub08_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub08_f_CMJ_t1",
+         "sub08_f_CMJ_t3"
+        ]
+       },
+       "sub09": {
+        "non_fatigued": [
+         "sub09_CMJ_t1",
+         "sub09_CMJ_t2",
+         "sub09_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub09_f_CMJ_t1",
+         "sub09_f_CMJ_t2",
+         "sub09_f_CMJ_t3"
+        ]
+       },
+       "sub10": {
+        "non_fatigued": [
+         "sub10_CMJ_t1",
+         "sub10_CMJ_t2",
+         "sub10_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub10_f_CMJ_t1",
+         "sub10_f_CMJ_t2",
+         "sub10_f_CMJ_t3"
+        ]
+       },
+       "sub11": {
+        "non_fatigued": [
+         "sub11_CMJ_t1",
+         "sub11_CMJ_t2",
+         "sub11_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub11_f_CMJ_t1",
+         "sub11_f_CMJ_t2",
+         "sub11_f_CMJ_t3"
+        ]
+       },
+       "sub12": {
+        "non_fatigued": [
+         "sub12_CMJ_t1",
+         "sub12_CMJ_t2",
+         "sub12_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub12_f_CMJ_t1",
+         "sub12_f_CMJ_t2",
+         "sub12_f_CMJ_t3"
+        ]
+       },
+       "sub13": {
+        "non_fatigued": [
+         "sub13_CMJ_t1",
+         "sub13_CMJ_t2",
+         "sub13_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub13_f_CMJ_t1",
+         "sub13_f_CMJ_t2",
+         "sub13_f_CMJ_t3"
+        ]
+       },
+       "sub14": {
+        "non_fatigued": [
+         "sub14_CMJ_t1",
+         "sub14_CMJ_t2",
+         "sub14_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub14_f_CMJ_t1",
+         "sub14_f_CMJ_t2",
+         "sub14_f_CMJ_t3"
+        ]
+       },
+       "sub15": {
+        "non_fatigued": [
+         "sub15_CMJ_t1",
+         "sub15_CMJ_t2",
+         "sub15_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub15_f_CMJ_t1",
+         "sub15_f_CMJ_t2"
+        ]
+       },
+       "sub16": {
+        "non_fatigued": [
+         "sub16_CMJ_t1",
+         "sub16_CMJ_t2",
+         "sub16_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub16_f_CMJ_t2",
+         "sub16_f_CMJ_t3"
+        ]
+       },
+       "sub17": {
+        "non_fatigued": [
+         "sub17_CMJ_t1",
+         "sub17_CMJ_t2",
+         "sub17_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub17_f_CMJ_t1",
+         "sub17_f_CMJ_t2",
+         "sub17_f_CMJ_t3"
+        ]
+       },
+       "sub18": {
+        "non_fatigued": [
+         "sub18_CMJ_t2",
+         "sub18_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub18_f_CMJ_t1",
+         "sub18_f_CMJ_t2",
+         "sub18_f_CMJ_t3"
+        ]
+       },
+       "sub19": {
+        "non_fatigued": [
+         "sub19_CMJ_t1",
+         "sub19_CMJ_t2",
+         "sub19_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub19_f_CMJ_t1",
+         "sub19_f_CMJ_t2",
+         "sub19_f_CMJ_t3"
+        ]
+       },
+       "sub20": {
+        "non_fatigued": [],
+        "fatigued": [
+         "sub20_f_CMJ_t1"
+        ]
+       },
+       "sub21": {
+        "non_fatigued": [
+         "sub21_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub21_f_CMJ_t2",
+         "sub21_f_CMJ_t3"
+        ]
+       },
+       "sub22": {
+        "non_fatigued": [
+         "sub22_CMJ_t1",
+         "sub22_CMJ_t2",
+         "sub22_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub22_f_CMJ_t1",
+         "sub22_f_CMJ_t2",
+         "sub22_f_CMJ_t3"
+        ]
+       },
+       "sub23": {
+        "non_fatigued": [
+         "sub23_CMJ_t1",
+         "sub23_CMJ_t2",
+         "sub23_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub23_f_CMJ_t1",
+         "sub23_f_CMJ_t2",
+         "sub23_f_CMJ_t3"
+        ]
+       },
+       "sub24": {
+        "non_fatigued": [
+         "sub24_CMJ_t1",
+         "sub24_CMJ_t2"
+        ],
+        "fatigued": [
+         "sub24_f_CMJ_t1",
+         "sub24_f_CMJ_t2",
+         "sub24_f_CMJ_t3"
+        ]
+       },
+       "sub25": {
+        "non_fatigued": [
+         "sub25_CMJ_t1",
+         "sub25_CMJ_t2",
+         "sub25_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub25_f_CMJ_t1",
+         "sub25_f_CMJ_t2",
+         "sub25_f_CMJ_t3"
+        ]
+       },
+       "sub26": {
+        "non_fatigued": [
+         "sub26_CMJ_t1",
+         "sub26_CMJ_t2"
+        ],
+        "fatigued": [
+         "sub26_f_CMJ_t2",
+         "sub26_f_CMJ_t3"
+        ]
+       },
+       "sub27": {
+        "non_fatigued": [
+         "sub27_CMJ_t1",
+         "sub27_CMJ_t2",
+         "sub27_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub27_f_CMJ_t1",
+         "sub27_f_CMJ_t2",
+         "sub27_f_CMJ_t3"
+        ]
+       },
+       "sub28": {
+        "non_fatigued": [
+         "sub28_CMJ_t1"
+        ],
+        "fatigued": [
+         "sub28_f_CMJ_t1",
+         "sub28_f_CMJ_t2"
+        ]
+       },
+       "sub29": {
+        "non_fatigued": [
+         "sub29_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub29_f_CMJ_t1",
+         "sub29_f_CMJ_t3"
+        ]
+       },
+       "sub30": {
+        "non_fatigued": [
+         "sub30_CMJ_t2",
+         "sub30_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub30_f_CMJ_t1",
+         "sub30_f_CMJ_t2",
+         "sub30_f_CMJ_t3"
+        ]
+       },
+       "sub31": {
+        "non_fatigued": [
+         "sub31_CMJ_t1",
+         "sub31_CMJ_t2",
+         "sub31_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub31_f_CMJ_t1",
+         "sub31_f_CMJ_t2",
+         "sub31_f_CMJ_t3"
+        ]
+       },
+       "sub32": {
+        "non_fatigued": [
+         "sub32_CMJ_t2"
+        ],
+        "fatigued": []
+       },
+       "sub33": {
+        "non_fatigued": [
+         "sub33_CMJ_t1",
+         "sub33_CMJ_t2",
+         "sub33_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub33_f_CMJ_t1",
+         "sub33_f_CMJ_t2",
+         "sub33_f_CMJ_t3"
+        ]
+       },
+       "sub34": {
+        "non_fatigued": [
+         "sub34_CMJ_t2",
+         "sub34_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub34_f_CMJ_t3"
+        ]
+       },
+       "sub35": {
+        "non_fatigued": [
+         "sub35_CMJ_t1",
+         "sub35_CMJ_t2",
+         "sub35_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub35_f_CMJ_t1",
+         "sub35_f_CMJ_t2",
+         "sub35_f_CMJ_t3"
+        ]
+       },
+       "sub36": {
+        "non_fatigued": [
+         "sub36_CMJ_t1",
+         "sub36_CMJ_t2",
+         "sub36_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub36_f_CMJ_t1",
+         "sub36_f_CMJ_t2",
+         "sub36_f_CMJ_t3"
+        ]
+       },
+       "sub37": {
+        "non_fatigued": [
+         "sub37_CMJ_t1",
+         "sub37_CMJ_t2",
+         "sub37_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub37_f_CMJ_t1",
+         "sub37_f_CMJ_t2",
+         "sub37_f_CMJ_t3"
+        ]
+       },
+       "sub38": {
+        "non_fatigued": [
+         "sub38_CMJ_t1",
+         "sub38_CMJ_t2",
+         "sub38_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub38_f_CMJ_t1",
+         "sub38_f_CMJ_t2",
+         "sub38_f_CMJ_t3"
+        ]
+       },
+       "sub39": {
+        "non_fatigued": [
+         "sub39_CMJ_t2",
+         "sub39_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub39_f_CMJ_t1"
+        ]
+       },
+       "sub40": {
+        "non_fatigued": [
+         "sub40_CMJ_t1",
+         "sub40_CMJ_t2"
+        ],
+        "fatigued": [
+         "sub40_f_CMJ_t1"
+        ]
+       },
+       "sub41": {
+        "non_fatigued": [
+         "sub41_CMJ_t1",
+         "sub41_CMJ_t2",
+         "sub41_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub41_f_CMJ_t1",
+         "sub41_f_CMJ_t2"
+        ]
+       },
+       "sub42": {
+        "non_fatigued": [
+         "sub42_CMJ_t1",
+         "sub42_CMJ_t2",
+         "sub42_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub42_f_CMJ_t1",
+         "sub42_f_CMJ_t2"
+        ]
+       },
+       "sub43": {
+        "non_fatigued": [
+         "sub43_CMJ_t2",
+         "sub43_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub43_f_CMJ_t1",
+         "sub43_f_CMJ_t2",
+         "sub43_f_CMJ_t3"
+        ]
+       },
+       "sub44": {
+        "non_fatigued": [
+         "sub44_CMJ_t1",
+         "sub44_CMJ_t2"
+        ],
+        "fatigued": [
+         "sub44_f_CMJ_t1",
+         "sub44_f_CMJ_t2"
+        ]
+       }
+      }
+     }
+    }
+   },
+   "B": {
+    "label": "Path B: experimental timing pipeline (P1: 6 Hz Butterworth timing, One Euro angles; research only)",
+    "variant": "dual_butter6",
+    "views": {
+     "advised": {
+      "stream": "az35_d3.5",
+      "trials_usable": 247,
+      "trials_not_found": [],
+      "not_found_by_group_condition": {
+       "ACL/fatigued": {
+        "missing": 0,
+        "of": 58
+       },
+       "ACL/non_fatigued": {
+        "missing": 0,
+        "of": 61
+       },
+       "control/fatigued": {
+        "missing": 0,
+        "of": 63
+       },
+       "control/non_fatigued": {
+        "missing": 0,
+        "of": 65
+       }
+      },
+      "samples": {
+       "primary_3_plus_3": {
+        "n": 38,
+        "by_group": {
+         "control": 20,
+         "ACL": 18
+        },
+        "by_sex": {
+         "female": 22,
+         "male": 16
+        },
+        "participants": [
+         "sub01",
+         "sub02",
+         "sub03",
+         "sub04",
+         "sub06",
+         "sub07",
+         "sub08",
+         "sub09",
+         "sub10",
+         "sub11",
+         "sub12",
+         "sub13",
+         "sub14",
+         "sub16",
+         "sub17",
+         "sub18",
+         "sub19",
+         "sub20",
+         "sub21",
+         "sub22",
+         "sub23",
+         "sub24",
+         "sub25",
+         "sub26",
+         "sub27",
+         "sub28",
+         "sub29",
+         "sub30",
+         "sub31",
+         "sub33",
+         "sub35",
+         "sub36",
+         "sub37",
+         "sub38",
+         "sub39",
+         "sub41",
+         "sub42",
+         "sub43"
+        ]
+       },
+       "at_least_2_plus_2": {
+        "n": 40,
+        "by_group": {
+         "control": 21,
+         "ACL": 19
+        },
+        "by_sex": {
+         "female": 23,
+         "male": 17
+        },
+        "participants": [
+         "sub01",
+         "sub02",
+         "sub03",
+         "sub04",
+         "sub06",
+         "sub07",
+         "sub08",
+         "sub09",
+         "sub10",
+         "sub11",
+         "sub12",
+         "sub13",
+         "sub14",
+         "sub15",
+         "sub16",
+         "sub17",
+         "sub18",
+         "sub19",
+         "sub20",
+         "sub21",
+         "sub22",
+         "sub23",
+         "sub24",
+         "sub25",
+         "sub26",
+         "sub27",
+         "sub28",
+         "sub29",
+         "sub30",
+         "sub31",
+         "sub33",
+         "sub35",
+         "sub36",
+         "sub37",
+         "sub38",
+         "sub39",
+         "sub41",
+         "sub42",
+         "sub43",
+         "sub44"
+        ]
+       },
+       "at_least_1_plus_1_person_means": {
+        "n": 43,
+        "by_group": {
+         "control": 22,
+         "ACL": 21
+        },
+        "by_sex": {
+         "female": 23,
+         "male": 20
+        },
+        "participants": [
+         "sub01",
+         "sub02",
+         "sub03",
+         "sub04",
+         "sub06",
+         "sub07",
+         "sub08",
+         "sub09",
+         "sub10",
+         "sub11",
+         "sub12",
+         "sub13",
+         "sub14",
+         "sub15",
+         "sub16",
+         "sub17",
+         "sub18",
+         "sub19",
+         "sub20",
+         "sub21",
+         "sub22",
+         "sub23",
+         "sub24",
+         "sub25",
+         "sub26",
+         "sub27",
+         "sub28",
+         "sub29",
+         "sub30",
+         "sub31",
+         "sub32",
+         "sub33",
+         "sub34",
+         "sub35",
+         "sub36",
+         "sub37",
+         "sub38",
+         "sub39",
+         "sub40",
+         "sub41",
+         "sub42",
+         "sub43",
+         "sub44"
+        ]
+       }
+      },
+      "usable_trials_by_participant": {
+       "sub01": {
+        "non_fatigued": [
+         "sub01_CMJ_t1",
+         "sub01_CMJ_t2",
+         "sub01_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub01_f_CMJ_t1",
+         "sub01_f_CMJ_t2",
+         "sub01_f_CMJ_t3"
+        ]
+       },
+       "sub02": {
+        "non_fatigued": [
+         "sub02_CMJ_t1",
+         "sub02_CMJ_t2",
+         "sub02_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub02_f_CMJ_t1",
+         "sub02_f_CMJ_t2",
+         "sub02_f_CMJ_t3"
+        ]
+       },
+       "sub03": {
+        "non_fatigued": [
+         "sub03_CMJ_t1",
+         "sub03_CMJ_t2",
+         "sub03_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub03_f_CMJ_t1",
+         "sub03_f_CMJ_t2",
+         "sub03_f_CMJ_t3"
+        ]
+       },
+       "sub04": {
+        "non_fatigued": [
+         "sub04_CMJ_t1",
+         "sub04_CMJ_t2",
+         "sub04_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub04_f_CMJ_t1",
+         "sub04_f_CMJ_t2",
+         "sub04_f_CMJ_t3"
+        ]
+       },
+       "sub06": {
+        "non_fatigued": [
+         "sub06_CMJ_t1",
+         "sub06_CMJ_t2",
+         "sub06_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub06_f_CMJ_t1",
+         "sub06_f_CMJ_t2",
+         "sub06_f_CMJ_t3"
+        ]
+       },
+       "sub07": {
+        "non_fatigued": [
+         "sub07_CMJ_t1",
+         "sub07_CMJ_t2",
+         "sub07_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub07_f_CMJ_t1",
+         "sub07_f_CMJ_t2",
+         "sub07_f_CMJ_t3"
+        ]
+       },
+       "sub08": {
+        "non_fatigued": [
+         "sub08_CMJ_t1",
+         "sub08_CMJ_t2",
+         "sub08_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub08_f_CMJ_t1",
+         "sub08_f_CMJ_t2",
+         "sub08_f_CMJ_t3"
+        ]
+       },
+       "sub09": {
+        "non_fatigued": [
+         "sub09_CMJ_t1",
+         "sub09_CMJ_t2",
+         "sub09_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub09_f_CMJ_t1",
+         "sub09_f_CMJ_t2",
+         "sub09_f_CMJ_t3"
+        ]
+       },
+       "sub10": {
+        "non_fatigued": [
+         "sub10_CMJ_t1",
+         "sub10_CMJ_t2",
+         "sub10_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub10_f_CMJ_t1",
+         "sub10_f_CMJ_t2",
+         "sub10_f_CMJ_t3"
+        ]
+       },
+       "sub11": {
+        "non_fatigued": [
+         "sub11_CMJ_t1",
+         "sub11_CMJ_t2",
+         "sub11_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub11_f_CMJ_t1",
+         "sub11_f_CMJ_t2",
+         "sub11_f_CMJ_t3"
+        ]
+       },
+       "sub12": {
+        "non_fatigued": [
+         "sub12_CMJ_t1",
+         "sub12_CMJ_t2",
+         "sub12_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub12_f_CMJ_t1",
+         "sub12_f_CMJ_t2",
+         "sub12_f_CMJ_t3"
+        ]
+       },
+       "sub13": {
+        "non_fatigued": [
+         "sub13_CMJ_t1",
+         "sub13_CMJ_t2",
+         "sub13_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub13_f_CMJ_t1",
+         "sub13_f_CMJ_t2",
+         "sub13_f_CMJ_t3"
+        ]
+       },
+       "sub14": {
+        "non_fatigued": [
+         "sub14_CMJ_t1",
+         "sub14_CMJ_t2",
+         "sub14_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub14_f_CMJ_t1",
+         "sub14_f_CMJ_t2",
+         "sub14_f_CMJ_t3"
+        ]
+       },
+       "sub15": {
+        "non_fatigued": [
+         "sub15_CMJ_t1",
+         "sub15_CMJ_t2",
+         "sub15_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub15_f_CMJ_t1",
+         "sub15_f_CMJ_t2"
+        ]
+       },
+       "sub16": {
+        "non_fatigued": [
+         "sub16_CMJ_t1",
+         "sub16_CMJ_t2",
+         "sub16_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub16_f_CMJ_t1",
+         "sub16_f_CMJ_t2",
+         "sub16_f_CMJ_t3"
+        ]
+       },
+       "sub17": {
+        "non_fatigued": [
+         "sub17_CMJ_t1",
+         "sub17_CMJ_t2",
+         "sub17_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub17_f_CMJ_t1",
+         "sub17_f_CMJ_t2",
+         "sub17_f_CMJ_t3"
+        ]
+       },
+       "sub18": {
+        "non_fatigued": [
+         "sub18_CMJ_t1",
+         "sub18_CMJ_t2",
+         "sub18_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub18_f_CMJ_t1",
+         "sub18_f_CMJ_t2",
+         "sub18_f_CMJ_t3"
+        ]
+       },
+       "sub19": {
+        "non_fatigued": [
+         "sub19_CMJ_t1",
+         "sub19_CMJ_t2",
+         "sub19_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub19_f_CMJ_t1",
+         "sub19_f_CMJ_t2",
+         "sub19_f_CMJ_t3"
+        ]
+       },
+       "sub20": {
+        "non_fatigued": [
+         "sub20_CMJ_t1",
+         "sub20_CMJ_t2",
+         "sub20_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub20_f_CMJ_t1",
+         "sub20_f_CMJ_t2",
+         "sub20_f_CMJ_t3"
+        ]
+       },
+       "sub21": {
+        "non_fatigued": [
+         "sub21_CMJ_t1",
+         "sub21_CMJ_t2",
+         "sub21_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub21_f_CMJ_t1",
+         "sub21_f_CMJ_t2",
+         "sub21_f_CMJ_t3"
+        ]
+       },
+       "sub22": {
+        "non_fatigued": [
+         "sub22_CMJ_t1",
+         "sub22_CMJ_t2",
+         "sub22_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub22_f_CMJ_t1",
+         "sub22_f_CMJ_t2",
+         "sub22_f_CMJ_t3"
+        ]
+       },
+       "sub23": {
+        "non_fatigued": [
+         "sub23_CMJ_t1",
+         "sub23_CMJ_t2",
+         "sub23_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub23_f_CMJ_t1",
+         "sub23_f_CMJ_t2",
+         "sub23_f_CMJ_t3"
+        ]
+       },
+       "sub24": {
+        "non_fatigued": [
+         "sub24_CMJ_t1",
+         "sub24_CMJ_t2",
+         "sub24_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub24_f_CMJ_t1",
+         "sub24_f_CMJ_t2",
+         "sub24_f_CMJ_t3"
+        ]
+       },
+       "sub25": {
+        "non_fatigued": [
+         "sub25_CMJ_t1",
+         "sub25_CMJ_t2",
+         "sub25_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub25_f_CMJ_t1",
+         "sub25_f_CMJ_t2",
+         "sub25_f_CMJ_t3"
+        ]
+       },
+       "sub26": {
+        "non_fatigued": [
+         "sub26_CMJ_t1",
+         "sub26_CMJ_t2",
+         "sub26_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub26_f_CMJ_t1",
+         "sub26_f_CMJ_t2",
+         "sub26_f_CMJ_t3"
+        ]
+       },
+       "sub27": {
+        "non_fatigued": [
+         "sub27_CMJ_t1",
+         "sub27_CMJ_t2",
+         "sub27_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub27_f_CMJ_t1",
+         "sub27_f_CMJ_t2",
+         "sub27_f_CMJ_t3"
+        ]
+       },
+       "sub28": {
+        "non_fatigued": [
+         "sub28_CMJ_t1",
+         "sub28_CMJ_t2",
+         "sub28_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub28_f_CMJ_t1",
+         "sub28_f_CMJ_t2",
+         "sub28_f_CMJ_t3"
+        ]
+       },
+       "sub29": {
+        "non_fatigued": [
+         "sub29_CMJ_t1",
+         "sub29_CMJ_t2",
+         "sub29_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub29_f_CMJ_t1",
+         "sub29_f_CMJ_t2",
+         "sub29_f_CMJ_t3"
+        ]
+       },
+       "sub30": {
+        "non_fatigued": [
+         "sub30_CMJ_t1",
+         "sub30_CMJ_t2",
+         "sub30_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub30_f_CMJ_t1",
+         "sub30_f_CMJ_t2",
+         "sub30_f_CMJ_t3"
+        ]
+       },
+       "sub31": {
+        "non_fatigued": [
+         "sub31_CMJ_t1",
+         "sub31_CMJ_t2",
+         "sub31_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub31_f_CMJ_t1",
+         "sub31_f_CMJ_t2",
+         "sub31_f_CMJ_t3"
+        ]
+       },
+       "sub32": {
+        "non_fatigued": [
+         "sub32_CMJ_t2",
+         "sub32_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub32_f_CMJ_t1"
+        ]
+       },
+       "sub33": {
+        "non_fatigued": [
+         "sub33_CMJ_t1",
+         "sub33_CMJ_t2",
+         "sub33_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub33_f_CMJ_t1",
+         "sub33_f_CMJ_t2",
+         "sub33_f_CMJ_t3"
+        ]
+       },
+       "sub34": {
+        "non_fatigued": [
+         "sub34_CMJ_t2",
+         "sub34_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub34_f_CMJ_t3"
+        ]
+       },
+       "sub35": {
+        "non_fatigued": [
+         "sub35_CMJ_t1",
+         "sub35_CMJ_t2",
+         "sub35_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub35_f_CMJ_t1",
+         "sub35_f_CMJ_t2",
+         "sub35_f_CMJ_t3"
+        ]
+       },
+       "sub36": {
+        "non_fatigued": [
+         "sub36_CMJ_t1",
+         "sub36_CMJ_t2",
+         "sub36_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub36_f_CMJ_t1",
+         "sub36_f_CMJ_t2",
+         "sub36_f_CMJ_t3"
+        ]
+       },
+       "sub37": {
+        "non_fatigued": [
+         "sub37_CMJ_t1",
+         "sub37_CMJ_t2",
+         "sub37_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub37_f_CMJ_t1",
+         "sub37_f_CMJ_t2",
+         "sub37_f_CMJ_t3"
+        ]
+       },
+       "sub38": {
+        "non_fatigued": [
+         "sub38_CMJ_t1",
+         "sub38_CMJ_t2",
+         "sub38_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub38_f_CMJ_t1",
+         "sub38_f_CMJ_t2",
+         "sub38_f_CMJ_t3"
+        ]
+       },
+       "sub39": {
+        "non_fatigued": [
+         "sub39_CMJ_t1",
+         "sub39_CMJ_t2",
+         "sub39_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub39_f_CMJ_t1",
+         "sub39_f_CMJ_t2",
+         "sub39_f_CMJ_t3"
+        ]
+       },
+       "sub40": {
+        "non_fatigued": [
+         "sub40_CMJ_t1",
+         "sub40_CMJ_t2",
+         "sub40_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub40_f_CMJ_t1"
+        ]
+       },
+       "sub41": {
+        "non_fatigued": [
+         "sub41_CMJ_t1",
+         "sub41_CMJ_t2",
+         "sub41_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub41_f_CMJ_t1",
+         "sub41_f_CMJ_t2",
+         "sub41_f_CMJ_t3"
+        ]
+       },
+       "sub42": {
+        "non_fatigued": [
+         "sub42_CMJ_t1",
+         "sub42_CMJ_t2",
+         "sub42_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub42_f_CMJ_t1",
+         "sub42_f_CMJ_t2",
+         "sub42_f_CMJ_t3"
+        ]
+       },
+       "sub43": {
+        "non_fatigued": [
+         "sub43_CMJ_t1",
+         "sub43_CMJ_t2",
+         "sub43_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub43_f_CMJ_t1",
+         "sub43_f_CMJ_t2",
+         "sub43_f_CMJ_t3"
+        ]
+       },
+       "sub44": {
+        "non_fatigued": [
+         "sub44_CMJ_t1",
+         "sub44_CMJ_t2"
+        ],
+        "fatigued": [
+         "sub44_f_CMJ_t1",
+         "sub44_f_CMJ_t2"
+        ]
+       }
+      }
+     },
+     "side": {
+      "stream": "az0_d3.5",
+      "trials_usable": 245,
+      "trials_not_found": [
+       "sub29_f_CMJ_t2",
+       "sub29_f_CMJ_t3"
+      ],
+      "not_found_by_group_condition": {
+       "ACL/fatigued": {
+        "missing": 2,
+        "of": 58
+       },
+       "ACL/non_fatigued": {
+        "missing": 0,
+        "of": 61
+       },
+       "control/fatigued": {
+        "missing": 0,
+        "of": 63
+       },
+       "control/non_fatigued": {
+        "missing": 0,
+        "of": 65
+       }
+      },
+      "samples": {
+       "primary_3_plus_3": {
+        "n": 37,
+        "by_group": {
+         "control": 20,
+         "ACL": 17
+        },
+        "by_sex": {
+         "female": 22,
+         "male": 15
+        },
+        "participants": [
+         "sub01",
+         "sub02",
+         "sub03",
+         "sub04",
+         "sub06",
+         "sub07",
+         "sub08",
+         "sub09",
+         "sub10",
+         "sub11",
+         "sub12",
+         "sub13",
+         "sub14",
+         "sub16",
+         "sub17",
+         "sub18",
+         "sub19",
+         "sub20",
+         "sub21",
+         "sub22",
+         "sub23",
+         "sub24",
+         "sub25",
+         "sub26",
+         "sub27",
+         "sub28",
+         "sub30",
+         "sub31",
+         "sub33",
+         "sub35",
+         "sub36",
+         "sub37",
+         "sub38",
+         "sub39",
+         "sub41",
+         "sub42",
+         "sub43"
+        ]
+       },
+       "at_least_2_plus_2": {
+        "n": 39,
+        "by_group": {
+         "control": 21,
+         "ACL": 18
+        },
+        "by_sex": {
+         "female": 23,
+         "male": 16
+        },
+        "participants": [
+         "sub01",
+         "sub02",
+         "sub03",
+         "sub04",
+         "sub06",
+         "sub07",
+         "sub08",
+         "sub09",
+         "sub10",
+         "sub11",
+         "sub12",
+         "sub13",
+         "sub14",
+         "sub15",
+         "sub16",
+         "sub17",
+         "sub18",
+         "sub19",
+         "sub20",
+         "sub21",
+         "sub22",
+         "sub23",
+         "sub24",
+         "sub25",
+         "sub26",
+         "sub27",
+         "sub28",
+         "sub30",
+         "sub31",
+         "sub33",
+         "sub35",
+         "sub36",
+         "sub37",
+         "sub38",
+         "sub39",
+         "sub41",
+         "sub42",
+         "sub43",
+         "sub44"
+        ]
+       },
+       "at_least_1_plus_1_person_means": {
+        "n": 43,
+        "by_group": {
+         "control": 22,
+         "ACL": 21
+        },
+        "by_sex": {
+         "female": 23,
+         "male": 20
+        },
+        "participants": [
+         "sub01",
+         "sub02",
+         "sub03",
+         "sub04",
+         "sub06",
+         "sub07",
+         "sub08",
+         "sub09",
+         "sub10",
+         "sub11",
+         "sub12",
+         "sub13",
+         "sub14",
+         "sub15",
+         "sub16",
+         "sub17",
+         "sub18",
+         "sub19",
+         "sub20",
+         "sub21",
+         "sub22",
+         "sub23",
+         "sub24",
+         "sub25",
+         "sub26",
+         "sub27",
+         "sub28",
+         "sub29",
+         "sub30",
+         "sub31",
+         "sub32",
+         "sub33",
+         "sub34",
+         "sub35",
+         "sub36",
+         "sub37",
+         "sub38",
+         "sub39",
+         "sub40",
+         "sub41",
+         "sub42",
+         "sub43",
+         "sub44"
+        ]
+       }
+      },
+      "usable_trials_by_participant": {
+       "sub01": {
+        "non_fatigued": [
+         "sub01_CMJ_t1",
+         "sub01_CMJ_t2",
+         "sub01_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub01_f_CMJ_t1",
+         "sub01_f_CMJ_t2",
+         "sub01_f_CMJ_t3"
+        ]
+       },
+       "sub02": {
+        "non_fatigued": [
+         "sub02_CMJ_t1",
+         "sub02_CMJ_t2",
+         "sub02_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub02_f_CMJ_t1",
+         "sub02_f_CMJ_t2",
+         "sub02_f_CMJ_t3"
+        ]
+       },
+       "sub03": {
+        "non_fatigued": [
+         "sub03_CMJ_t1",
+         "sub03_CMJ_t2",
+         "sub03_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub03_f_CMJ_t1",
+         "sub03_f_CMJ_t2",
+         "sub03_f_CMJ_t3"
+        ]
+       },
+       "sub04": {
+        "non_fatigued": [
+         "sub04_CMJ_t1",
+         "sub04_CMJ_t2",
+         "sub04_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub04_f_CMJ_t1",
+         "sub04_f_CMJ_t2",
+         "sub04_f_CMJ_t3"
+        ]
+       },
+       "sub06": {
+        "non_fatigued": [
+         "sub06_CMJ_t1",
+         "sub06_CMJ_t2",
+         "sub06_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub06_f_CMJ_t1",
+         "sub06_f_CMJ_t2",
+         "sub06_f_CMJ_t3"
+        ]
+       },
+       "sub07": {
+        "non_fatigued": [
+         "sub07_CMJ_t1",
+         "sub07_CMJ_t2",
+         "sub07_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub07_f_CMJ_t1",
+         "sub07_f_CMJ_t2",
+         "sub07_f_CMJ_t3"
+        ]
+       },
+       "sub08": {
+        "non_fatigued": [
+         "sub08_CMJ_t1",
+         "sub08_CMJ_t2",
+         "sub08_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub08_f_CMJ_t1",
+         "sub08_f_CMJ_t2",
+         "sub08_f_CMJ_t3"
+        ]
+       },
+       "sub09": {
+        "non_fatigued": [
+         "sub09_CMJ_t1",
+         "sub09_CMJ_t2",
+         "sub09_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub09_f_CMJ_t1",
+         "sub09_f_CMJ_t2",
+         "sub09_f_CMJ_t3"
+        ]
+       },
+       "sub10": {
+        "non_fatigued": [
+         "sub10_CMJ_t1",
+         "sub10_CMJ_t2",
+         "sub10_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub10_f_CMJ_t1",
+         "sub10_f_CMJ_t2",
+         "sub10_f_CMJ_t3"
+        ]
+       },
+       "sub11": {
+        "non_fatigued": [
+         "sub11_CMJ_t1",
+         "sub11_CMJ_t2",
+         "sub11_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub11_f_CMJ_t1",
+         "sub11_f_CMJ_t2",
+         "sub11_f_CMJ_t3"
+        ]
+       },
+       "sub12": {
+        "non_fatigued": [
+         "sub12_CMJ_t1",
+         "sub12_CMJ_t2",
+         "sub12_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub12_f_CMJ_t1",
+         "sub12_f_CMJ_t2",
+         "sub12_f_CMJ_t3"
+        ]
+       },
+       "sub13": {
+        "non_fatigued": [
+         "sub13_CMJ_t1",
+         "sub13_CMJ_t2",
+         "sub13_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub13_f_CMJ_t1",
+         "sub13_f_CMJ_t2",
+         "sub13_f_CMJ_t3"
+        ]
+       },
+       "sub14": {
+        "non_fatigued": [
+         "sub14_CMJ_t1",
+         "sub14_CMJ_t2",
+         "sub14_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub14_f_CMJ_t1",
+         "sub14_f_CMJ_t2",
+         "sub14_f_CMJ_t3"
+        ]
+       },
+       "sub15": {
+        "non_fatigued": [
+         "sub15_CMJ_t1",
+         "sub15_CMJ_t2",
+         "sub15_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub15_f_CMJ_t1",
+         "sub15_f_CMJ_t2"
+        ]
+       },
+       "sub16": {
+        "non_fatigued": [
+         "sub16_CMJ_t1",
+         "sub16_CMJ_t2",
+         "sub16_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub16_f_CMJ_t1",
+         "sub16_f_CMJ_t2",
+         "sub16_f_CMJ_t3"
+        ]
+       },
+       "sub17": {
+        "non_fatigued": [
+         "sub17_CMJ_t1",
+         "sub17_CMJ_t2",
+         "sub17_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub17_f_CMJ_t1",
+         "sub17_f_CMJ_t2",
+         "sub17_f_CMJ_t3"
+        ]
+       },
+       "sub18": {
+        "non_fatigued": [
+         "sub18_CMJ_t1",
+         "sub18_CMJ_t2",
+         "sub18_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub18_f_CMJ_t1",
+         "sub18_f_CMJ_t2",
+         "sub18_f_CMJ_t3"
+        ]
+       },
+       "sub19": {
+        "non_fatigued": [
+         "sub19_CMJ_t1",
+         "sub19_CMJ_t2",
+         "sub19_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub19_f_CMJ_t1",
+         "sub19_f_CMJ_t2",
+         "sub19_f_CMJ_t3"
+        ]
+       },
+       "sub20": {
+        "non_fatigued": [
+         "sub20_CMJ_t1",
+         "sub20_CMJ_t2",
+         "sub20_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub20_f_CMJ_t1",
+         "sub20_f_CMJ_t2",
+         "sub20_f_CMJ_t3"
+        ]
+       },
+       "sub21": {
+        "non_fatigued": [
+         "sub21_CMJ_t1",
+         "sub21_CMJ_t2",
+         "sub21_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub21_f_CMJ_t1",
+         "sub21_f_CMJ_t2",
+         "sub21_f_CMJ_t3"
+        ]
+       },
+       "sub22": {
+        "non_fatigued": [
+         "sub22_CMJ_t1",
+         "sub22_CMJ_t2",
+         "sub22_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub22_f_CMJ_t1",
+         "sub22_f_CMJ_t2",
+         "sub22_f_CMJ_t3"
+        ]
+       },
+       "sub23": {
+        "non_fatigued": [
+         "sub23_CMJ_t1",
+         "sub23_CMJ_t2",
+         "sub23_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub23_f_CMJ_t1",
+         "sub23_f_CMJ_t2",
+         "sub23_f_CMJ_t3"
+        ]
+       },
+       "sub24": {
+        "non_fatigued": [
+         "sub24_CMJ_t1",
+         "sub24_CMJ_t2",
+         "sub24_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub24_f_CMJ_t1",
+         "sub24_f_CMJ_t2",
+         "sub24_f_CMJ_t3"
+        ]
+       },
+       "sub25": {
+        "non_fatigued": [
+         "sub25_CMJ_t1",
+         "sub25_CMJ_t2",
+         "sub25_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub25_f_CMJ_t1",
+         "sub25_f_CMJ_t2",
+         "sub25_f_CMJ_t3"
+        ]
+       },
+       "sub26": {
+        "non_fatigued": [
+         "sub26_CMJ_t1",
+         "sub26_CMJ_t2",
+         "sub26_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub26_f_CMJ_t1",
+         "sub26_f_CMJ_t2",
+         "sub26_f_CMJ_t3"
+        ]
+       },
+       "sub27": {
+        "non_fatigued": [
+         "sub27_CMJ_t1",
+         "sub27_CMJ_t2",
+         "sub27_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub27_f_CMJ_t1",
+         "sub27_f_CMJ_t2",
+         "sub27_f_CMJ_t3"
+        ]
+       },
+       "sub28": {
+        "non_fatigued": [
+         "sub28_CMJ_t1",
+         "sub28_CMJ_t2",
+         "sub28_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub28_f_CMJ_t1",
+         "sub28_f_CMJ_t2",
+         "sub28_f_CMJ_t3"
+        ]
+       },
+       "sub29": {
+        "non_fatigued": [
+         "sub29_CMJ_t1",
+         "sub29_CMJ_t2",
+         "sub29_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub29_f_CMJ_t1"
+        ]
+       },
+       "sub30": {
+        "non_fatigued": [
+         "sub30_CMJ_t1",
+         "sub30_CMJ_t2",
+         "sub30_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub30_f_CMJ_t1",
+         "sub30_f_CMJ_t2",
+         "sub30_f_CMJ_t3"
+        ]
+       },
+       "sub31": {
+        "non_fatigued": [
+         "sub31_CMJ_t1",
+         "sub31_CMJ_t2",
+         "sub31_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub31_f_CMJ_t1",
+         "sub31_f_CMJ_t2",
+         "sub31_f_CMJ_t3"
+        ]
+       },
+       "sub32": {
+        "non_fatigued": [
+         "sub32_CMJ_t2",
+         "sub32_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub32_f_CMJ_t1"
+        ]
+       },
+       "sub33": {
+        "non_fatigued": [
+         "sub33_CMJ_t1",
+         "sub33_CMJ_t2",
+         "sub33_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub33_f_CMJ_t1",
+         "sub33_f_CMJ_t2",
+         "sub33_f_CMJ_t3"
+        ]
+       },
+       "sub34": {
+        "non_fatigued": [
+         "sub34_CMJ_t2",
+         "sub34_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub34_f_CMJ_t3"
+        ]
+       },
+       "sub35": {
+        "non_fatigued": [
+         "sub35_CMJ_t1",
+         "sub35_CMJ_t2",
+         "sub35_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub35_f_CMJ_t1",
+         "sub35_f_CMJ_t2",
+         "sub35_f_CMJ_t3"
+        ]
+       },
+       "sub36": {
+        "non_fatigued": [
+         "sub36_CMJ_t1",
+         "sub36_CMJ_t2",
+         "sub36_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub36_f_CMJ_t1",
+         "sub36_f_CMJ_t2",
+         "sub36_f_CMJ_t3"
+        ]
+       },
+       "sub37": {
+        "non_fatigued": [
+         "sub37_CMJ_t1",
+         "sub37_CMJ_t2",
+         "sub37_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub37_f_CMJ_t1",
+         "sub37_f_CMJ_t2",
+         "sub37_f_CMJ_t3"
+        ]
+       },
+       "sub38": {
+        "non_fatigued": [
+         "sub38_CMJ_t1",
+         "sub38_CMJ_t2",
+         "sub38_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub38_f_CMJ_t1",
+         "sub38_f_CMJ_t2",
+         "sub38_f_CMJ_t3"
+        ]
+       },
+       "sub39": {
+        "non_fatigued": [
+         "sub39_CMJ_t1",
+         "sub39_CMJ_t2",
+         "sub39_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub39_f_CMJ_t1",
+         "sub39_f_CMJ_t2",
+         "sub39_f_CMJ_t3"
+        ]
+       },
+       "sub40": {
+        "non_fatigued": [
+         "sub40_CMJ_t1",
+         "sub40_CMJ_t2",
+         "sub40_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub40_f_CMJ_t1"
+        ]
+       },
+       "sub41": {
+        "non_fatigued": [
+         "sub41_CMJ_t1",
+         "sub41_CMJ_t2",
+         "sub41_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub41_f_CMJ_t1",
+         "sub41_f_CMJ_t2",
+         "sub41_f_CMJ_t3"
+        ]
+       },
+       "sub42": {
+        "non_fatigued": [
+         "sub42_CMJ_t1",
+         "sub42_CMJ_t2",
+         "sub42_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub42_f_CMJ_t1",
+         "sub42_f_CMJ_t2",
+         "sub42_f_CMJ_t3"
+        ]
+       },
+       "sub43": {
+        "non_fatigued": [
+         "sub43_CMJ_t1",
+         "sub43_CMJ_t2",
+         "sub43_CMJ_t3"
+        ],
+        "fatigued": [
+         "sub43_f_CMJ_t1",
+         "sub43_f_CMJ_t2",
+         "sub43_f_CMJ_t3"
+        ]
+       },
+       "sub44": {
+        "non_fatigued": [
+         "sub44_CMJ_t1",
+         "sub44_CMJ_t2"
+        ],
+        "fatigued": [
+         "sub44_f_CMJ_t1",
+         "sub44_f_CMJ_t2"
+        ]
+       }
+      }
+     }
+    }
+   }
+  },
+  "path_b_on_path_a_sample": {
+   "n": 30,
+   "participants": [
+    "sub01",
+    "sub03",
+    "sub04",
+    "sub06",
+    "sub07",
+    "sub08",
+    "sub09",
+    "sub10",
+    "sub11",
+    "sub12",
+    "sub13",
+    "sub14",
+    "sub17",
+    "sub18",
+    "sub19",
+    "sub21",
+    "sub22",
+    "sub23",
+    "sub24",
+    "sub25",
+    "sub27",
+    "sub30",
+    "sub31",
+    "sub33",
+    "sub35",
+    "sub36",
+    "sub37",
+    "sub38",
+    "sub41",
+    "sub42"
+   ],
+   "note": "like-for-like comparison of the two paths on the same participants"
+  },
+  "only_in_path_b_primary": [
+   "sub02",
+   "sub16",
+   "sub20",
+   "sub26",
+   "sub28",
+   "sub29",
+   "sub39",
+   "sub43"
+  ],
+  "only_in_path_a_primary": []
+ },
+ "rehab24_6": {
+  "ex6_squat/oblique35": {
+   "role": "primary",
+   "annotated_reps": 195,
+   "excluded_reps": [
+    {
+     "rep": "PM_113#19",
+     "person": 8,
+     "correct": true,
+     "reason": "flagged as a motion-capture error in the dataset"
+    },
+    {
+     "rep": "PM_113#20",
+     "person": 8,
+     "correct": true,
+     "reason": "flagged as a motion-capture error in the dataset"
+    },
+    {
+     "rep": "PM_113#21",
+     "person": 8,
+     "correct": true,
+     "reason": "flagged as a motion-capture error in the dataset"
+    },
+    {
+     "rep": "PM_113#22",
+     "person": 8,
+     "correct": true,
+     "reason": "flagged as a motion-capture error in the dataset"
+    }
+   ],
+   "reps_without_a_linked_found_rep": [],
+   "per_person": {
+    "1": {
+     "correct": 21,
+     "incorrect": 6,
+     "linked_correct": 21,
+     "linked_incorrect": 6
+    },
+    "2": {
+     "correct": 21,
+     "incorrect": 1,
+     "linked_correct": 21,
+     "linked_incorrect": 1
+    },
+    "3": {
+     "correct": 10,
+     "incorrect": 10,
+     "linked_correct": 10,
+     "linked_incorrect": 10
+    },
+    "4": {
+     "correct": 17,
+     "incorrect": 3,
+     "linked_correct": 17,
+     "linked_incorrect": 3
+    },
+    "5": {
+     "correct": 10,
+     "incorrect": 10,
+     "linked_correct": 10,
+     "linked_incorrect": 10
+    },
+    "6": {
+     "correct": 10,
+     "incorrect": 11,
+     "linked_correct": 10,
+     "linked_incorrect": 11
+    },
+    "7": {
+     "correct": 10,
+     "incorrect": 10,
+     "linked_correct": 10,
+     "linked_incorrect": 10
+    },
+    "8": {
+     "correct": 13,
+     "incorrect": 5,
+     "linked_correct": 13,
+     "linked_incorrect": 5
+    },
+    "9": {
+     "correct": 18,
+     "incorrect": 5,
+     "linked_correct": 18,
+     "linked_incorrect": 5
+    }
+   },
+   "eligible_for_personal_baseline": {
+    "rule": "at least 4 linked correct reps (3 or more remain after holding one out) and at least 1 linked incorrect rep",
+    "persons": [
+     "1",
+     "2",
+     "3",
+     "4",
+     "5",
+     "6",
+     "7",
+     "8",
+     "9"
+    ],
+    "not_eligible": [],
+    "fewer_than_3_incorrect_reps": [
+     "2"
+    ]
+   }
+  },
+  "ex6_squat/side": {
+   "role": "sensitivity view",
+   "annotated_reps": 195,
+   "excluded_reps": [
+    {
+     "rep": "PM_113#19",
+     "person": 8,
+     "correct": true,
+     "reason": "flagged as a motion-capture error in the dataset"
+    },
+    {
+     "rep": "PM_113#20",
+     "person": 8,
+     "correct": true,
+     "reason": "flagged as a motion-capture error in the dataset"
+    },
+    {
+     "rep": "PM_113#21",
+     "person": 8,
+     "correct": true,
+     "reason": "flagged as a motion-capture error in the dataset"
+    },
+    {
+     "rep": "PM_113#22",
+     "person": 8,
+     "correct": true,
+     "reason": "flagged as a motion-capture error in the dataset"
+    }
+   ],
+   "reps_without_a_linked_found_rep": [],
+   "per_person": {
+    "1": {
+     "correct": 21,
+     "incorrect": 6,
+     "linked_correct": 21,
+     "linked_incorrect": 6
+    },
+    "2": {
+     "correct": 21,
+     "incorrect": 1,
+     "linked_correct": 21,
+     "linked_incorrect": 1
+    },
+    "3": {
+     "correct": 10,
+     "incorrect": 10,
+     "linked_correct": 10,
+     "linked_incorrect": 10
+    },
+    "4": {
+     "correct": 17,
+     "incorrect": 3,
+     "linked_correct": 17,
+     "linked_incorrect": 3
+    },
+    "5": {
+     "correct": 10,
+     "incorrect": 10,
+     "linked_correct": 10,
+     "linked_incorrect": 10
+    },
+    "6": {
+     "correct": 10,
+     "incorrect": 11,
+     "linked_correct": 10,
+     "linked_incorrect": 11
+    },
+    "7": {
+     "correct": 10,
+     "incorrect": 10,
+     "linked_correct": 10,
+     "linked_incorrect": 10
+    },
+    "8": {
+     "correct": 13,
+     "incorrect": 5,
+     "linked_correct": 13,
+     "linked_incorrect": 5
+    },
+    "9": {
+     "correct": 18,
+     "incorrect": 5,
+     "linked_correct": 18,
+     "linked_incorrect": 5
+    }
+   },
+   "eligible_for_personal_baseline": {
+    "rule": "at least 4 linked correct reps (3 or more remain after holding one out) and at least 1 linked incorrect rep",
+    "persons": [
+     "1",
+     "2",
+     "3",
+     "4",
+     "5",
+     "6",
+     "7",
+     "8",
+     "9"
+    ],
+    "not_eligible": [],
+    "fewer_than_3_incorrect_reps": [
+     "2"
+    ]
+   }
+  },
+  "ex5_lunge/side": {
+   "role": "secondary, descriptive only",
+   "annotated_reps": 174,
+   "excluded_reps": [],
+   "reps_without_a_linked_found_rep": [
+    {
+     "rep": "PM_028#1",
+     "person": 3,
+     "correct": false
+    },
+    {
+     "rep": "PM_028#2",
+     "person": 3,
+     "correct": false
+    },
+    {
+     "rep": "PM_028#3",
+     "person": 3,
+     "correct": false
+    },
+    {
+     "rep": "PM_028#12",
+     "person": 3,
+     "correct": false
+    },
+    {
+     "rep": "PM_028#13",
+     "person": 3,
+     "correct": false
+    },
+    {
+     "rep": "PM_037#11",
+     "person": 4,
+     "correct": true
+    },
+    {
+     "rep": "PM_037#12",
+     "person": 4,
+     "correct": true
+    },
+    {
+     "rep": "PM_037#13",
+     "person": 4,
+     "correct": true
+    },
+    {
+     "rep": "PM_042#21",
+     "person": 5,
+     "correct": false
+    },
+    {
+     "rep": "PM_117a#1",
+     "person": 9,
+     "correct": true
+    },
+    {
+     "rep": "PM_117a#2",
+     "person": 9,
+     "correct": true
+    },
+    {
+     "rep": "PM_117a#3",
+     "person": 9,
+     "correct": true
+    },
+    {
+     "rep": "PM_117a#4",
+     "person": 9,
+     "correct": true
+    },
+    {
+     "rep": "PM_117a#5",
+     "person": 9,
+     "correct": true
+    },
+    {
+     "rep": "PM_117a#6",
+     "person": 9,
+     "correct": true
+    },
+    {
+     "rep": "PM_117a#8",
+     "person": 9,
+     "correct": false
+    },
+    {
+     "rep": "PM_117b#4",
+     "person": 9,
+     "correct": true
+    },
+    {
+     "rep": "PM_117b#6",
+     "person": 9,
+     "correct": true
+    },
+    {
+     "rep": "PM_117b#7",
+     "person": 9,
+     "correct": true
+    },
+    {
+     "rep": "PM_117b#8",
+     "person": 9,
+     "correct": true
+    },
+    {
+     "rep": "PM_125#1",
+     "person": 7,
+     "correct": true
+    },
+    {
+     "rep": "PM_125#2",
+     "person": 7,
+     "correct": true
+    },
+    {
+     "rep": "PM_125#3",
+     "person": 7,
+     "correct": true
+    },
+    {
+     "rep": "PM_125#4",
+     "person": 7,
+     "correct": true
+    },
+    {
+     "rep": "PM_125#5",
+     "person": 7,
+     "correct": true
+    },
+    {
+     "rep": "PM_125#11",
+     "person": 7,
+     "correct": true
+    },
+    {
+     "rep": "PM_125#12",
+     "person": 7,
+     "correct": true
+    },
+    {
+     "rep": "PM_125#14",
+     "person": 7,
+     "correct": true
+    },
+    {
+     "rep": "PM_125#15",
+     "person": 7,
+     "correct": true
+    }
+   ],
+   "per_person": {
+    "2": {
+     "correct": 10,
+     "incorrect": 10,
+     "linked_correct": 10,
+     "linked_incorrect": 10
+    },
+    "3": {
+     "correct": 0,
+     "incorrect": 21,
+     "linked_correct": 0,
+     "linked_incorrect": 16
+    },
+    "4": {
+     "correct": 10,
+     "incorrect": 10,
+     "linked_correct": 7,
+     "linked_incorrect": 10
+    },
+    "5": {
+     "correct": 13,
+     "incorrect": 12,
+     "linked_correct": 13,
+     "linked_incorrect": 11
+    },
+    "6": {
+     "correct": 10,
+     "incorrect": 10,
+     "linked_correct": 10,
+     "linked_incorrect": 10
+    },
+    "7": {
+     "correct": 10,
+     "incorrect": 10,
+     "linked_correct": 1,
+     "linked_incorrect": 10
+    },
+    "8": {
+     "correct": 13,
+     "incorrect": 12,
+     "linked_correct": 13,
+     "linked_incorrect": 12
+    },
+    "9": {
+     "correct": 12,
+     "incorrect": 11,
+     "linked_correct": 2,
+     "linked_incorrect": 10
+    }
+   },
+   "eligible_for_personal_baseline": {
+    "rule": "at least 4 linked correct reps (3 or more remain after holding one out) and at least 1 linked incorrect rep",
+    "persons": [
+     "2",
+     "4",
+     "5",
+     "6",
+     "8"
+    ],
+    "not_eligible": [
+     "3",
+     "7",
+     "9"
+    ],
+    "fewer_than_3_incorrect_reps": []
+   }
+  }
+ },
+ "inputs_sha256": {
+  "data/processed/measurement/references/jump.json": "cf1780abd7c75556c946f59f9d35a6553ea0c5d9e25ee2a79e17e9c96f3b2030",
+  "data/processed/measurement/references/participants.json": "8b80b91026e1ac0a6b653901721d3144cba32be692a86a97ddf405a03871e420",
+  "data/processed/measurement/runs/jump/az35_d3.5/production__s0__seed0.json": "89d57c7dffeed6518583d4cfc93fe6e57b18af6da0e0567503cdeaf93376075f",
+  "data/processed/measurement/runs/jump/az0_d3.5/production__s0__seed0.json": "69ee8a5ac2bf9b721812fb302b778dd126563cbec584f57daded7387e8841dcf",
+  "data/processed/measurement/runs/jump/az35_d3.5/dual_butter6__s0__seed0.json": "591d9176ef34845cf60007aa32237e3d6c5d3c4535fb7e91afc598f852e4fb9a",
+  "data/processed/measurement/runs/jump/az0_d3.5/dual_butter6__s0__seed0.json": "b230e1a8f2f2486d51b3dd1f0ac17bd1ce20b2880ab7557f0468edd662ec67c9",
+  "data/processed/landmarks/rehab/ex6_squat/oblique35/index.json": "724647438319ddad491a2d6de89195344fa03adf84a88b96fedaa62d2fcda990",
+  "data/processed/measurement/runs/rehab/ex6_squat/oblique35/production__s0__seed0.json": "6664a476b581193d60e02de0643b651514136b25653eab62fef20477487904c5",
+  "data/processed/landmarks/rehab/ex6_squat/side/index.json": "00097b8b42d23032e07f6677642a49c6a13fb4ad824ed9ae07dce277cce0a48d",
+  "data/processed/measurement/runs/rehab/ex6_squat/side/production__s0__seed0.json": "682a4db8baf3463a769c8b503cbaa5d149b9bb7c973c87d7ffca7bd09d70a6cf",
+  "data/processed/landmarks/rehab/ex5_lunge/side/index.json": "2feb09b04fc1d6388a44ac0db6af56f57e85d78b4262c59fa6341aa6becbbca5",
+  "data/processed/measurement/runs/rehab/ex5_lunge/side/production__s0__seed0.json": "de2cccc739faeddc75557153376c475205fea023af48e48c930f2e6748d50fd1"
+ },
+ "code_sha256": {
+  "research/measurement/inclusion.py": "3a4eda32962d4398580a1d4e62ef0984ca8f6acf4a05e264a621a54cfe7a228f"
+ }
+}

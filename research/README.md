@@ -9,7 +9,8 @@ Everything here is an **offline biomechanics evaluation**: motion-capture positi
 | Phase | What | State |
 |---|---|---|
 | 4A | Dataset integration: loaders, checks, landmark mapping, offline feature extraction | Done. Report: [`reports/phase4a_dataset_integration.md`](reports/phase4a_dataset_integration.md) |
-| 4B | Exploratory evaluation | Protocols drafted, **awaiting approval, not run**: [`protocols/jump_fatigue_v02.md`](protocols/jump_fatigue_v02.md), [`protocols/rehab24_6_v02.md`](protocols/rehab24_6_v02.md) |
+| 4A.5 | Measurement validity: timing, smoothing alternatives, agreement with lab criteria, segmentation, missing data | Done. Report: [`reports/phase4a5_measurement_validity.md`](reports/phase4a5_measurement_validity.md) (tables: [`reports/phase4a5_tables.md`](reports/phase4a5_tables.md)) |
+| 4B | Exploratory evaluation | Protocols v04 final and frozen ([`protocols/phase4b_protocol_freeze.json`](protocols/phase4b_protocol_freeze.json)): [`jump_fatigue_v04.md`](protocols/jump_fatigue_v04.md), [`rehab24_6_v04.md`](protocols/rehab24_6_v04.md), [`phase4b_preanalysis_checks.md`](protocols/phase4b_preanalysis_checks.md), inclusion lists [`phase4b_inclusion_v04.json`](protocols/phase4b_inclusion_v04.json). **Not run with real labels.** Drafts v02 and v03 kept for the record. |
 
 ## Datasets
 
@@ -31,6 +32,7 @@ How motion capture differs from the app's webcam measurements: [`datasets/measur
 | `evaluation/offlinePipeline.ts` | The app's frame path (smoothing, frame metrics, segmentation, rep measurements), imported from `src/`, for recorded streams. `tests/research_pipeline.test.ts` checks it gives exactly what the app gives. |
 | `evaluation/extract_features.ts` | Runs every recording through it; writes `data/processed/features/` |
 | `evaluation/integration_report.py` | The Phase 4A report |
+| `measurement/` | Phase 4A.5: measurement streams and lab references (`build_streams.py`), experimental signal chains (`variants.ts`, research only), runs (`run_variants.ts`), analysis (`analyze.py`), Phase 4B inclusion lists (`inclusion.py`) |
 | `protocols/` | Evaluation protocols, fixed before any outcome is computed |
 | `tests/` | Unit tests (`python -I -m unittest discover -s research/tests`) |
 | `tools/make_shipped_parity_fixture.py` | Builds the parity fixture for the shipped detector config (`tests/parity_shipped.test.ts`) |
@@ -47,4 +49,11 @@ python -I research/adapters/build_landmarks.py
 npx vite-node research/evaluation/extract_features.ts
 python -I research/evaluation/integration_report.py
 python -I -m unittest discover -s research/tests
+
+# Phase 4A.5 (measurement validity) and the Phase 4B inclusion lists
+python -I research/measurement/build_streams.py
+npx vite-node research/measurement/run_variants.ts
+python -I research/measurement/analyze.py
+python -I research/measurement/inclusion.py
+python -I research/measurement/freeze.py verify-protocol
 ```
