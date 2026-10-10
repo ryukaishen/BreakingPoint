@@ -1,9 +1,10 @@
 // Descriptive, NON-MEDICAL drift-pattern labels derived from the dominant feature
 // deviations. Each feature maps to a movement family and a direction that counts as
 // "drift" for that family; the family with the largest standardized changes names
-// the pattern. Sports may rename a label (e.g. basketball calls explosive fatigue
-// "jump consistency drift") but never change which pattern the data shows.
-// These labels describe movement change only — they are not diagnoses.
+// the pattern. Sports may rename a label (e.g. basketball calls a drop in jump output
+// "jump consistency changing") but never change which pattern the data shows.
+// These labels describe movement change only. They are not diagnoses and they do not
+// claim the cause of a change (fatigue or anything else).
 
 import type { ExerciseType } from '../biomechanics/catalog';
 import type { RepRecord } from '../session/engine';
@@ -12,23 +13,23 @@ import { sampleSd } from '../utils/stats';
 export type PatternId = 'explosive' | 'recovery' | 'landing' | 'rom' | 'technique' | 'asymmetry' | 'variability';
 
 export const PATTERN_LABELS: Record<PatternId, string> = {
-  explosive: 'EXPLOSIVE FATIGUE',
+  explosive: 'EXPLOSIVE OUTPUT DROPPING',
   recovery: 'RECOVERY SLOWING',
-  landing: 'LANDING CONSISTENCY DRIFT',
-  rom: 'RANGE-OF-MOTION DRIFT',
-  technique: 'TECHNIQUE DRIFT',
-  asymmetry: 'ASYMMETRY EMERGING',
-  variability: 'MOVEMENT VARIABILITY INCREASING',
+  landing: 'LANDING CHANGING',
+  rom: 'RANGE OF MOTION CHANGING',
+  technique: 'TECHNIQUE CHANGING',
+  asymmetry: 'LEFT–RIGHT DIFFERENCE GROWING',
+  variability: 'REPS LESS CONSISTENT',
 };
 
 export const PATTERN_EXPLAIN: Record<PatternId, string> = {
-  explosive: 'Explosive output (height, speed, reactive strength) is dropping relative to your baseline.',
-  recovery: 'The return / drive phase is getting slower than your baseline.',
-  landing: 'Landing absorption is changing away from your usual landing.',
-  rom: 'Range of motion is shrinking compared with your fresh reps.',
-  technique: 'Posture and movement strategy are shifting (e.g. more trunk lean).',
-  asymmetry: 'Left/right differences are growing beyond your normal pattern.',
-  variability: 'Reps are becoming less consistent with each other.',
+  explosive: 'Your explosive output (jump height, push-off or drive speed) is lower than in your fresh reps.',
+  recovery: 'The drive back up is getting slower than in your fresh reps.',
+  landing: 'You are landing differently from your usual landing.',
+  rom: 'Your range of motion is smaller than in your fresh reps.',
+  technique: 'Your posture or movement strategy is changing, for example more trunk lean.',
+  asymmetry: 'The difference between your left and right side is larger than usual.',
+  variability: 'Your reps are less consistent with each other than usual.',
 };
 
 type Dir = 1 | -1 | 0; // +1 increase counts as drift, -1 decrease counts, 0 either direction

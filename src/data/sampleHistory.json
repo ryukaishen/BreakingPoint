@@ -1,0 +1,2613 @@
+[
+ {
+  "daysAgo": 37,
+  "record": {
+   "schemaVersion": 2,
+   "id": "sample_jump-repeated_1",
+   "source": "demo",
+   "sportId": "soccer",
+   "protocolId": "jump-repeated",
+   "exercise": "cmj",
+   "detectorConfigId": "ewma|a=0.4|bp=2|w=1|m=0|clip=2.5",
+   "calibration": {
+    "nReps": 6,
+    "referenceSource": "loo",
+    "mu0": 0.573466,
+    "sigma0": 0.2,
+    "excludedFeatures": 0,
+    "totalFeatures": 9,
+    "ok": true,
+    "reasons": []
+   },
+   "reps": [
+    {
+     "index": 1,
+     "score": 0.566174,
+     "state": "STABLE",
+     "ewma": 0.570549,
+     "quality": 0.965135,
+     "afterWarning": false
+    },
+    {
+     "index": 2,
+     "score": 0.584551,
+     "state": "STABLE",
+     "ewma": 0.57615,
+     "quality": 0.963971,
+     "afterWarning": false
+    },
+    {
+     "index": 3,
+     "score": 0.946682,
+     "state": "STABLE",
+     "ewma": 0.724363,
+     "quality": 0.964771,
+     "afterWarning": false
+    },
+    {
+     "index": 4,
+     "score": 1.249062,
+     "state": "DRIFT",
+     "ewma": 0.864004,
+     "quality": 0.96378,
+     "afterWarning": false
+    },
+    {
+     "index": 5,
+     "score": 1.867049,
+     "state": "DRIFT",
+     "ewma": 0.947789,
+     "quality": 0.965772,
+     "afterWarning": false
+    },
+    {
+     "index": 6,
+     "score": 2.629178,
+     "state": "BREAKPOINT",
+     "ewma": 0.99806,
+     "quality": 0.963866,
+     "afterWarning": false
+    },
+    {
+     "index": 7,
+     "score": 2.504313,
+     "state": "BREAKPOINT",
+     "ewma": 1.028222,
+     "quality": 0.96387,
+     "afterWarning": true
+    }
+   ],
+   "totalReps": 7,
+   "scoredReps": 7,
+   "heldReps": 3,
+   "onsetRep": 3,
+   "breakpointRep": 6,
+   "avgPre": 1.042704,
+   "avgPost": 2.566746,
+   "topChanges": [
+    {
+     "key": "rsiMod",
+     "meanZ": -4.569548
+    },
+    {
+     "key": "jumpHeight",
+     "meanZ": -3.528876
+    },
+    {
+     "key": "flightTime",
+     "meanZ": -2.403846
+    },
+    {
+     "key": "concentricDuration",
+     "meanZ": 1.666667
+    }
+   ],
+   "patternId": "explosive",
+   "recovery": {
+    "percent": 0.42122,
+    "status": "partial",
+    "meanRecovery": 1.727137,
+    "meanPost": 2.566746,
+    "scores": [
+     1.597214,
+     1.648002,
+     1.936193
+    ],
+    "completedAt": "2000-01-01T00:00:00.000Z"
+   },
+   "quality": {
+    "scoredFraction": 1,
+    "meanCapture": 0.964452,
+    "calibrationOk": true,
+    "eligible": true,
+    "reasons": []
+   }
+  }
+ },
+ {
+  "daysAgo": 33,
+  "record": {
+   "schemaVersion": 2,
+   "id": "sample_jump-repeated_2",
+   "source": "demo",
+   "sportId": "soccer",
+   "protocolId": "jump-repeated",
+   "exercise": "cmj",
+   "detectorConfigId": "ewma|a=0.4|bp=2|w=1|m=0|clip=2.5",
+   "calibration": {
+    "nReps": 6,
+    "referenceSource": "loo",
+    "mu0": 0.648636,
+    "sigma0": 0.202394,
+    "excludedFeatures": 0,
+    "totalFeatures": 9,
+    "ok": true,
+    "reasons": []
+   },
+   "reps": [
+    {
+     "index": 1,
+     "score": 0.68436,
+     "state": "STABLE",
+     "ewma": 0.662926,
+     "quality": 0.965708,
+     "afterWarning": false
+    },
+    {
+     "index": 2,
+     "score": 0.66338,
+     "state": "STABLE",
+     "ewma": 0.663108,
+     "quality": 0.965529,
+     "afterWarning": false
+    },
+    {
+     "index": 3,
+     "score": 0.652716,
+     "state": "STABLE",
+     "ewma": 0.658951,
+     "quality": 0.965778,
+     "afterWarning": false
+    },
+    {
+     "index": 4,
+     "score": 0.968391,
+     "state": "STABLE",
+     "ewma": 0.782727,
+     "quality": 0.965643,
+     "afterWarning": false
+    },
+    {
+     "index": 5,
+     "score": 1.560564,
+     "state": "DRIFT",
+     "ewma": 0.931485,
+     "quality": 0.964785,
+     "afterWarning": false
+    },
+    {
+     "index": 6,
+     "score": 2.378366,
+     "state": "DRIFT",
+     "ewma": 1.020739,
+     "quality": 0.964743,
+     "afterWarning": false
+    },
+    {
+     "index": 7,
+     "score": 2.544764,
+     "state": "BREAKPOINT",
+     "ewma": 1.074292,
+     "quality": 0.965618,
+     "afterWarning": false
+    },
+    {
+     "index": 8,
+     "score": 2.827972,
+     "state": "BREAKPOINT",
+     "ewma": 1.106424,
+     "quality": 0.964998,
+     "afterWarning": true
+    }
+   ],
+   "totalReps": 8,
+   "scoredReps": 8,
+   "heldReps": 4,
+   "onsetRep": 4,
+   "breakpointRep": 7,
+   "avgPre": 1.151296,
+   "avgPost": 2.686368,
+   "topChanges": [
+    {
+     "key": "rsiMod",
+     "meanZ": -4.861532
+    },
+    {
+     "key": "jumpHeight",
+     "meanZ": -3.528949
+    },
+    {
+     "key": "concentricDuration",
+     "meanZ": 2.777778
+    },
+    {
+     "key": "flightTime",
+     "meanZ": -1.923077
+    }
+   ],
+   "patternId": "explosive",
+   "recovery": {
+    "percent": 0.590753,
+    "status": "partial",
+    "meanRecovery": 1.482572,
+    "meanPost": 2.686368,
+    "scores": [
+     1.933785,
+     1.691827,
+     0.822103
+    ],
+    "completedAt": "2000-01-01T00:00:00.000Z"
+   },
+   "quality": {
+    "scoredFraction": 1,
+    "meanCapture": 0.96535,
+    "calibrationOk": true,
+    "eligible": true,
+    "reasons": []
+   }
+  }
+ },
+ {
+  "daysAgo": 30,
+  "record": {
+   "schemaVersion": 2,
+   "id": "sample_jump-repeated_3",
+   "source": "demo",
+   "sportId": "soccer",
+   "protocolId": "jump-repeated",
+   "exercise": "cmj",
+   "detectorConfigId": "ewma|a=0.4|bp=2|w=1|m=0|clip=2.5",
+   "calibration": {
+    "nReps": 6,
+    "referenceSource": "loo",
+    "mu0": 0.5,
+    "sigma0": 0.2,
+    "excludedFeatures": 0,
+    "totalFeatures": 9,
+    "ok": true,
+    "reasons": []
+   },
+   "reps": [
+    {
+     "index": 1,
+     "score": 0.466864,
+     "state": "STABLE",
+     "ewma": 0.486746,
+     "quality": 0.965648,
+     "afterWarning": false
+    },
+    {
+     "index": 2,
+     "score": 0.365969,
+     "state": "STABLE",
+     "ewma": 0.438435,
+     "quality": 0.966508,
+     "afterWarning": false
+    },
+    {
+     "index": 3,
+     "score": 0.763599,
+     "state": "STABLE",
+     "ewma": 0.568501,
+     "quality": 0.964997,
+     "afterWarning": false
+    },
+    {
+     "index": 4,
+     "score": 0.813155,
+     "state": "STABLE",
+     "ewma": 0.666362,
+     "quality": 0.964789,
+     "afterWarning": false
+    },
+    {
+     "index": 5,
+     "score": 1.219514,
+     "state": "DRIFT",
+     "ewma": 0.799817,
+     "quality": 0.965115,
+     "afterWarning": false
+    },
+    {
+     "index": 6,
+     "score": 1.963925,
+     "state": "DRIFT",
+     "ewma": 0.87989,
+     "quality": 0.964466,
+     "afterWarning": false
+    },
+    {
+     "index": 7,
+     "score": 2.414017,
+     "state": "BREAKPOINT",
+     "ewma": 0.927934,
+     "quality": 0.963096,
+     "afterWarning": false
+    },
+    {
+     "index": 8,
+     "score": 2.86628,
+     "state": "BREAKPOINT",
+     "ewma": 0.956761,
+     "quality": 0.965252,
+     "afterWarning": true
+    }
+   ],
+   "totalReps": 8,
+   "scoredReps": 8,
+   "heldReps": 4,
+   "onsetRep": 3,
+   "breakpointRep": 7,
+   "avgPre": 0.932171,
+   "avgPost": 2.640148,
+   "topChanges": [
+    {
+     "key": "rsiMod",
+     "meanZ": -4.588966
+    },
+    {
+     "key": "jumpHeight",
+     "meanZ": -3.346751
+    },
+    {
+     "key": "flightTime",
+     "meanZ": -2.403846
+    },
+    {
+     "key": "concentricDuration",
+     "meanZ": 2.222222
+    }
+   ],
+   "patternId": "explosive",
+   "recovery": {
+    "percent": 0.635086,
+    "status": "partial",
+    "meanRecovery": 1.280969,
+    "meanPost": 2.640148,
+    "scores": [
+     0.975458,
+     1.332897,
+     1.534552
+    ],
+    "completedAt": "2000-01-01T00:00:00.000Z"
+   },
+   "quality": {
+    "scoredFraction": 1,
+    "meanCapture": 0.964984,
+    "calibrationOk": true,
+    "eligible": true,
+    "reasons": []
+   }
+  }
+ },
+ {
+  "daysAgo": 26,
+  "record": {
+   "schemaVersion": 2,
+   "id": "sample_jump-repeated_4",
+   "source": "demo",
+   "sportId": "soccer",
+   "protocolId": "jump-repeated",
+   "exercise": "cmj",
+   "detectorConfigId": "ewma|a=0.4|bp=2|w=1|m=0|clip=2.5",
+   "calibration": {
+    "nReps": 6,
+    "referenceSource": "loo",
+    "mu0": 0.535226,
+    "sigma0": 0.2,
+    "excludedFeatures": 0,
+    "totalFeatures": 9,
+    "ok": true,
+    "reasons": []
+   },
+   "reps": [
+    {
+     "index": 1,
+     "score": 0.439722,
+     "state": "STABLE",
+     "ewma": 0.497024,
+     "quality": 0.965015,
+     "afterWarning": false
+    },
+    {
+     "index": 2,
+     "score": 0.180113,
+     "state": "STABLE",
+     "ewma": 0.370259,
+     "quality": 0.965708,
+     "afterWarning": false
+    },
+    {
+     "index": 3,
+     "score": 0.637062,
+     "state": "STABLE",
+     "ewma": 0.47698,
+     "quality": 0.964543,
+     "afterWarning": false
+    },
+    {
+     "index": 4,
+     "score": 0.464213,
+     "state": "STABLE",
+     "ewma": 0.471873,
+     "quality": 0.96537,
+     "afterWarning": false
+    },
+    {
+     "index": 5,
+     "score": 0.820896,
+     "state": "STABLE",
+     "ewma": 0.611483,
+     "quality": 0.963991,
+     "afterWarning": false
+    },
+    {
+     "index": 6,
+     "score": 1.094273,
+     "state": "DRIFT",
+     "ewma": 0.78098,
+     "quality": 0.963984,
+     "afterWarning": false
+    },
+    {
+     "index": 7,
+     "score": 1.661456,
+     "state": "DRIFT",
+     "ewma": 0.882678,
+     "quality": 0.965286,
+     "afterWarning": false
+    },
+    {
+     "index": 8,
+     "score": 2.603796,
+     "state": "BREAKPOINT",
+     "ewma": 0.943697,
+     "quality": 0.964186,
+     "afterWarning": false
+    },
+    {
+     "index": 9,
+     "score": 2.451867,
+     "state": "BREAKPOINT",
+     "ewma": 0.980308,
+     "quality": 0.964458,
+     "afterWarning": true
+    }
+   ],
+   "totalReps": 9,
+   "scoredReps": 9,
+   "heldReps": 5,
+   "onsetRep": 5,
+   "breakpointRep": 8,
+   "avgPre": 0.756819,
+   "avgPost": 2.527832,
+   "topChanges": [
+    {
+     "key": "rsiMod",
+     "meanZ": -4.344099
+    },
+    {
+     "key": "jumpHeight",
+     "meanZ": -3.737973
+    },
+    {
+     "key": "flightTime",
+     "meanZ": -1.923077
+    },
+    {
+     "key": "countermovementDepth",
+     "meanZ": -1.610991
+    }
+   ],
+   "patternId": "explosive",
+   "recovery": {
+    "percent": 0.695329,
+    "status": "partial",
+    "meanRecovery": 1.142314,
+    "meanPost": 2.527832,
+    "scores": [
+     1.101625,
+     0.970761,
+     1.354556
+    ],
+    "completedAt": "2000-01-01T00:00:00.000Z"
+   },
+   "quality": {
+    "scoredFraction": 1,
+    "meanCapture": 0.964727,
+    "calibrationOk": true,
+    "eligible": true,
+    "reasons": []
+   }
+  }
+ },
+ {
+  "daysAgo": 19,
+  "record": {
+   "schemaVersion": 2,
+   "id": "sample_jump-repeated_5",
+   "source": "demo",
+   "sportId": "soccer",
+   "protocolId": "jump-repeated",
+   "exercise": "cmj",
+   "detectorConfigId": "ewma|a=0.4|bp=2|w=1|m=0|clip=2.5",
+   "calibration": {
+    "nReps": 6,
+    "referenceSource": "loo",
+    "mu0": 0.582574,
+    "sigma0": 0.2,
+    "excludedFeatures": 0,
+    "totalFeatures": 9,
+    "ok": true,
+    "reasons": []
+   },
+   "reps": [
+    {
+     "index": 1,
+     "score": 0.504901,
+     "state": "STABLE",
+     "ewma": 0.551505,
+     "quality": 0.964552,
+     "afterWarning": false
+    },
+    {
+     "index": 2,
+     "score": 0.552785,
+     "state": "STABLE",
+     "ewma": 0.552017,
+     "quality": 0.965949,
+     "afterWarning": false
+    },
+    {
+     "index": 3,
+     "score": 0.60269,
+     "state": "STABLE",
+     "ewma": 0.572286,
+     "quality": 0.965338,
+     "afterWarning": false
+    },
+    {
+     "index": 4,
+     "score": 1.145017,
+     "state": "STABLE",
+     "ewma": 0.776401,
+     "quality": 0.965738,
+     "afterWarning": false
+    },
+    {
+     "index": 5,
+     "score": 1.681885,
+     "state": "DRIFT",
+     "ewma": 0.89887,
+     "quality": 0.965429,
+     "afterWarning": false
+    },
+    {
+     "index": 6,
+     "score": 1.693864,
+     "state": "DRIFT",
+     "ewma": 0.972352,
+     "quality": 0.963766,
+     "afterWarning": false
+    },
+    {
+     "index": 7,
+     "score": 2.798147,
+     "state": "BREAKPOINT",
+     "ewma": 1.016441,
+     "quality": 0.963477,
+     "afterWarning": false
+    },
+    {
+     "index": 8,
+     "score": 2.469922,
+     "state": "BREAKPOINT",
+     "ewma": 1.042894,
+     "quality": 0.966721,
+     "afterWarning": true
+    }
+   ],
+   "totalReps": 8,
+   "scoredReps": 8,
+   "heldReps": 4,
+   "onsetRep": 4,
+   "breakpointRep": 7,
+   "avgPre": 1.03019,
+   "avgPost": 2.634034,
+   "topChanges": [
+    {
+     "key": "rsiMod",
+     "meanZ": -4.421373
+    },
+    {
+     "key": "jumpHeight",
+     "meanZ": -3.475378
+    },
+    {
+     "key": "flightTime",
+     "meanZ": -2.884615
+    },
+    {
+     "key": "concentricDuration",
+     "meanZ": 2.777778
+    }
+   ],
+   "patternId": "explosive",
+   "recovery": {
+    "percent": 0.740866,
+    "status": "partial",
+    "meanRecovery": 1.114177,
+    "meanPost": 2.634034,
+    "scores": [
+     1.652458,
+     0.964548,
+     0.725525
+    ],
+    "completedAt": "2000-01-01T00:00:00.000Z"
+   },
+   "quality": {
+    "scoredFraction": 1,
+    "meanCapture": 0.965121,
+    "calibrationOk": true,
+    "eligible": true,
+    "reasons": []
+   }
+  }
+ },
+ {
+  "daysAgo": 16,
+  "record": {
+   "schemaVersion": 2,
+   "id": "sample_jump-repeated_6",
+   "source": "demo",
+   "sportId": "soccer",
+   "protocolId": "jump-repeated",
+   "exercise": "cmj",
+   "detectorConfigId": "ewma|a=0.4|bp=2|w=1|m=0|clip=2.5",
+   "calibration": {
+    "nReps": 6,
+    "referenceSource": "loo",
+    "mu0": 0.637301,
+    "sigma0": 0.2,
+    "excludedFeatures": 0,
+    "totalFeatures": 9,
+    "ok": true,
+    "reasons": []
+   },
+   "reps": [
+    {
+     "index": 1,
+     "score": 0.783248,
+     "state": "STABLE",
+     "ewma": 0.69568,
+     "quality": 0.965148,
+     "afterWarning": false
+    },
+    {
+     "index": 2,
+     "score": 0.552892,
+     "state": "STABLE",
+     "ewma": 0.638565,
+     "quality": 0.966381,
+     "afterWarning": false
+    },
+    {
+     "index": 3,
+     "score": 0.670429,
+     "state": "STABLE",
+     "ewma": 0.65131,
+     "quality": 0.965241,
+     "afterWarning": false
+    },
+    {
+     "index": 4,
+     "score": 0.459754,
+     "state": "STABLE",
+     "ewma": 0.574688,
+     "quality": 0.966044,
+     "afterWarning": false
+    },
+    {
+     "index": 5,
+     "score": 1.012079,
+     "state": "STABLE",
+     "ewma": 0.749644,
+     "quality": 0.964186,
+     "afterWarning": false
+    },
+    {
+     "index": 6,
+     "score": 1.853972,
+     "state": "DRIFT",
+     "ewma": 0.904707,
+     "quality": 0.964934,
+     "afterWarning": false
+    },
+    {
+     "index": 7,
+     "score": 2.205371,
+     "state": "DRIFT",
+     "ewma": 0.997744,
+     "quality": 0.964199,
+     "afterWarning": false
+    },
+    {
+     "index": 8,
+     "score": 2.484898,
+     "state": "BREAKPOINT",
+     "ewma": 1.053567,
+     "quality": 0.965703,
+     "afterWarning": false
+    },
+    {
+     "index": 9,
+     "score": 2.727359,
+     "state": "BREAKPOINT",
+     "ewma": 1.08706,
+     "quality": 0.964993,
+     "afterWarning": true
+    }
+   ],
+   "totalReps": 9,
+   "scoredReps": 9,
+   "heldReps": 5,
+   "onsetRep": 5,
+   "breakpointRep": 8,
+   "avgPre": 1.076821,
+   "avgPost": 2.606128,
+   "topChanges": [
+    {
+     "key": "rsiMod",
+     "meanZ": -4.636668
+    },
+    {
+     "key": "jumpHeight",
+     "meanZ": -3.320434
+    },
+    {
+     "key": "concentricDuration",
+     "meanZ": 2.777778
+    },
+    {
+     "key": "countermovementDepth",
+     "meanZ": -1.848217
+    }
+   ],
+   "patternId": "explosive",
+   "recovery": {
+    "percent": 0.708318,
+    "status": "partial",
+    "meanRecovery": 1.211573,
+    "meanPost": 2.606128,
+    "scores": [
+     1.401478,
+     1.138495,
+     1.094745
+    ],
+    "completedAt": "2000-01-01T00:00:00.000Z"
+   },
+   "quality": {
+    "scoredFraction": 1,
+    "meanCapture": 0.965203,
+    "calibrationOk": true,
+    "eligible": true,
+    "reasons": []
+   }
+  }
+ },
+ {
+  "daysAgo": 12,
+  "record": {
+   "schemaVersion": 2,
+   "id": "sample_jump-repeated_7",
+   "source": "demo",
+   "sportId": "soccer",
+   "protocolId": "jump-repeated",
+   "exercise": "cmj",
+   "detectorConfigId": "ewma|a=0.4|bp=2|w=1|m=0|clip=2.5",
+   "calibration": {
+    "nReps": 6,
+    "referenceSource": "loo",
+    "mu0": 0.600848,
+    "sigma0": 0.2,
+    "excludedFeatures": 0,
+    "totalFeatures": 9,
+    "ok": true,
+    "reasons": []
+   },
+   "reps": [
+    {
+     "index": 1,
+     "score": 0.435107,
+     "state": "STABLE",
+     "ewma": 0.534552,
+     "quality": 0.964016,
+     "afterWarning": false
+    },
+    {
+     "index": 2,
+     "score": 0.305457,
+     "state": "STABLE",
+     "ewma": 0.442914,
+     "quality": 0.964566,
+     "afterWarning": false
+    },
+    {
+     "index": 3,
+     "score": 0.42834,
+     "state": "STABLE",
+     "ewma": 0.437084,
+     "quality": 0.964415,
+     "afterWarning": false
+    },
+    {
+     "index": 4,
+     "score": 0.314598,
+     "state": "STABLE",
+     "ewma": 0.38809,
+     "quality": 0.965636,
+     "afterWarning": false
+    },
+    {
+     "index": 5,
+     "score": 1.270859,
+     "state": "STABLE",
+     "ewma": 0.673193,
+     "quality": 0.964819,
+     "afterWarning": false
+    },
+    {
+     "index": 6,
+     "score": 1.328093,
+     "state": "DRIFT",
+     "ewma": 0.844255,
+     "quality": 0.96428,
+     "afterWarning": false
+    },
+    {
+     "index": 7,
+     "score": 1.991007,
+     "state": "DRIFT",
+     "ewma": 0.946892,
+     "quality": 0.965137,
+     "afterWarning": false
+    },
+    {
+     "index": 8,
+     "score": 2.100729,
+     "state": "BREAKPOINT",
+     "ewma": 1.008474,
+     "quality": 0.963752,
+     "afterWarning": false
+    },
+    {
+     "index": 9,
+     "score": 2.916271,
+     "state": "BREAKPOINT",
+     "ewma": 1.045424,
+     "quality": 0.965455,
+     "afterWarning": true
+    }
+   ],
+   "totalReps": 9,
+   "scoredReps": 9,
+   "heldReps": 5,
+   "onsetRep": 5,
+   "breakpointRep": 8,
+   "avgPre": 0.867637,
+   "avgPost": 2.5085,
+   "topChanges": [
+    {
+     "key": "rsiMod",
+     "meanZ": -4.552225
+    },
+    {
+     "key": "jumpHeight",
+     "meanZ": -3.293325
+    },
+    {
+     "key": "flightTime",
+     "meanZ": -1.923077
+    },
+    {
+     "key": "concentricDuration",
+     "meanZ": 1.666667
+    }
+   ],
+   "patternId": "explosive",
+   "recovery": {
+    "percent": 0.731136,
+    "status": "partial",
+    "meanRecovery": 1.113747,
+    "meanPost": 2.5085,
+    "scores": [
+     1.2811,
+     1.223181,
+     0.836959
+    ],
+    "completedAt": "2000-01-01T00:00:00.000Z"
+   },
+   "quality": {
+    "scoredFraction": 1,
+    "meanCapture": 0.964675,
+    "calibrationOk": true,
+    "eligible": true,
+    "reasons": []
+   }
+  }
+ },
+ {
+  "daysAgo": 9,
+  "record": {
+   "schemaVersion": 2,
+   "id": "sample_jump-repeated_8",
+   "source": "demo",
+   "sportId": "soccer",
+   "protocolId": "jump-repeated",
+   "exercise": "cmj",
+   "detectorConfigId": "ewma|a=0.4|bp=2|w=1|m=0|clip=2.5",
+   "calibration": {
+    "nReps": 6,
+    "referenceSource": "loo",
+    "mu0": 0.632421,
+    "sigma0": 0.2,
+    "excludedFeatures": 0,
+    "totalFeatures": 9,
+    "ok": true,
+    "reasons": []
+   },
+   "reps": [
+    {
+     "index": 1,
+     "score": 0.606209,
+     "state": "STABLE",
+     "ewma": 0.621936,
+     "quality": 0.964253,
+     "afterWarning": false
+    },
+    {
+     "index": 2,
+     "score": 0.764312,
+     "state": "STABLE",
+     "ewma": 0.678887,
+     "quality": 0.96445,
+     "afterWarning": false
+    },
+    {
+     "index": 3,
+     "score": 0.348606,
+     "state": "STABLE",
+     "ewma": 0.546774,
+     "quality": 0.965215,
+     "afterWarning": false
+    },
+    {
+     "index": 4,
+     "score": 0.323014,
+     "state": "STABLE",
+     "ewma": 0.45727,
+     "quality": 0.965872,
+     "afterWarning": false
+    },
+    {
+     "index": 5,
+     "score": 0.408359,
+     "state": "STABLE",
+     "ewma": 0.437706,
+     "quality": 0.965606,
+     "afterWarning": false
+    },
+    {
+     "index": 6,
+     "score": 1.011328,
+     "state": "STABLE",
+     "ewma": 0.667155,
+     "quality": 0.965632,
+     "afterWarning": false
+    },
+    {
+     "index": 7,
+     "score": 1.456768,
+     "state": "DRIFT",
+     "ewma": 0.853261,
+     "quality": 0.964133,
+     "afterWarning": false
+    },
+    {
+     "index": 8,
+     "score": 2.633014,
+     "state": "DRIFT",
+     "ewma": 0.964925,
+     "quality": 0.966694,
+     "afterWarning": false
+    },
+    {
+     "index": 9,
+     "score": 1.939743,
+     "state": "DRIFT",
+     "ewma": 1.031924,
+     "quality": 0.964383,
+     "afterWarning": false
+    },
+    {
+     "index": 10,
+     "score": 2.724062,
+     "state": "BREAKPOINT",
+     "ewma": 1.072123,
+     "quality": 0.964702,
+     "afterWarning": false
+    }
+   ],
+   "totalReps": 10,
+   "scoredReps": 10,
+   "heldReps": 6,
+   "onsetRep": 6,
+   "breakpointRep": 10,
+   "avgPre": 1.054595,
+   "avgPost": 2.724062,
+   "topChanges": [
+    {
+     "key": "rsiMod",
+     "meanZ": -4.580287
+    },
+    {
+     "key": "jumpHeight",
+     "meanZ": -3.769562
+    },
+    {
+     "key": "flightTime",
+     "meanZ": -2.738613
+    },
+    {
+     "key": "countermovementDepth",
+     "meanZ": -1.925604
+    }
+   ],
+   "patternId": "explosive",
+   "recovery": {
+    "percent": 0.724999,
+    "status": "partial",
+    "meanRecovery": 1.207624,
+    "meanPost": 2.724062,
+    "scores": [
+     1.133834,
+     1.182234,
+     1.306805
+    ],
+    "completedAt": "2000-01-01T00:00:00.000Z"
+   },
+   "quality": {
+    "scoredFraction": 1,
+    "meanCapture": 0.965094,
+    "calibrationOk": true,
+    "eligible": true,
+    "reasons": []
+   }
+  }
+ },
+ {
+  "daysAgo": 5,
+  "record": {
+   "schemaVersion": 2,
+   "id": "sample_jump-repeated_9",
+   "source": "demo",
+   "sportId": "soccer",
+   "protocolId": "jump-repeated",
+   "exercise": "cmj",
+   "detectorConfigId": "ewma|a=0.4|bp=2|w=1|m=0|clip=2.5",
+   "calibration": {
+    "nReps": 6,
+    "referenceSource": "loo",
+    "mu0": 0.539578,
+    "sigma0": 0.284018,
+    "excludedFeatures": 0,
+    "totalFeatures": 9,
+    "ok": true,
+    "reasons": []
+   },
+   "reps": [
+    {
+     "index": 1,
+     "score": 0.60106,
+     "state": "STABLE",
+     "ewma": 0.564171,
+     "quality": 0.965159,
+     "afterWarning": false
+    },
+    {
+     "index": 2,
+     "score": 0.54283,
+     "state": "STABLE",
+     "ewma": 0.555634,
+     "quality": 0.966113,
+     "afterWarning": false
+    },
+    {
+     "index": 3,
+     "score": 0.566947,
+     "state": "STABLE",
+     "ewma": 0.560159,
+     "quality": 0.964347,
+     "afterWarning": false
+    },
+    {
+     "index": 4,
+     "score": 0.510792,
+     "state": "STABLE",
+     "ewma": 0.540412,
+     "quality": 0.964976,
+     "afterWarning": false
+    },
+    {
+     "index": 5,
+     "score": 0.647513,
+     "state": "STABLE",
+     "ewma": 0.583253,
+     "quality": 0.965979,
+     "afterWarning": false
+    },
+    {
+     "index": 6,
+     "score": 0.551122,
+     "state": "STABLE",
+     "ewma": 0.5704,
+     "quality": 0.964626,
+     "afterWarning": false
+    },
+    {
+     "index": 7,
+     "score": 1.261269,
+     "state": "DRIFT",
+     "ewma": 0.842089,
+     "quality": 0.965724,
+     "afterWarning": false
+    },
+    {
+     "index": 8,
+     "score": 1.984615,
+     "state": "DRIFT",
+     "ewma": 1.005103,
+     "quality": 0.964815,
+     "afterWarning": false
+    },
+    {
+     "index": 9,
+     "score": 2.587989,
+     "state": "DRIFT",
+     "ewma": 1.102911,
+     "quality": 0.96439,
+     "afterWarning": false
+    },
+    {
+     "index": 10,
+     "score": 2.75639,
+     "state": "BREAKPOINT",
+     "ewma": 1.161596,
+     "quality": 0.965194,
+     "afterWarning": false
+    }
+   ],
+   "totalReps": 10,
+   "scoredReps": 10,
+   "heldReps": 6,
+   "onsetRep": 7,
+   "breakpointRep": 10,
+   "avgPre": 1.028237,
+   "avgPost": 2.75639,
+   "topChanges": [
+    {
+     "key": "rsiMod",
+     "meanZ": -5.101549
+    },
+    {
+     "key": "jumpHeight",
+     "meanZ": -3.716743
+    },
+    {
+     "key": "concentricDuration",
+     "meanZ": 2.222222
+    },
+    {
+     "key": "flightTime",
+     "meanZ": -1.923077
+    }
+   ],
+   "patternId": "explosive",
+   "recovery": {
+    "percent": 0.779166,
+    "status": "partial",
+    "meanRecovery": 1.029124,
+    "meanPost": 2.75639,
+    "scores": [
+     1.376972,
+     0.510649,
+     1.199752
+    ],
+    "completedAt": "2000-01-01T00:00:00.000Z"
+   },
+   "quality": {
+    "scoredFraction": 1,
+    "meanCapture": 0.965132,
+    "calibrationOk": true,
+    "eligible": true,
+    "reasons": []
+   }
+  }
+ },
+ {
+  "daysAgo": 35,
+  "record": {
+   "schemaVersion": 2,
+   "id": "sample_squat-bodyweight_1",
+   "source": "demo",
+   "sportId": "strength",
+   "protocolId": "squat-bodyweight",
+   "exercise": "squat",
+   "detectorConfigId": "ewma|a=0.4|bp=2|w=1|m=0|clip=2.5",
+   "calibration": {
+    "nReps": 6,
+    "referenceSource": "loo",
+    "mu0": 0.789648,
+    "sigma0": 0.206022,
+    "excludedFeatures": 0,
+    "totalFeatures": 10,
+    "ok": true,
+    "reasons": []
+   },
+   "reps": [
+    {
+     "index": 1,
+     "score": 1.005958,
+     "state": "STABLE",
+     "ewma": 0.876172,
+     "quality": 0.965905,
+     "afterWarning": false
+    },
+    {
+     "index": 2,
+     "score": 0.648581,
+     "state": "STABLE",
+     "ewma": 0.785136,
+     "quality": 0.963269,
+     "afterWarning": false
+    },
+    {
+     "index": 3,
+     "score": 1.055038,
+     "state": "STABLE",
+     "ewma": 0.893097,
+     "quality": 0.965004,
+     "afterWarning": false
+    },
+    {
+     "index": 4,
+     "score": 2.256413,
+     "state": "DRIFT",
+     "ewma": 1.057739,
+     "quality": 0.964413,
+     "afterWarning": false
+    },
+    {
+     "index": 5,
+     "score": 3.147699,
+     "state": "DRIFT",
+     "ewma": 1.156525,
+     "quality": 0.965611,
+     "afterWarning": false
+    },
+    {
+     "index": 6,
+     "score": 3.2417,
+     "state": "BREAKPOINT",
+     "ewma": 1.215796,
+     "quality": 0.964736,
+     "afterWarning": false
+    },
+    {
+     "index": 7,
+     "score": 3.271989,
+     "state": "BREAKPOINT",
+     "ewma": 1.251359,
+     "quality": 0.964936,
+     "afterWarning": true
+    }
+   ],
+   "totalReps": 7,
+   "scoredReps": 7,
+   "heldReps": 3,
+   "onsetRep": 3,
+   "breakpointRep": 6,
+   "avgPre": 1.622738,
+   "avgPost": 3.256844,
+   "topChanges": [
+    {
+     "key": "kneeRomR",
+     "meanZ": -5.354058
+    },
+    {
+     "key": "kneeRomL",
+     "meanZ": -4.553219
+    },
+    {
+     "key": "trunkLean",
+     "meanZ": 4.005976
+    },
+    {
+     "key": "peakVelocity",
+     "meanZ": -3.814108
+    }
+   ],
+   "patternId": "rom",
+   "recovery": {
+    "percent": 0.601555,
+    "status": "partial",
+    "meanRecovery": 1.77269,
+    "meanPost": 3.256844,
+    "scores": [
+     1.714771,
+     1.962356,
+     1.640943
+    ],
+    "completedAt": "2000-01-01T00:00:00.000Z"
+   },
+   "quality": {
+    "scoredFraction": 1,
+    "meanCapture": 0.964839,
+    "calibrationOk": true,
+    "eligible": true,
+    "reasons": []
+   }
+  }
+ },
+ {
+  "daysAgo": 28,
+  "record": {
+   "schemaVersion": 2,
+   "id": "sample_squat-bodyweight_2",
+   "source": "demo",
+   "sportId": "strength",
+   "protocolId": "squat-bodyweight",
+   "exercise": "squat",
+   "detectorConfigId": "ewma|a=0.4|bp=2|w=1|m=0|clip=2.5",
+   "calibration": {
+    "nReps": 6,
+    "referenceSource": "loo",
+    "mu0": 0.677677,
+    "sigma0": 0.248988,
+    "excludedFeatures": 0,
+    "totalFeatures": 10,
+    "ok": true,
+    "reasons": []
+   },
+   "reps": [
+    {
+     "index": 1,
+     "score": 0.658405,
+     "state": "STABLE",
+     "ewma": 0.669968,
+     "quality": 0.964289,
+     "afterWarning": false
+    },
+    {
+     "index": 2,
+     "score": 0.55215,
+     "state": "STABLE",
+     "ewma": 0.622841,
+     "quality": 0.96509,
+     "afterWarning": false
+    },
+    {
+     "index": 3,
+     "score": 0.470855,
+     "state": "STABLE",
+     "ewma": 0.562046,
+     "quality": 0.96324,
+     "afterWarning": false
+    },
+    {
+     "index": 4,
+     "score": 1.610583,
+     "state": "STABLE",
+     "ewma": 0.857287,
+     "quality": 0.965509,
+     "afterWarning": false
+    },
+    {
+     "index": 5,
+     "score": 1.946349,
+     "state": "DRIFT",
+     "ewma": 1.034431,
+     "quality": 0.965027,
+     "afterWarning": false
+    },
+    {
+     "index": 6,
+     "score": 3.403042,
+     "state": "DRIFT",
+     "ewma": 1.140718,
+     "quality": 0.965743,
+     "afterWarning": false
+    },
+    {
+     "index": 7,
+     "score": 3.323284,
+     "state": "BREAKPOINT",
+     "ewma": 1.20449,
+     "quality": 0.965316,
+     "afterWarning": false
+    },
+    {
+     "index": 8,
+     "score": 3.575544,
+     "state": "BREAKPOINT",
+     "ewma": 1.242753,
+     "quality": 0.965834,
+     "afterWarning": true
+    }
+   ],
+   "totalReps": 8,
+   "scoredReps": 8,
+   "heldReps": 4,
+   "onsetRep": 4,
+   "breakpointRep": 7,
+   "avgPre": 1.44023,
+   "avgPost": 3.449414,
+   "topChanges": [
+    {
+     "key": "kneeRomR",
+     "meanZ": -5.75482
+    },
+    {
+     "key": "kneeRomL",
+     "meanZ": -4.747158
+    },
+    {
+     "key": "peakVelocity",
+     "meanZ": -4.580776
+    },
+    {
+     "key": "trunkLean",
+     "meanZ": 4.138317
+    }
+   ],
+   "patternId": "rom",
+   "recovery": {
+    "percent": 0.619901,
+    "status": "partial",
+    "meanRecovery": 1.731212,
+    "meanPost": 3.449414,
+    "scores": [
+     1.878702,
+     1.562947,
+     1.751986
+    ],
+    "completedAt": "2000-01-01T00:00:00.000Z"
+   },
+   "quality": {
+    "scoredFraction": 1,
+    "meanCapture": 0.965006,
+    "calibrationOk": true,
+    "eligible": true,
+    "reasons": []
+   }
+  }
+ },
+ {
+  "daysAgo": 21,
+  "record": {
+   "schemaVersion": 2,
+   "id": "sample_squat-bodyweight_3",
+   "source": "demo",
+   "sportId": "strength",
+   "protocolId": "squat-bodyweight",
+   "exercise": "squat",
+   "detectorConfigId": "ewma|a=0.4|bp=2|w=1|m=0|clip=2.5",
+   "calibration": {
+    "nReps": 6,
+    "referenceSource": "loo",
+    "mu0": 0.5,
+    "sigma0": 0.269901,
+    "excludedFeatures": 0,
+    "totalFeatures": 10,
+    "ok": true,
+    "reasons": []
+   },
+   "reps": [
+    {
+     "index": 1,
+     "score": 0.520432,
+     "state": "STABLE",
+     "ewma": 0.508173,
+     "quality": 0.964732,
+     "afterWarning": false
+    },
+    {
+     "index": 2,
+     "score": 0.821193,
+     "state": "STABLE",
+     "ewma": 0.633381,
+     "quality": 0.965155,
+     "afterWarning": false
+    },
+    {
+     "index": 3,
+     "score": 0.439024,
+     "state": "STABLE",
+     "ewma": 0.555638,
+     "quality": 0.965381,
+     "afterWarning": false
+    },
+    {
+     "index": 4,
+     "score": 1.032251,
+     "state": "STABLE",
+     "ewma": 0.746283,
+     "quality": 0.965164,
+     "afterWarning": false
+    },
+    {
+     "index": 5,
+     "score": 1.873444,
+     "state": "DRIFT",
+     "ewma": 0.917671,
+     "quality": 0.964719,
+     "afterWarning": false
+    },
+    {
+     "index": 6,
+     "score": 2.45275,
+     "state": "DRIFT",
+     "ewma": 1.020503,
+     "quality": 0.965415,
+     "afterWarning": false
+    },
+    {
+     "index": 7,
+     "score": 3.424775,
+     "state": "BREAKPOINT",
+     "ewma": 1.082203,
+     "quality": 0.965702,
+     "afterWarning": false
+    },
+    {
+     "index": 8,
+     "score": 3.710678,
+     "state": "BREAKPOINT",
+     "ewma": 1.119222,
+     "quality": 0.96377,
+     "afterWarning": true
+    }
+   ],
+   "totalReps": 8,
+   "scoredReps": 8,
+   "heldReps": 4,
+   "onsetRep": 4,
+   "breakpointRep": 7,
+   "avgPre": 1.189849,
+   "avgPost": 3.567727,
+   "topChanges": [
+    {
+     "key": "kneeRomR",
+     "meanZ": -6
+    },
+    {
+     "key": "trunkLean",
+     "meanZ": 5.063214
+    },
+    {
+     "key": "kneeRomL",
+     "meanZ": -4.166794
+    },
+    {
+     "key": "peakVelocity",
+     "meanZ": -4.060689
+    }
+   ],
+   "patternId": "rom",
+   "recovery": {
+    "percent": 0.652573,
+    "status": "partial",
+    "meanRecovery": 1.565812,
+    "meanPost": 3.567727,
+    "scores": [
+     1.505452,
+     1.597127,
+     1.594857
+    ],
+    "completedAt": "2000-01-01T00:00:00.000Z"
+   },
+   "quality": {
+    "scoredFraction": 1,
+    "meanCapture": 0.965005,
+    "calibrationOk": true,
+    "eligible": true,
+    "reasons": []
+   }
+  }
+ },
+ {
+  "daysAgo": 14,
+  "record": {
+   "schemaVersion": 2,
+   "id": "sample_squat-bodyweight_4",
+   "source": "demo",
+   "sportId": "strength",
+   "protocolId": "squat-bodyweight",
+   "exercise": "squat",
+   "detectorConfigId": "ewma|a=0.4|bp=2|w=1|m=0|clip=2.5",
+   "calibration": {
+    "nReps": 6,
+    "referenceSource": "loo",
+    "mu0": 0.669854,
+    "sigma0": 0.2,
+    "excludedFeatures": 0,
+    "totalFeatures": 10,
+    "ok": true,
+    "reasons": []
+   },
+   "reps": [
+    {
+     "index": 1,
+     "score": 0.363658,
+     "state": "STABLE",
+     "ewma": 0.547375,
+     "quality": 0.965876,
+     "afterWarning": false
+    },
+    {
+     "index": 2,
+     "score": 0.844785,
+     "state": "STABLE",
+     "ewma": 0.666339,
+     "quality": 0.966045,
+     "afterWarning": false
+    },
+    {
+     "index": 3,
+     "score": 0.377637,
+     "state": "STABLE",
+     "ewma": 0.550858,
+     "quality": 0.964012,
+     "afterWarning": false
+    },
+    {
+     "index": 4,
+     "score": 0.414555,
+     "state": "STABLE",
+     "ewma": 0.496337,
+     "quality": 0.965625,
+     "afterWarning": false
+    },
+    {
+     "index": 5,
+     "score": 1.120216,
+     "state": "STABLE",
+     "ewma": 0.745888,
+     "quality": 0.964691,
+     "afterWarning": false
+    },
+    {
+     "index": 6,
+     "score": 1.811134,
+     "state": "DRIFT",
+     "ewma": 0.915475,
+     "quality": 0.965994,
+     "afterWarning": false
+    },
+    {
+     "index": 7,
+     "score": 2.131632,
+     "state": "DRIFT",
+     "ewma": 1.017226,
+     "quality": 0.964098,
+     "afterWarning": false
+    },
+    {
+     "index": 8,
+     "score": 3.038988,
+     "state": "BREAKPOINT",
+     "ewma": 1.078277,
+     "quality": 0.964629,
+     "afterWarning": false
+    },
+    {
+     "index": 9,
+     "score": 3.480812,
+     "state": "BREAKPOINT",
+     "ewma": 1.114908,
+     "quality": 0.966419,
+     "afterWarning": true
+    }
+   ],
+   "totalReps": 9,
+   "scoredReps": 9,
+   "heldReps": 5,
+   "onsetRep": 5,
+   "breakpointRep": 8,
+   "avgPre": 1.009088,
+   "avgPost": 3.2599,
+   "topChanges": [
+    {
+     "key": "kneeRomR",
+     "meanZ": -4.337295
+    },
+    {
+     "key": "trunkLean",
+     "meanZ": 4.321975
+    },
+    {
+     "key": "peakVelocity",
+     "meanZ": -4.231213
+    },
+    {
+     "key": "kneeRomL",
+     "meanZ": -4.164284
+    }
+   ],
+   "patternId": "rom",
+   "recovery": {
+    "percent": 0.801456,
+    "status": "partial",
+    "meanRecovery": 1.184093,
+    "meanPost": 3.2599,
+    "scores": [
+     1.048193,
+     1.186281,
+     1.317805
+    ],
+    "completedAt": "2000-01-01T00:00:00.000Z"
+   },
+   "quality": {
+    "scoredFraction": 1,
+    "meanCapture": 0.965265,
+    "calibrationOk": true,
+    "eligible": true,
+    "reasons": []
+   }
+  }
+ },
+ {
+  "daysAgo": 7,
+  "record": {
+   "schemaVersion": 2,
+   "id": "sample_squat-bodyweight_5",
+   "source": "demo",
+   "sportId": "strength",
+   "protocolId": "squat-bodyweight",
+   "exercise": "squat",
+   "detectorConfigId": "ewma|a=0.4|bp=2|w=1|m=0|clip=2.5",
+   "calibration": {
+    "nReps": 6,
+    "referenceSource": "loo",
+    "mu0": 0.701634,
+    "sigma0": 0.310244,
+    "excludedFeatures": 0,
+    "totalFeatures": 10,
+    "ok": true,
+    "reasons": []
+   },
+   "reps": [
+    {
+     "index": 1,
+     "score": 0.388914,
+     "state": "STABLE",
+     "ewma": 0.576546,
+     "quality": 0.965282,
+     "afterWarning": false
+    },
+    {
+     "index": 2,
+     "score": 0.457744,
+     "state": "STABLE",
+     "ewma": 0.529025,
+     "quality": 0.963451,
+     "afterWarning": false
+    },
+    {
+     "index": 3,
+     "score": 0.748609,
+     "state": "STABLE",
+     "ewma": 0.616859,
+     "quality": 0.965103,
+     "afterWarning": false
+    },
+    {
+     "index": 4,
+     "score": 0.797757,
+     "state": "STABLE",
+     "ewma": 0.689218,
+     "quality": 0.964657,
+     "afterWarning": false
+    },
+    {
+     "index": 5,
+     "score": 1.129332,
+     "state": "STABLE",
+     "ewma": 0.865264,
+     "quality": 0.964776,
+     "afterWarning": false
+    },
+    {
+     "index": 6,
+     "score": 2.112223,
+     "state": "DRIFT",
+     "ewma": 1.110056,
+     "quality": 0.964826,
+     "afterWarning": false
+    },
+    {
+     "index": 7,
+     "score": 2.005944,
+     "state": "DRIFT",
+     "ewma": 1.256932,
+     "quality": 0.965497,
+     "afterWarning": false
+    },
+    {
+     "index": 8,
+     "score": 2.842947,
+     "state": "BREAKPOINT",
+     "ewma": 1.345057,
+     "quality": 0.96668,
+     "afterWarning": false
+    },
+    {
+     "index": 9,
+     "score": 2.938227,
+     "state": "BREAKPOINT",
+     "ewma": 1.397932,
+     "quality": 0.96499,
+     "afterWarning": true
+    }
+   ],
+   "totalReps": 9,
+   "scoredReps": 9,
+   "heldReps": 5,
+   "onsetRep": 5,
+   "breakpointRep": 8,
+   "avgPre": 1.091503,
+   "avgPost": 2.890587,
+   "topChanges": [
+    {
+     "key": "kneeRomR",
+     "meanZ": -4.893618
+    },
+    {
+     "key": "peakVelocity",
+     "meanZ": -4.087993
+    },
+    {
+     "key": "trunkLean",
+     "meanZ": 3.822969
+    },
+    {
+     "key": "kneeRomL",
+     "meanZ": -3.150864
+    }
+   ],
+   "patternId": "explosive",
+   "recovery": {
+    "percent": 0.680892,
+    "status": "partial",
+    "meanRecovery": 1.400147,
+    "meanPost": 2.890587,
+    "scores": [
+     1.681116,
+     1.214046,
+     1.305279
+    ],
+    "completedAt": "2000-01-01T00:00:00.000Z"
+   },
+   "quality": {
+    "scoredFraction": 1,
+    "meanCapture": 0.965029,
+    "calibrationOk": true,
+    "eligible": true,
+    "reasons": []
+   }
+  }
+ },
+ {
+  "daysAgo": 2,
+  "record": {
+   "schemaVersion": 2,
+   "id": "sample_squat-bodyweight_6",
+   "source": "demo",
+   "sportId": "strength",
+   "protocolId": "squat-bodyweight",
+   "exercise": "squat",
+   "detectorConfigId": "ewma|a=0.4|bp=2|w=1|m=0|clip=2.5",
+   "calibration": {
+    "nReps": 6,
+    "referenceSource": "loo",
+    "mu0": 0.723795,
+    "sigma0": 0.2,
+    "excludedFeatures": 0,
+    "totalFeatures": 10,
+    "ok": true,
+    "reasons": []
+   },
+   "reps": [
+    {
+     "index": 1,
+     "score": 0.275694,
+     "state": "STABLE",
+     "ewma": 0.544555,
+     "quality": 0.965265,
+     "afterWarning": false
+    },
+    {
+     "index": 2,
+     "score": 1.225268,
+     "state": "STABLE",
+     "ewma": 0.816251,
+     "quality": 0.963651,
+     "afterWarning": false
+    },
+    {
+     "index": 3,
+     "score": 0.768318,
+     "state": "STABLE",
+     "ewma": 0.797078,
+     "quality": 0.964984,
+     "afterWarning": false
+    },
+    {
+     "index": 4,
+     "score": 0.41819,
+     "state": "STABLE",
+     "ewma": 0.645522,
+     "quality": 0.966057,
+     "afterWarning": false
+    },
+    {
+     "index": 5,
+     "score": 0.630163,
+     "state": "STABLE",
+     "ewma": 0.639379,
+     "quality": 0.964584,
+     "afterWarning": false
+    },
+    {
+     "index": 6,
+     "score": 1.100351,
+     "state": "STABLE",
+     "ewma": 0.823768,
+     "quality": 0.966701,
+     "afterWarning": false
+    },
+    {
+     "index": 7,
+     "score": 1.720308,
+     "state": "DRIFT",
+     "ewma": 0.983778,
+     "quality": 0.963777,
+     "afterWarning": false
+    },
+    {
+     "index": 8,
+     "score": 2.608484,
+     "state": "DRIFT",
+     "ewma": 1.079785,
+     "quality": 0.965053,
+     "afterWarning": false
+    },
+    {
+     "index": 9,
+     "score": 3.282587,
+     "state": "BREAKPOINT",
+     "ewma": 1.137389,
+     "quality": 0.966152,
+     "afterWarning": false
+    },
+    {
+     "index": 10,
+     "score": 3.105769,
+     "state": "BREAKPOINT",
+     "ewma": 1.171951,
+     "quality": 0.963602,
+     "afterWarning": true
+    }
+   ],
+   "totalReps": 10,
+   "scoredReps": 10,
+   "heldReps": 6,
+   "onsetRep": 6,
+   "breakpointRep": 9,
+   "avgPre": 1.093347,
+   "avgPost": 3.194178,
+   "topChanges": [
+    {
+     "key": "kneeRomR",
+     "meanZ": -5.283984
+    },
+    {
+     "key": "peakVelocity",
+     "meanZ": -4.393405
+    },
+    {
+     "key": "trunkLean",
+     "meanZ": 4.233715
+    },
+    {
+     "key": "kneeRomL",
+     "meanZ": -3.842655
+    }
+   ],
+   "patternId": "rom",
+   "recovery": {
+    "percent": 0.821669,
+    "status": "partial",
+    "meanRecovery": 1.16434,
+    "meanPost": 3.194178,
+    "scores": [
+     1.210399,
+     0.933202,
+     1.349418
+    ],
+    "completedAt": "2000-01-01T00:00:00.000Z"
+   },
+   "quality": {
+    "scoredFraction": 1,
+    "meanCapture": 0.964983,
+    "calibrationOk": true,
+    "eligible": true,
+    "reasons": []
+   }
+  }
+ },
+ {
+  "daysAgo": 31,
+  "record": {
+   "schemaVersion": 2,
+   "id": "sample_lunge-forward_1",
+   "source": "demo",
+   "sportId": "racquet",
+   "subSportId": "pickleball",
+   "protocolId": "lunge-forward",
+   "exercise": "lunge",
+   "detectorConfigId": "ewma|a=0.4|bp=2|w=1|m=0|clip=2.5",
+   "calibration": {
+    "nReps": 6,
+    "referenceSource": "loo",
+    "mu0": 0.537017,
+    "sigma0": 0.2,
+    "excludedFeatures": 0,
+    "totalFeatures": 11,
+    "ok": true,
+    "reasons": []
+   },
+   "reps": [
+    {
+     "index": 1,
+     "score": 0.508781,
+     "state": "STABLE",
+     "ewma": 0.525722,
+     "quality": 0.96585,
+     "afterWarning": false
+    },
+    {
+     "index": 2,
+     "score": 0.782992,
+     "state": "STABLE",
+     "ewma": 0.62863,
+     "quality": 0.961851,
+     "afterWarning": false
+    },
+    {
+     "index": 3,
+     "score": 0.778688,
+     "state": "STABLE",
+     "ewma": 0.688653,
+     "quality": 0.966201,
+     "afterWarning": false
+    },
+    {
+     "index": 4,
+     "score": 1.362655,
+     "state": "DRIFT",
+     "ewma": 0.827999,
+     "quality": 0.96415,
+     "afterWarning": false
+    },
+    {
+     "index": 5,
+     "score": 1.821024,
+     "state": "DRIFT",
+     "ewma": 0.911606,
+     "quality": 0.966228,
+     "afterWarning": false
+    },
+    {
+     "index": 6,
+     "score": 2.446321,
+     "state": "BREAKPOINT",
+     "ewma": 0.96177,
+     "quality": 0.966029,
+     "afterWarning": false
+    },
+    {
+     "index": 7,
+     "score": 2.180249,
+     "state": "BREAKPOINT",
+     "ewma": 0.991869,
+     "quality": 0.964137,
+     "afterWarning": true
+    }
+   ],
+   "totalReps": 7,
+   "scoredReps": 7,
+   "heldReps": 3,
+   "onsetRep": 2,
+   "breakpointRep": 6,
+   "avgPre": 1.050828,
+   "avgPost": 2.313285,
+   "topChanges": [
+    {
+     "key": "recoveryVelocity",
+     "meanZ": -3.637231
+    },
+    {
+     "key": "asymmetry",
+     "meanZ": 3.580374
+    },
+    {
+     "key": "trunkLean",
+     "meanZ": 2.801676
+    },
+    {
+     "key": "kneeRomR",
+     "meanZ": -2.693193
+    }
+   ],
+   "patternId": "asymmetry",
+   "recovery": {
+    "percent": 0.659586,
+    "status": "partial",
+    "meanRecovery": 1.141684,
+    "meanPost": 2.313285,
+    "scores": [
+     1.23296,
+     1.202064,
+     0.990028
+    ],
+    "completedAt": "2000-01-01T00:00:00.000Z"
+   },
+   "quality": {
+    "scoredFraction": 1,
+    "meanCapture": 0.964921,
+    "calibrationOk": true,
+    "eligible": true,
+    "reasons": []
+   }
+  }
+ },
+ {
+  "daysAgo": 24,
+  "record": {
+   "schemaVersion": 2,
+   "id": "sample_lunge-forward_2",
+   "source": "demo",
+   "sportId": "racquet",
+   "subSportId": "pickleball",
+   "protocolId": "lunge-forward",
+   "exercise": "lunge",
+   "detectorConfigId": "ewma|a=0.4|bp=2|w=1|m=0|clip=2.5",
+   "calibration": {
+    "nReps": 6,
+    "referenceSource": "loo",
+    "mu0": 0.578345,
+    "sigma0": 0.2,
+    "excludedFeatures": 0,
+    "totalFeatures": 11,
+    "ok": true,
+    "reasons": []
+   },
+   "reps": [
+    {
+     "index": 1,
+     "score": 0.641358,
+     "state": "STABLE",
+     "ewma": 0.60355,
+     "quality": 0.964592,
+     "afterWarning": false
+    },
+    {
+     "index": 2,
+     "score": 0.525098,
+     "state": "STABLE",
+     "ewma": 0.572169,
+     "quality": 0.966053,
+     "afterWarning": false
+    },
+    {
+     "index": 3,
+     "score": 0.508584,
+     "state": "STABLE",
+     "ewma": 0.546735,
+     "quality": 0.966483,
+     "afterWarning": false
+    },
+    {
+     "index": 4,
+     "score": 1.08736,
+     "state": "STABLE",
+     "ewma": 0.759379,
+     "quality": 0.966101,
+     "afterWarning": false
+    },
+    {
+     "index": 5,
+     "score": 1.038988,
+     "state": "DRIFT",
+     "ewma": 0.871223,
+     "quality": 0.96436,
+     "afterWarning": false
+    },
+    {
+     "index": 6,
+     "score": 1.587076,
+     "state": "DRIFT",
+     "ewma": 0.954072,
+     "quality": 0.963735,
+     "afterWarning": false
+    },
+    {
+     "index": 7,
+     "score": 1.789521,
+     "state": "BREAKPOINT",
+     "ewma": 1.003781,
+     "quality": 0.965259,
+     "afterWarning": false
+    },
+    {
+     "index": 8,
+     "score": 2.266227,
+     "state": "BREAKPOINT",
+     "ewma": 1.033607,
+     "quality": 0.965807,
+     "afterWarning": true
+    }
+   ],
+   "totalReps": 8,
+   "scoredReps": 8,
+   "heldReps": 4,
+   "onsetRep": 4,
+   "breakpointRep": 7,
+   "avgPre": 0.898077,
+   "avgPost": 2.027874,
+   "topChanges": [
+    {
+     "key": "recoveryVelocity",
+     "meanZ": -4.008374
+    },
+    {
+     "key": "kneeRomR",
+     "meanZ": -2.525985
+    },
+    {
+     "key": "trunkLean",
+     "meanZ": 2.400875
+    },
+    {
+     "key": "concentricDuration",
+     "meanZ": 1.954338
+    }
+   ],
+   "patternId": "recovery",
+   "recovery": {
+    "percent": 0.840252,
+    "status": "partial",
+    "meanRecovery": 0.809905,
+    "meanPost": 2.027874,
+    "scores": [
+     1.020021,
+     0.703188,
+     0.706505
+    ],
+    "completedAt": "2000-01-01T00:00:00.000Z"
+   },
+   "quality": {
+    "scoredFraction": 1,
+    "meanCapture": 0.965299,
+    "calibrationOk": true,
+    "eligible": true,
+    "reasons": []
+   }
+  }
+ },
+ {
+  "daysAgo": 17,
+  "record": {
+   "schemaVersion": 2,
+   "id": "sample_lunge-forward_3",
+   "source": "demo",
+   "sportId": "racquet",
+   "subSportId": "pickleball",
+   "protocolId": "lunge-forward",
+   "exercise": "lunge",
+   "detectorConfigId": "ewma|a=0.4|bp=2|w=1|m=0|clip=2.5",
+   "calibration": {
+    "nReps": 6,
+    "referenceSource": "loo",
+    "mu0": 0.5,
+    "sigma0": 0.201215,
+    "excludedFeatures": 0,
+    "totalFeatures": 11,
+    "ok": true,
+    "reasons": []
+   },
+   "reps": [
+    {
+     "index": 1,
+     "score": 0.31769,
+     "state": "STABLE",
+     "ewma": 0.427076,
+     "quality": 0.964887,
+     "afterWarning": false
+    },
+    {
+     "index": 2,
+     "score": 0.354699,
+     "state": "STABLE",
+     "ewma": 0.398125,
+     "quality": 0.966282,
+     "afterWarning": false
+    },
+    {
+     "index": 3,
+     "score": 0.363791,
+     "state": "STABLE",
+     "ewma": 0.384392,
+     "quality": 0.967235,
+     "afterWarning": false
+    },
+    {
+     "index": 4,
+     "score": 0.425381,
+     "state": "STABLE",
+     "ewma": 0.400787,
+     "quality": 0.965551,
+     "afterWarning": false
+    },
+    {
+     "index": 5,
+     "score": 0.91802,
+     "state": "STABLE",
+     "ewma": 0.60768,
+     "quality": 0.966117,
+     "afterWarning": false
+    },
+    {
+     "index": 6,
+     "score": 1.042237,
+     "state": "DRIFT",
+     "ewma": 0.765823,
+     "quality": 0.965146,
+     "afterWarning": false
+    },
+    {
+     "index": 7,
+     "score": 1.244335,
+     "state": "DRIFT",
+     "ewma": 0.860708,
+     "quality": 0.965291,
+     "afterWarning": false
+    },
+    {
+     "index": 8,
+     "score": 2.248659,
+     "state": "BREAKPOINT",
+     "ewma": 0.91764,
+     "quality": 0.965717,
+     "afterWarning": false
+    },
+    {
+     "index": 9,
+     "score": 2.380199,
+     "state": "BREAKPOINT",
+     "ewma": 0.951798,
+     "quality": 0.964361,
+     "afterWarning": true
+    }
+   ],
+   "totalReps": 9,
+   "scoredReps": 9,
+   "heldReps": 5,
+   "onsetRep": 5,
+   "breakpointRep": 8,
+   "avgPre": 0.666593,
+   "avgPost": 2.314429,
+   "topChanges": [
+    {
+     "key": "asymmetry",
+     "meanZ": 4.191601
+    },
+    {
+     "key": "recoveryVelocity",
+     "meanZ": -3.818524
+    },
+    {
+     "key": "kneeRomR",
+     "meanZ": -3.715514
+    },
+    {
+     "key": "trunkLean",
+     "meanZ": 2.005214
+    }
+   ],
+   "patternId": "asymmetry",
+   "recovery": {
+    "percent": 0.842144,
+    "status": "partial",
+    "meanRecovery": 0.786419,
+    "meanPost": 2.314429,
+    "scores": [
+     0.725002,
+     0.874173,
+     0.760083
+    ],
+    "completedAt": "2000-01-01T00:00:00.000Z"
+   },
+   "quality": {
+    "scoredFraction": 1,
+    "meanCapture": 0.965621,
+    "calibrationOk": true,
+    "eligible": true,
+    "reasons": []
+   }
+  }
+ },
+ {
+  "daysAgo": 10,
+  "record": {
+   "schemaVersion": 2,
+   "id": "sample_lunge-forward_4",
+   "source": "demo",
+   "sportId": "racquet",
+   "subSportId": "pickleball",
+   "protocolId": "lunge-forward",
+   "exercise": "lunge",
+   "detectorConfigId": "ewma|a=0.4|bp=2|w=1|m=0|clip=2.5",
+   "calibration": {
+    "nReps": 6,
+    "referenceSource": "loo",
+    "mu0": 0.540164,
+    "sigma0": 0.2,
+    "excludedFeatures": 0,
+    "totalFeatures": 11,
+    "ok": true,
+    "reasons": []
+   },
+   "reps": [
+    {
+     "index": 1,
+     "score": 0.390853,
+     "state": "STABLE",
+     "ewma": 0.480439,
+     "quality": 0.96547,
+     "afterWarning": false
+    },
+    {
+     "index": 2,
+     "score": 0.476859,
+     "state": "STABLE",
+     "ewma": 0.479007,
+     "quality": 0.965557,
+     "afterWarning": false
+    },
+    {
+     "index": 3,
+     "score": 0.547033,
+     "state": "STABLE",
+     "ewma": 0.506218,
+     "quality": 0.966355,
+     "afterWarning": false
+    },
+    {
+     "index": 4,
+     "score": 0.472217,
+     "state": "STABLE",
+     "ewma": 0.492617,
+     "quality": 0.964483,
+     "afterWarning": false
+    },
+    {
+     "index": 5,
+     "score": 0.768809,
+     "state": "STABLE",
+     "ewma": 0.603094,
+     "quality": 0.965085,
+     "afterWarning": false
+    },
+    {
+     "index": 6,
+     "score": 1.042969,
+     "state": "DRIFT",
+     "ewma": 0.777922,
+     "quality": 0.963087,
+     "afterWarning": false
+    },
+    {
+     "index": 7,
+     "score": 1.263504,
+     "state": "DRIFT",
+     "ewma": 0.882819,
+     "quality": 0.963828,
+     "afterWarning": false
+    },
+    {
+     "index": 8,
+     "score": 1.890706,
+     "state": "BREAKPOINT",
+     "ewma": 0.945757,
+     "quality": 0.966189,
+     "afterWarning": false
+    },
+    {
+     "index": 9,
+     "score": 2.379239,
+     "state": "BREAKPOINT",
+     "ewma": 0.98352,
+     "quality": 0.964819,
+     "afterWarning": true
+    }
+   ],
+   "totalReps": 9,
+   "scoredReps": 9,
+   "heldReps": 5,
+   "onsetRep": 5,
+   "breakpointRep": 8,
+   "avgPre": 0.708892,
+   "avgPost": 2.134972,
+   "topChanges": [
+    {
+     "key": "recoveryVelocity",
+     "meanZ": -4.394994
+    },
+    {
+     "key": "kneeRomR",
+     "meanZ": -3.221944
+    },
+    {
+     "key": "asymmetry",
+     "meanZ": 2.674672
+    },
+    {
+     "key": "concentricDuration",
+     "meanZ": 1.965263
+    }
+   ],
+   "patternId": "recovery",
+   "recovery": {
+    "percent": 0.767986,
+    "status": "partial",
+    "meanRecovery": 0.910182,
+    "meanPost": 2.134972,
+    "scores": [
+     0.669186,
+     0.946282,
+     1.115078
+    ],
+    "completedAt": "2000-01-01T00:00:00.000Z"
+   },
+   "quality": {
+    "scoredFraction": 1,
+    "meanCapture": 0.964986,
+    "calibrationOk": true,
+    "eligible": true,
+    "reasons": []
+   }
+  }
+ }
+]

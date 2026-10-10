@@ -1,0 +1,5 @@
+path,sample,view,participants,jumps,comparison,n,spearman,share_same_sign,note
+B,primary,advised,38,228,app_vs_com_rise,38,0.9144326512747565,0.9210526315789473,
+B,primary,advised,38,228,app_vs_forceplate,38,,0.6842105263157895,participant_log.xlsx force-plate heights; provenance unverified; direction only
+A,primary,advised,30,180,app_vs_com_rise,30,0.8767519466073415,0.8666666666666667,
+A,primary,advised,30,180,app_vs_forceplate,30,,0.7333333333333333,participant_log.xlsx force-plate heights; provenance unverified; direction only

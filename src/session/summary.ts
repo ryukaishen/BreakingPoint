@@ -62,8 +62,8 @@ export function buildSummary(
   const topChanges = rankChanges(changeSet, exercise).slice(0, 4);
   const recommendation =
     breakpointRep !== null
-      ? 'Persistent movement drift detected. Consider a recovery period or reducing training intensity before reassessing.'
-      : 'Movement stayed consistent with your personal baseline for this set.';
+      ? 'Your reps kept differing from your usual form, so BreakingPoint triggered an alert. Consider resting or lowering the intensity, then run a recovery check.'
+      : 'Your form stayed close to your usual form for this set.';
   return {
     athlete,
     exercise,

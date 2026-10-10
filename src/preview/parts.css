@@ -1,0 +1,43 @@
+/* Preview-only layout for docs/preview/breakaway-parts.html. Not shipped. */
+html, body { height: auto; }
+.pv-page { max-width: 1240px; margin: 0 auto; padding: 32px 32px 96px; display: grid; gap: 40px; }
+.pv-page h1 { margin: 0; font-size: 28px; }
+.pv-note { margin: 0; color: var(--text-2); font-size: 14px; }
+.pv-block { display: grid; gap: 12px; }
+.pv-title { margin: 0; font-size: 13px; color: var(--muted); font-weight: 600; }
+
+/* The result slab: the one place cobalt carries a big field. Its lower edge is cut at 12 degrees (tan 12 = 0.2126). */
+.pv-debrief { display: grid; gap: 24px; }
+.pv-slab {
+  position: relative; display: flex; align-items: flex-end; gap: 28px; min-height: 200px; padding: 28px 36px 40px;
+  background: var(--sys); color: #fff;
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 51px), calc(100% - 240px) 100%, 0 100%);
+}
+.pv-hero { color: #fff; }
+.pv-what { display: grid; gap: 4px; padding-bottom: 10px; }
+.pv-what b { font-size: 22px; }
+.pv-what small { font-size: 14px; opacity: 0.9; }
+.pv-newrec {
+  position: absolute; top: 24px; right: 36px; padding: 6px 16px 6px 22px; font-size: 14px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase;
+  background: var(--lime); color: var(--on-lime);
+  clip-path: polygon(10px 0, 100% 0, 100% 100%, 0 100%);
+}
+
+/* The warning and the next step: separate, serious, above the replay. */
+.pv-warn { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 18px 22px; }
+.pv-warn h3 { margin: 0 0 4px; font-size: 18px; color: var(--break); }
+.pv-warn p { margin: 0; color: var(--text-2); max-width: 62ch; }
+
+.pv-progress { display: grid; grid-template-columns: minmax(220px, 300px) minmax(0, 1fr); gap: 32px; align-items: start; }
+.pv-progress-solo { grid-template-columns: minmax(0, 1fr); }
+.pv-pb { display: grid; gap: 8px; padding: 22px 24px 28px; background: var(--navy); clip-path: polygon(0 0, 100% 0, calc(100% - 28px) 100%, 0 100%); }
+.pv-pb-label { font-size: 14px; color: var(--text-2); }
+.pv-pb .pv-hero { color: var(--text); }
+.pv-pb-sub { font-size: 14px; color: var(--text-2); }
+
+@media (max-width: 760px) {
+  .pv-page { padding: 20px 16px 64px; }
+  .pv-slab { padding: 20px 20px 36px; flex-wrap: wrap; }
+  .pv-warn { flex-direction: column; align-items: stretch; }
+  .pv-progress { grid-template-columns: minmax(0, 1fr); }
+}

@@ -44,7 +44,7 @@ export const PROTOCOLS: Record<string, ProtocolDef> = {
     primitive: 'JUMP_AND_LAND',
     status: 'READY',
     camera: 'Side-on, 30–45°, whole body plus room above the head',
-    purpose: 'Track how an explosive jump-and-land signature changes across repeated jumps.',
+    purpose: 'Track how your jumps and landings change across repeated jumps.',
     metrics: keys('cmj'),
   },
   'lunge-forward': {
@@ -129,7 +129,7 @@ export const PROTOCOLS: Record<string, ProtocolDef> = {
   },
   'stride-asymmetry': {
     id: 'stride-asymmetry', name: 'Stride Asymmetry', primitive: 'GAIT_CYCLE', status: 'FUTURE',
-    camera: 'Side-on or rear view', purpose: 'Left/right stride differences emerging with fatigue.',
+    camera: 'Side-on or rear view', purpose: 'Track how left/right stride differences change during a run.',
     metrics: [], plannedMetrics: ['Step time asymmetry', 'Contact time asymmetry'],
   },
   'step-analysis': {

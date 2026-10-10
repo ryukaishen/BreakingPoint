@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import type { DetectorConfig } from '../detection/config';
 import { DemoController } from '../demo/demoController';
+import { heldReps } from '../data/progress';
 import { makeLabeler } from '../protocols/labels';
 import { DEMO_CONTEXTS, protocolRefs, resolveDemo } from '../protocols/launch';
 import { sessionPattern } from '../protocols/patterns';
@@ -8,9 +9,10 @@ import { PRIMITIVES } from '../protocols/primitives';
 import { PROTOCOLS, type ProtocolStatus } from '../protocols/protocols';
 import { SPORTS, type SportProfile } from '../protocols/sports';
 import { SessionEngine, type Snapshot } from '../session/engine';
-import { pct } from '../utils/format';
+import { DISCLAIMER } from '../session/summary';
+import { arrow, pct } from '../utils/format';
 import { FormDrawdown } from './FormDrawdown';
-import { Cpu, Flask, Lock, Play } from './Icons';
+import { Camera, Chevron, Flask, Lock, Play } from './Icons';
 import { SportIcon } from './SportIcons';
 
 interface Props {
@@ -37,28 +39,42 @@ function statusSummary(sport: SportProfile): { ready: number; beta: number; road
   };
 }
 
-function SportCard({ sport, onClick, compact }: { sport: SportProfile; onClick: () => void; compact?: boolean }) {
+function RosterRow({ sport, onClick }: { sport: SportProfile; onClick: () => void }) {
   const s = statusSummary(sport);
-  const subs = sport.subSports?.map((x) => x.name).join(' · ');
+  const subs = sport.subSports?.map((x) => x.name).join(', ');
+  const launchable = s.ready + s.beta > 0;
   return (
-    <button className={`sport-card ${compact ? 'compact' : ''}`} onClick={onClick}>
-      <span className="sport-icon">
-        <SportIcon id={sport.icon} size={compact ? 24 : 30} />
-      </span>
-      <span className="sport-body">
-        <span className="sport-name">{sport.name}</span>
-        <span className="sport-desc">{sport.descriptor}</span>
-        {!compact && subs && <span className="sport-subs">{subs}</span>}
-      </span>
-      <span className="sport-meta">
-        {s.ready > 0 && <span className="status-badge ready">{s.ready} ready</span>}
-        {s.beta > 0 && <span className="status-badge beta">{s.beta} beta</span>}
-        {s.ready + s.beta === 0 && <span className="status-badge soon">roadmap</span>}
-        {!compact && s.primitives.length > 0 && <span className="prim-tag">{s.primitives.join(' · ')}</span>}
-      </span>
-    </button>
+    <li>
+      <button className={`roster-row ${launchable ? '' : 'roadmap'}`} onClick={onClick}>
+        <span className="sport-icon" aria-hidden>
+          <SportIcon id={sport.icon} size={24} />
+        </span>
+        <span className="rr-body">
+          <span className="rr-name">{sport.name}</span>
+          <span className="rr-desc">{sport.descriptor}</span>
+          {subs && <span className="rr-subs">{subs}</span>}
+        </span>
+        <span className="rr-side">
+          {s.ready > 0 && <span className="status-badge ready">{s.ready} ready</span>}
+          {s.beta > 0 && <span className="status-badge beta">{s.beta} beta</span>}
+          {!launchable && (
+            <span className="status-badge soon">
+              <Lock size={10} /> roadmap
+            </span>
+          )}
+          <Chevron size={16} className="rr-chev" aria-hidden />
+        </span>
+      </button>
+    </li>
   );
 }
+
+const FLOW = [
+  ['Calibrate', 'Do 5 to 8 controlled reps while you’re fresh. BreakingPoint learns your usual form from them, not from an “ideal” athlete.'],
+  ['Monitor', 'Keep training. The camera tracks every rep, and BreakingPoint compares it with your usual form: depth, tempo, trunk angle and more.'],
+  ['Detect', 'One odd rep has little effect. When the changes repeat, BreakingPoint triggers an alert and shows which measurements changed.'],
+  ['Recover', 'After a rest, three more reps show how close you are to your usual form again.'],
+] as const;
 
 export function Landing({ config, athlete, onSport, onDemo, onLibrary, onLab }: Props) {
   const [preview, setPreview] = useState<Snapshot | null>(null);
@@ -81,168 +97,185 @@ export function Landing({ config, athlete, onSport, onDemo, onLibrary, onLab }: 
   const pattern =
     preview && previewCtx ? sessionPattern(previewCtx.exercise, preview.monitorReps, preview.onsetRep, preview.baseline?.reference.sigma0, previewCtx.patternLabels) : null;
   const top = preview?.breakpointContributors?.slice(0, 3) ?? [];
-  const primary = SPORTS.filter((s) => s.tier === 'primary');
-  const secondary = SPORTS.filter((s) => s.tier === 'secondary');
+  const featured = DEMO_CONTEXTS[0];
+  const others = DEMO_CONTEXTS.slice(1);
+  const alarm = preview?.alarmRep ?? null;
 
   return (
     <div className="landing">
-      <section className="hero">
+      <section className="section hero">
         <div>
-          <div className="eyebrow">BreakingPoint · personalized movement monitoring for athletes</div>
           <h1>
-            Your movement.
-            <br />
-            Your <span className="yours">baseline.</span>
+            <span>Your movement.</span>
+            <span className="base">Your baseline.</span>
           </h1>
-          <p className="lead">BreakingPoint learns how you move when fresh and detects when that movement begins to change.</p>
-          <p className="lead-strong">Different athletes move differently. BreakingPoint compares you to you.</p>
-          <div className="demo-row">
-            <span className="demo-row-label">
-              <Play size={12} /> Run a demo
-            </span>
-            {DEMO_CONTEXTS.map((d) => {
-              const ctx = resolveDemo(d.id);
-              return (
-                <button key={d.id} className="demo-chip" onClick={() => onDemo(d.id)}>
-                  <b>{ctx?.contextName}</b> {d.label}
+          <p className="lead">BreakingPoint learns how you move when you’re fresh, then tracks how your form changes throughout a workout.</p>
+          <p className="lead-2">Most fitness apps count your reps. BreakingPoint looks at how those reps change.</p>
+          <div className="hero-actions">
+            <button className="btn primary lg" onClick={() => onDemo(featured.id)}>
+              <Play size={13} /> Run the {resolveDemo(featured.id)?.contextName.toLowerCase()} demo
+            </button>
+            <div className="demo-more">
+              <span className="lbl">Other demos</span>
+              {others.map((d) => (
+                <button key={d.id} onClick={() => onDemo(d.id)}>
+                  <b>{resolveDemo(d.id)?.contextName}</b>
+                  {d.label.toLowerCase()}
                 </button>
-              );
-            })}
+              ))}
+            </div>
           </div>
-          <div className="hero-note">
-            <span>
-              <Lock size={13} /> Video never leaves your device
-            </span>
-            <span>
-              <Cpu size={13} /> Any laptop or phone camera · no wearables · no force plates
-            </span>
-          </div>
+          <ul className="hero-facts">
+            <li>
+              <Lock size={14} /> Video never leaves your device
+            </li>
+            <li>
+              <Camera size={14} /> Any laptop or phone camera. No wearables, no force plates.
+            </li>
+          </ul>
         </div>
-        <div className="hero-card">
-          <div className="hc-title">
-            <span className="eyebrow">Form drawdown · soccer demo</span>
-            <span className="badge demo">
-              <span className="dot" /> synthetic athlete
+
+        <div className={`sys-window toned hero-window ${alarm !== null ? 'tone-break' : ''}`}>
+          <div className="hw-head">
+            <span className="eyebrow">
+              {previewCtx?.contextName} / {previewCtx?.title}
             </span>
+            <span className="badge demo">Synthetic athlete</span>
           </div>
           {preview ? (
-            <FormDrawdown
-              reps={preview.monitorReps}
-              thresholds={preview.thresholds}
-              cusumH={config.cusumH}
-              mode={config.mode}
-              alarmRep={preview.alarmRep}
-              onsetRep={preview.onsetRep}
-              exercise={previewCtx!.exercise}
-              height={200}
-              compact
-            />
-          ) : (
-            <div style={{ height: 200 }} className="muted">
-              Running demo pipeline…
-            </div>
-          )}
-          <div className="hc-caption">
-            {preview?.alarmRep ? (
-              <>
-                <b className="c-break">Breaking point at rep {preview.alarmRep}</b>
-                {pattern && (
+            <>
+              <div className="hw-readout">{alarm !== null ? `Breaking point · rep ${alarm}` : 'Stable'}</div>
+              <div className="hw-stats">
+                <div className="hw-stat">
+                  <div className="k">Reps at usual form</div>
+                  <div className="v">{heldReps(preview.monitorReps)} reps</div>
+                </div>
+                <div className="hw-stat">
+                  <div className="k">Changes began</div>
+                  <div className="v">{preview.onsetRep !== null ? `about rep ${preview.onsetRep}` : '—'}</div>
+                </div>
+                <div className="hw-stat">
+                  <div className="k">Pattern</div>
+                  <div className="v" title={pattern?.explain}>
+                    {pattern?.label ?? '—'}
+                  </div>
+                </div>
+              </div>
+              <FormDrawdown
+                reps={preview.monitorReps}
+                thresholds={preview.thresholds}
+                cusumH={config.cusumH}
+                mode={config.mode}
+                alarmRep={preview.alarmRep}
+                onsetRep={preview.onsetRep}
+                exercise={previewCtx!.exercise}
+                height={190}
+                compact
+              />
+              <div className="hw-caption">
+                {top.length > 0 ? (
                   <>
-                    {' '}
-                    · pattern <b>{pattern.label}</b>
+                    Biggest changes at the alert rep: <b>{top.map((d) => `${labels!.short(d.key)} ${arrow(d.zClipped ?? 0)}`).join(', ')}</b>
                   </>
-                )}{' '}
-                · primary changes: {top.map((d) => `${labels!.short(d.key)} ${(d.zClipped ?? 0) > 0 ? '↑' : '↓'}`).join(', ')}
-              </>
-            ) : (
-              'Every rep is scored against the athlete’s own baseline.'
-            )}
-          </div>
-        </div>
-      </section>
-
-      <section className="play">
-        <div className="play-head">
-          <h2>What do you play?</h2>
-          <p>Choose a sport and BreakingPoint will recommend a movement protocol.</p>
-        </div>
-        <div className="sport-grid">
-          {primary.map((s) => (
-            <SportCard key={s.id} sport={s} onClick={() => onSport(s.id)} />
-          ))}
-        </div>
-        <div className="sport-grid secondary">
-          {secondary.map((s) => (
-            <SportCard key={s.id} sport={s} onClick={() => onSport(s.id)} compact />
-          ))}
-        </div>
-        <div className="play-actions">
-          <button className="explore-card" onClick={onLibrary}>
-            <span className="eyebrow">Explore all protocols</span>
-            <span className="explore-title">Movement protocol library</span>
-            <span className="muted">
-              {SPORTS.reduce((n, sp) => n + (sp.subSports?.length || 1), 0)} sport contexts ·{' '}
-              {Object.values(PRIMITIVES).filter((p) => p.engine).length} reusable primitives today · one shared, validated detector →
-            </span>
-          </button>
-          <div className="custom-card">
-            <div className="row" style={{ justifyContent: 'space-between' }}>
-              <span className="eyebrow" style={{ color: '#a594ff' }}>
-                + Create your own protocol
-              </span>
-              <span className="status-badge soon">Coming soon</span>
-            </div>
-            <div className="explore-title">Teach BreakingPoint a repeatable movement.</div>
-            <div className="muted" style={{ fontSize: 12.5 }}>
-              Record a few clean reps of any repeatable movement — BreakingPoint segments them, learns the athlete's movement distribution, and monitors future reps
-              for persistent drift.
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="how">
-        <div className="how-card">
-          <div className="n">01 · CALIBRATE</div>
-          <h3>Learn your movement signature</h3>
-          <p>A few fresh reps of your sport's protocol. Per-feature median and robust spread — your baseline, not an "ideal" athlete.</p>
-        </div>
-        <div className="how-card">
-          <div className="n">02 · MONITOR</div>
-          <h3>Score every rep against you</h3>
-          <p>On-device pose estimation and rep segmentation. Each rep gets a transparent Movement Drift Score: the RMS of its standardized deviations.</p>
-        </div>
-        <div className="how-card">
-          <div className="n">03 · DETECT</div>
-          <h3>Find the breaking point</h3>
-          <p>EWMA / CUSUM sequential detection ignores one-off bad reps, fires on persistent drift, and names the pattern that changed.</p>
-        </div>
-      </section>
-
-      <section className="diff">
-        <div className="diff-card no">
-          <div className="eyebrow" style={{ color: '#7f8b9d' }}>Most form apps ask</div>
-          <div className="q">"Do you move like the ideal athlete?"</div>
-        </div>
-        <div className="diff-card yes">
-          <div className="eyebrow" style={{ color: '#2ee59d' }}>BreakingPoint asks</div>
-          <div className="q">"Are you still moving like yourself?"</div>
-        </div>
-        <div className="diff-card lab-strip" onClick={onLab} style={{ cursor: 'pointer' }}>
-          <div className="eyebrow">
-            <Flask size={12} /> BreakingPoint Lab · detector backtest
-          </div>
-          {validated ? (
-            <div className="big" style={{ marginTop: 8 }}>
-              {v!.numSessions!.toLocaleString()} simulated sessions → {pct(v!.falsePositiveRate)} false alarms, {pct(v!.truePositiveRate)} drift detected, median{' '}
-              {v!.medianDetectionDelay} reps delay (held-out).
-            </div>
+                ) : (
+                  'Every rep is compared with the athlete’s usual form.'
+                )}
+              </div>
+            </>
           ) : (
-            <div className="big" style={{ marginTop: 8 }}>Run the Lab to calibrate the detector.</div>
+            <div className="hw-loading">Running the demo pipeline…</div>
           )}
-          <div className="muted" style={{ fontSize: 12, marginTop: 6 }}>One validated detector shared by every protocol →</div>
         </div>
       </section>
+
+      <section className="section flow" aria-labelledby="flow-h">
+        <div className="section-head">
+          <h2 id="flow-h">How a session runs</h2>
+          <p>The same four stages track your progress at the top of every session.</p>
+        </div>
+        <ol className="flow-track">
+          {FLOW.map(([name, text], i) => (
+            <li key={name} className="flow-stage">
+              <span className="track-node" aria-hidden />
+              <span className="flow-n">Stage {i + 1}</span>
+              <h3>{name}</h3>
+              <p>{text}</p>
+            </li>
+          ))}
+        </ol>
+      </section>
+
+      <section className="section roster" aria-labelledby="roster-h">
+        <div className="roster-intro">
+          <h2 id="roster-h">What do you play?</h2>
+          <p>Choose a sport and BreakingPoint will recommend a movement protocol.</p>
+          <button className="btn" onClick={onLibrary}>
+            Browse the protocol library
+          </button>
+          <div className="locked-card">
+            <div className="lc-head">
+              <span className="lc-title">
+                <Lock size={14} /> Create your own protocol
+              </span>
+              <span className="status-badge soon">Roadmap</span>
+            </div>
+            <p>Record a few clean reps of any repeatable movement. BreakingPoint learns your usual form for it and tracks how later reps change.</p>
+          </div>
+        </div>
+        <ul className="roster-list">
+          {SPORTS.map((s) => (
+            <RosterRow key={s.id} sport={s} onClick={() => onSport(s.id)} />
+          ))}
+        </ul>
+      </section>
+
+      <section className="section thesis">
+        <div className="thesis-q">
+          <p className="q-old">
+            <span className="eyebrow">Most form apps ask</span>
+            <span className="q">Do you move like the ideal athlete?</span>
+          </p>
+          <p className="q-new">
+            <span className="eyebrow">BreakingPoint asks</span>
+            <span className="q">Are you still moving like yourself?</span>
+          </p>
+        </div>
+        <button className="sys-window lab-readout" onClick={onLab}>
+          <span className="lr-head">
+            <Flask size={14} /> Synthetic Validation | UF HiPerGator | October 2026
+          </span>
+          {validated ? (
+            <span className="lr-stats">
+              <span className="lr-stat">
+                <span className="v">{v!.numSessions!.toLocaleString()}</span>
+                <span className="k">simulated sessions</span>
+              </span>
+              <span className="lr-stat">
+                <span className="v">{pct(v!.falsePositiveRate)}</span>
+                <span className="k">false alerts on stable simulated sessions</span>
+              </span>
+              <span className="lr-stat">
+                <span className="v">{pct(v!.truePositiveRate)}</span>
+                <span className="k">simulated changes detected</span>
+              </span>
+              <span className="lr-stat">
+                <span className="v">{v!.medianDetectionDelay} reps</span>
+                <span className="k">median reps from change to alert</span>
+              </span>
+            </span>
+          ) : (
+            <span className="lr-stats">Open the study for its results.</span>
+          )}
+          <span className="lr-foot">
+            Simulated squat-like sessions, not real athletes. <b>See the study</b>
+          </span>
+        </button>
+      </section>
+
+      <footer className="section site-foot">
+        <span>{DISCLAIMER}</span>
+        <span>Pose estimation runs in your browser. No video is uploaded or stored.</span>
+      </footer>
     </div>
   );
 }

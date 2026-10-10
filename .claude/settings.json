@@ -1,0 +1,8 @@
+{
+  "enabledPlugins": {
+    "impeccable@local-desktop-app-uploads": true,
+    "ui-ux-pro-max@local-desktop-app-uploads": true,
+    "taste-skill@local-desktop-app-uploads": false,
+    "web-design-guidelines@local-desktop-app-uploads": false
+  }
+}

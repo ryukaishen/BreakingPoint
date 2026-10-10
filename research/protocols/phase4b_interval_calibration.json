@@ -1,0 +1,4520 @@
+{
+ "rule": {
+  "95% CI": ">= 0.935 coverage in the null and the positive control",
+  "approximate": ">= 0.85",
+  "not reported": "< 0.85"
+ },
+ "methods": {
+  "mean": "student_t",
+  "median": "exact_order_statistic",
+  "share1": "wilson"
+ },
+ "fast_mode": false,
+ "replicates": {
+  "enumeration_draws": 4000,
+  "bootstrap": 2000
+ },
+ "statistics": {
+  "jump|B/primary|delta_mean/jumpHeight": {
+   "method": "student_t",
+   "null_coverage": 0.9535,
+   "null_mc_se": 0.0033293298875299213,
+   "positive_control_coverage": 0.945,
+   "label": "95% CI"
+  },
+  "jump|B/primary|delta_median/jumpHeight": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.9665,
+   "null_mc_se": 0.0028450724946826917,
+   "positive_control_coverage": 0.9625,
+   "label": "96.6% exact interval"
+  },
+  "jump|B/primary|dz_mean/jumpHeight": {
+   "method": "student_t",
+   "null_coverage": 0.94675,
+   "null_mc_se": 0.0035501562465615516,
+   "positive_control_coverage": 0.96725,
+   "label": "95% CI"
+  },
+  "jump|B/primary|dz2_mean/jumpHeight": {
+   "method": "student_t",
+   "null_coverage": 0.94625,
+   "null_mc_se": 0.003565842729986839,
+   "positive_control_coverage": 0.9685,
+   "label": "95% CI"
+  },
+  "jump|B/primary|delta_mean/countermovementDepth": {
+   "method": "student_t",
+   "null_coverage": 0.956,
+   "null_mc_se": 0.0032428382630035695,
+   "positive_control_coverage": 0.94775,
+   "label": "95% CI"
+  },
+  "jump|B/primary|delta_median/countermovementDepth": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.969,
+   "null_mc_se": 0.002740392307681513,
+   "positive_control_coverage": null,
+   "label": "96.6% exact interval"
+  },
+  "jump|B/primary|dz_mean/countermovementDepth": {
+   "method": "student_t",
+   "null_coverage": 0.9575,
+   "null_mc_se": 0.0031895826529500684,
+   "positive_control_coverage": 0.95425,
+   "label": "95% CI"
+  },
+  "jump|B/primary|dz2_mean/countermovementDepth": {
+   "method": "student_t",
+   "null_coverage": 0.949,
+   "null_mc_se": 0.003478469491026191,
+   "positive_control_coverage": 0.94675,
+   "label": "95% CI"
+  },
+  "jump|B/primary|delta_mean/trunkLean": {
+   "method": "student_t",
+   "null_coverage": 0.94175,
+   "null_mc_se": 0.0037032734674879203,
+   "positive_control_coverage": 0.95175,
+   "label": "95% CI"
+  },
+  "jump|B/primary|delta_median/trunkLean": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.96225,
+   "null_mc_se": 0.0030135086485689713,
+   "positive_control_coverage": 0.9665,
+   "label": "96.6% exact interval"
+  },
+  "jump|B/primary|dz_mean/trunkLean": {
+   "method": "student_t",
+   "null_coverage": 0.9525,
+   "null_mc_se": 0.0033631737243264726,
+   "positive_control_coverage": 0.9585,
+   "label": "95% CI"
+  },
+  "jump|B/primary|dz2_mean/trunkLean": {
+   "method": "student_t",
+   "null_coverage": 0.94525,
+   "null_mc_se": 0.0035969583504677936,
+   "positive_control_coverage": 0.96875,
+   "label": "95% CI"
+  },
+  "jump|B/primary|delta_mean/landingKneeFlex": {
+   "method": "student_t",
+   "null_coverage": 0.94975,
+   "null_mc_se": 0.0034541618918342556,
+   "positive_control_coverage": 0.95025,
+   "label": "95% CI"
+  },
+  "jump|B/primary|delta_median/landingKneeFlex": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.96625,
+   "null_mc_se": 0.0028552993494553223,
+   "positive_control_coverage": null,
+   "label": "96.6% exact interval"
+  },
+  "jump|B/primary|dz_mean/landingKneeFlex": {
+   "method": "student_t",
+   "null_coverage": 0.95725,
+   "null_mc_se": 0.003198532378294769,
+   "positive_control_coverage": 0.9545,
+   "label": "95% CI"
+  },
+  "jump|B/primary|dz2_mean/landingKneeFlex": {
+   "method": "student_t",
+   "null_coverage": 0.95225,
+   "null_mc_se": 0.0033715700163277035,
+   "positive_control_coverage": 0.9485,
+   "label": "95% CI"
+  },
+  "jump|B/primary|delta_mean/rsiMod": {
+   "method": "student_t",
+   "null_coverage": 0.952,
+   "null_mc_se": 0.0033799408278844187,
+   "positive_control_coverage": 0.956,
+   "label": "95% CI"
+  },
+  "jump|B/primary|delta_median/rsiMod": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.969,
+   "null_mc_se": 0.002740392307681513,
+   "positive_control_coverage": null,
+   "label": "96.6% exact interval"
+  },
+  "jump|B/primary|dz_mean/rsiMod": {
+   "method": "student_t",
+   "null_coverage": 0.956,
+   "null_mc_se": 0.0032428382630035695,
+   "positive_control_coverage": 0.9565,
+   "label": "95% CI"
+  },
+  "jump|B/primary|dz2_mean/rsiMod": {
+   "method": "student_t",
+   "null_coverage": 0.94975,
+   "null_mc_se": 0.0034541618918342556,
+   "positive_control_coverage": 0.9525,
+   "label": "95% CI"
+  },
+  "jump|B/primary|delta_mean/eccentricDuration": {
+   "method": "student_t",
+   "null_coverage": 0.953,
+   "null_mc_se": 0.003346303931205295,
+   "positive_control_coverage": 0.958,
+   "label": "95% CI"
+  },
+  "jump|B/primary|delta_median/eccentricDuration": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.96425,
+   "null_mc_se": 0.002935640368812227,
+   "positive_control_coverage": null,
+   "label": "96.6% exact interval"
+  },
+  "jump|B/primary|dz_mean/eccentricDuration": {
+   "method": "student_t",
+   "null_coverage": 0.94925,
+   "null_mc_se": 0.003470390377896987,
+   "positive_control_coverage": 0.94925,
+   "label": "95% CI"
+  },
+  "jump|B/primary|dz2_mean/eccentricDuration": {
+   "method": "student_t",
+   "null_coverage": 0.94925,
+   "null_mc_se": 0.003470390377896987,
+   "positive_control_coverage": 0.95625,
+   "label": "95% CI"
+  },
+  "jump|B/primary|delta_mean/flightTime": {
+   "method": "student_t",
+   "null_coverage": 0.947,
+   "null_mc_se": 0.003542280338990692,
+   "positive_control_coverage": 0.9485,
+   "label": "95% CI"
+  },
+  "jump|B/primary|delta_median/flightTime": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.997,
+   "null_mc_se": 0.0008647253899360193,
+   "positive_control_coverage": null,
+   "label": "96.6% exact interval"
+  },
+  "jump|B/primary|dz_mean/flightTime": {
+   "method": "student_t",
+   "null_coverage": 0.9505,
+   "null_mc_se": 0.0034296410161998,
+   "positive_control_coverage": 0.959,
+   "label": "95% CI"
+  },
+  "jump|B/primary|dz2_mean/flightTime": {
+   "method": "student_t",
+   "null_coverage": 0.951,
+   "null_mc_se": 0.003413173010557773,
+   "positive_control_coverage": 0.9505,
+   "label": "95% CI"
+  },
+  "jump|B/primary|delta_mean/concentricDuration": {
+   "method": "student_t",
+   "null_coverage": 0.9565,
+   "null_mc_se": 0.0032252034819527276,
+   "positive_control_coverage": 0.958,
+   "label": "95% CI"
+  },
+  "jump|B/primary|delta_median/concentricDuration": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.98525,
+   "null_mc_se": 0.0019060717129740974,
+   "positive_control_coverage": null,
+   "label": "96.6% exact interval"
+  },
+  "jump|B/primary|dz_mean/concentricDuration": {
+   "method": "student_t",
+   "null_coverage": 0.955,
+   "null_mc_se": 0.003277766007511825,
+   "positive_control_coverage": 0.95625,
+   "label": "95% CI"
+  },
+  "jump|B/primary|dz2_mean/concentricDuration": {
+   "method": "student_t",
+   "null_coverage": 0.95175,
+   "null_mc_se": 0.0033882863478460618,
+   "positive_control_coverage": 0.95125,
+   "label": "95% CI"
+  },
+  "jump|B/primary|delta_mean/asymmetry": {
+   "method": "student_t",
+   "null_coverage": 0.9515,
+   "null_mc_se": 0.0033966067626382654,
+   "positive_control_coverage": 0.9545,
+   "label": "95% CI"
+  },
+  "jump|B/primary|delta_median/asymmetry": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.96675,
+   "null_mc_se": 0.0028348032339123646,
+   "positive_control_coverage": null,
+   "label": "96.6% exact interval"
+  },
+  "jump|B/primary|dz_mean/asymmetry": {
+   "method": "student_t",
+   "null_coverage": 0.956,
+   "null_mc_se": 0.0032428382630035695,
+   "positive_control_coverage": 0.94875,
+   "label": "95% CI"
+  },
+  "jump|B/primary|dz2_mean/asymmetry": {
+   "method": "student_t",
+   "null_coverage": 0.95225,
+   "null_mc_se": 0.0033715700163277035,
+   "positive_control_coverage": 0.95125,
+   "label": "95% CI"
+  },
+  "jump|B/primary|personal_rank_mean/S0": {
+   "method": "student_t",
+   "null_coverage": 0.94875,
+   "null_mc_se": 0.0034865254014562986,
+   "positive_control_coverage": 0.95575,
+   "label": "95% CI"
+  },
+  "jump|B/primary|personal_rank_median/S0": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.96825,
+   "null_mc_se": 0.0027722706172017167,
+   "positive_control_coverage": null,
+   "label": "96.6% exact interval"
+  },
+  "jump|B/primary|personal_rank_share1/S0": {
+   "method": "wilson",
+   "null_coverage": 0.954,
+   "null_mc_se": 0.003312249990565327,
+   "positive_control_coverage": 0.95625,
+   "label": "95% CI"
+  },
+  "jump|B/primary|personal_true_mean/S0": {
+   "method": "student_t",
+   "null_coverage": 0.9655,
+   "null_mc_se": 0.0028857299769728968,
+   "positive_control_coverage": 0.959,
+   "label": "95% CI"
+  },
+  "jump|B/primary|personal_rank_mean/S-P2": {
+   "method": "student_t",
+   "null_coverage": 0.949,
+   "null_mc_se": 0.003478469491026191,
+   "positive_control_coverage": 0.96,
+   "label": "95% CI"
+  },
+  "jump|B/primary|personal_rank_median/S-P2": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.9685,
+   "null_mc_se": 0.002761691058029481,
+   "positive_control_coverage": null,
+   "label": "96.6% exact interval"
+  },
+  "jump|B/primary|personal_rank_share1/S-P2": {
+   "method": "wilson",
+   "null_coverage": 0.965,
+   "null_mc_se": 0.0029058131392090594,
+   "positive_control_coverage": 0.963,
+   "label": "95% CI"
+  },
+  "jump|B/primary|personal_true_mean/S-P2": {
+   "method": "student_t",
+   "null_coverage": 0.9695,
+   "null_mc_se": 0.0027189037312858274,
+   "positive_control_coverage": 0.96125,
+   "label": "95% CI"
+  },
+  "jump|B/primary|personal_rank_mean/S-P3": {
+   "method": "student_t",
+   "null_coverage": 0.94475,
+   "null_mc_se": 0.003612389704198594,
+   "positive_control_coverage": 0.961,
+   "label": "95% CI"
+  },
+  "jump|B/primary|personal_rank_median/S-P3": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.9635,
+   "null_mc_se": 0.0029651201493362785,
+   "positive_control_coverage": null,
+   "label": "96.6% exact interval"
+  },
+  "jump|B/primary|personal_rank_share1/S-P3": {
+   "method": "wilson",
+   "null_coverage": 0.96675,
+   "null_mc_se": 0.0028348032339123646,
+   "positive_control_coverage": 0.9665,
+   "label": "95% CI"
+  },
+  "jump|B/primary|personal_true_mean/S-P3": {
+   "method": "student_t",
+   "null_coverage": 0.967,
+   "null_mc_se": 0.0028244911046062804,
+   "positive_control_coverage": 0.95325,
+   "label": "95% CI"
+  },
+  "jump|B/primary|personal_rank_mean/S-P2P3": {
+   "method": "student_t",
+   "null_coverage": 0.949,
+   "null_mc_se": 0.003478469491026191,
+   "positive_control_coverage": 0.959,
+   "label": "95% CI"
+  },
+  "jump|B/primary|personal_rank_median/S-P2P3": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.9655,
+   "null_mc_se": 0.0028857299769728968,
+   "positive_control_coverage": null,
+   "label": "96.6% exact interval"
+  },
+  "jump|B/primary|personal_rank_share1/S-P2P3": {
+   "method": "wilson",
+   "null_coverage": 0.9605,
+   "null_mc_se": 0.0030797625720175243,
+   "positive_control_coverage": 0.9595,
+   "label": "95% CI"
+  },
+  "jump|B/primary|personal_true_mean/S-P2P3": {
+   "method": "student_t",
+   "null_coverage": 0.9735,
+   "null_mc_se": 0.0025395742753461636,
+   "positive_control_coverage": 0.9595,
+   "label": "95% CI"
+  },
+  "jump|B/primary|personal_rank_mean/S-valid": {
+   "method": "student_t",
+   "null_coverage": 0.9495,
+   "null_mc_se": 0.003462287899640929,
+   "positive_control_coverage": 0.961,
+   "label": "95% CI"
+  },
+  "jump|B/primary|personal_rank_median/S-valid": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.9635,
+   "null_mc_se": 0.0029651201493362785,
+   "positive_control_coverage": null,
+   "label": "96.6% exact interval"
+  },
+  "jump|B/primary|personal_rank_share1/S-valid": {
+   "method": "wilson",
+   "null_coverage": 0.962,
+   "null_mc_se": 0.003023077901741867,
+   "positive_control_coverage": 0.97725,
+   "label": "95% CI"
+  },
+  "jump|B/primary|personal_true_mean/S-valid": {
+   "method": "student_t",
+   "null_coverage": 0.968,
+   "null_mc_se": 0.0027828043409481753,
+   "positive_control_coverage": 0.95975,
+   "label": "95% CI"
+  },
+  "jump|B/same_participants|delta_mean/jumpHeight": {
+   "method": "student_t",
+   "null_coverage": 0.94775,
+   "null_mc_se": 0.0035185201967588594,
+   "positive_control_coverage": 0.94925,
+   "label": "95% CI"
+  },
+  "jump|B/same_participants|delta_median/jumpHeight": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.9545,
+   "null_mc_se": 0.003295062594246124,
+   "positive_control_coverage": 0.96125,
+   "label": "95.7% exact interval"
+  },
+  "jump|B/same_participants|dz_mean/jumpHeight": {
+   "method": "student_t",
+   "null_coverage": 0.9495,
+   "null_mc_se": 0.003462287899640929,
+   "positive_control_coverage": 0.9585,
+   "label": "95% CI"
+  },
+  "jump|B/same_participants|dz2_mean/jumpHeight": {
+   "method": "student_t",
+   "null_coverage": 0.94925,
+   "null_mc_se": 0.003470390377896987,
+   "positive_control_coverage": 0.9595,
+   "label": "95% CI"
+  },
+  "jump|B/same_participants|delta_mean/countermovementDepth": {
+   "method": "student_t",
+   "null_coverage": 0.9435,
+   "null_mc_se": 0.003650607826102387,
+   "positive_control_coverage": 0.95175,
+   "label": "95% CI"
+  },
+  "jump|B/same_participants|delta_median/countermovementDepth": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.954,
+   "null_mc_se": 0.003312249990565327,
+   "positive_control_coverage": null,
+   "label": "95.7% exact interval"
+  },
+  "jump|B/same_participants|dz_mean/countermovementDepth": {
+   "method": "student_t",
+   "null_coverage": 0.9535,
+   "null_mc_se": 0.0033293298875299213,
+   "positive_control_coverage": 0.956,
+   "label": "95% CI"
+  },
+  "jump|B/same_participants|dz2_mean/countermovementDepth": {
+   "method": "student_t",
+   "null_coverage": 0.953,
+   "null_mc_se": 0.003346303931205295,
+   "positive_control_coverage": 0.945,
+   "label": "95% CI"
+  },
+  "jump|B/same_participants|delta_mean/trunkLean": {
+   "method": "student_t",
+   "null_coverage": 0.9485,
+   "null_mc_se": 0.0034945582696529753,
+   "positive_control_coverage": 0.95225,
+   "label": "95% CI"
+  },
+  "jump|B/same_participants|delta_median/trunkLean": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.95425,
+   "null_mc_se": 0.003303669834441691,
+   "positive_control_coverage": 0.95775,
+   "label": "95.7% exact interval"
+  },
+  "jump|B/same_participants|dz_mean/trunkLean": {
+   "method": "student_t",
+   "null_coverage": 0.9505,
+   "null_mc_se": 0.0034296410161998,
+   "positive_control_coverage": 0.9575,
+   "label": "95% CI"
+  },
+  "jump|B/same_participants|dz2_mean/trunkLean": {
+   "method": "student_t",
+   "null_coverage": 0.94725,
+   "null_mc_se": 0.0035343824602043273,
+   "positive_control_coverage": 0.96175,
+   "label": "95% CI"
+  },
+  "jump|B/same_participants|delta_mean/landingKneeFlex": {
+   "method": "student_t",
+   "null_coverage": 0.94875,
+   "null_mc_se": 0.0034865254014562986,
+   "positive_control_coverage": 0.94525,
+   "label": "95% CI"
+  },
+  "jump|B/same_participants|delta_median/landingKneeFlex": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.959,
+   "null_mc_se": 0.0031352432122564284,
+   "positive_control_coverage": null,
+   "label": "95.7% exact interval"
+  },
+  "jump|B/same_participants|dz_mean/landingKneeFlex": {
+   "method": "student_t",
+   "null_coverage": 0.94725,
+   "null_mc_se": 0.0035343824602043273,
+   "positive_control_coverage": 0.9415,
+   "label": "95% CI"
+  },
+  "jump|B/same_participants|dz2_mean/landingKneeFlex": {
+   "method": "student_t",
+   "null_coverage": 0.957,
+   "null_mc_se": 0.0032074522599720807,
+   "positive_control_coverage": 0.9525,
+   "label": "95% CI"
+  },
+  "jump|B/same_participants|delta_mean/rsiMod": {
+   "method": "student_t",
+   "null_coverage": 0.94825,
+   "null_mc_se": 0.0035025682541529424,
+   "positive_control_coverage": 0.94925,
+   "label": "95% CI"
+  },
+  "jump|B/same_participants|delta_median/rsiMod": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.958,
+   "null_mc_se": 0.0031715926598477316,
+   "positive_control_coverage": null,
+   "label": "95.7% exact interval"
+  },
+  "jump|B/same_participants|dz_mean/rsiMod": {
+   "method": "student_t",
+   "null_coverage": 0.9525,
+   "null_mc_se": 0.0033631737243264726,
+   "positive_control_coverage": 0.95275,
+   "label": "95% CI"
+  },
+  "jump|B/same_participants|dz2_mean/rsiMod": {
+   "method": "student_t",
+   "null_coverage": 0.952,
+   "null_mc_se": 0.0033799408278844187,
+   "positive_control_coverage": 0.95125,
+   "label": "95% CI"
+  },
+  "jump|B/same_participants|delta_mean/eccentricDuration": {
+   "method": "student_t",
+   "null_coverage": 0.9565,
+   "null_mc_se": 0.0032252034819527276,
+   "positive_control_coverage": 0.9595,
+   "label": "95% CI"
+  },
+  "jump|B/same_participants|delta_median/eccentricDuration": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.9585,
+   "null_mc_se": 0.00315348022032801,
+   "positive_control_coverage": null,
+   "label": "95.7% exact interval"
+  },
+  "jump|B/same_participants|dz_mean/eccentricDuration": {
+   "method": "student_t",
+   "null_coverage": 0.9465,
+   "null_mc_se": 0.0035580103288214327,
+   "positive_control_coverage": 0.94875,
+   "label": "95% CI"
+  },
+  "jump|B/same_participants|dz2_mean/eccentricDuration": {
+   "method": "student_t",
+   "null_coverage": 0.95475,
+   "null_mc_se": 0.0032864280571769716,
+   "positive_control_coverage": 0.9525,
+   "label": "95% CI"
+  },
+  "jump|B/same_participants|delta_mean/flightTime": {
+   "method": "student_t",
+   "null_coverage": 0.951,
+   "null_mc_se": 0.003413173010557773,
+   "positive_control_coverage": 0.9525,
+   "label": "95% CI"
+  },
+  "jump|B/same_participants|delta_median/flightTime": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.994,
+   "null_mc_se": 0.0012210651088291734,
+   "positive_control_coverage": null,
+   "label": "95.7% exact interval"
+  },
+  "jump|B/same_participants|dz_mean/flightTime": {
+   "method": "student_t",
+   "null_coverage": 0.94675,
+   "null_mc_se": 0.0035501562465615516,
+   "positive_control_coverage": 0.95575,
+   "label": "95% CI"
+  },
+  "jump|B/same_participants|dz2_mean/flightTime": {
+   "method": "student_t",
+   "null_coverage": 0.95575,
+   "null_mc_se": 0.0032516125807051494,
+   "positive_control_coverage": 0.946,
+   "label": "95% CI"
+  },
+  "jump|B/same_participants|delta_mean/concentricDuration": {
+   "method": "student_t",
+   "null_coverage": 0.9535,
+   "null_mc_se": 0.0033293298875299213,
+   "positive_control_coverage": 0.9605,
+   "label": "95% CI"
+  },
+  "jump|B/same_participants|delta_median/concentricDuration": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.97775,
+   "null_mc_se": 0.002332109426034721,
+   "positive_control_coverage": null,
+   "label": "95.7% exact interval"
+  },
+  "jump|B/same_participants|dz_mean/concentricDuration": {
+   "method": "student_t",
+   "null_coverage": 0.9505,
+   "null_mc_se": 0.0034296410161998,
+   "positive_control_coverage": 0.94925,
+   "label": "95% CI"
+  },
+  "jump|B/same_participants|dz2_mean/concentricDuration": {
+   "method": "student_t",
+   "null_coverage": 0.95075,
+   "null_mc_se": 0.003421419204803762,
+   "positive_control_coverage": 0.95,
+   "label": "95% CI"
+  },
+  "jump|B/same_participants|delta_mean/asymmetry": {
+   "method": "student_t",
+   "null_coverage": 0.94775,
+   "null_mc_se": 0.0035185201967588594,
+   "positive_control_coverage": 0.94675,
+   "label": "95% CI"
+  },
+  "jump|B/same_participants|delta_median/asymmetry": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.95725,
+   "null_mc_se": 0.003198532378294769,
+   "positive_control_coverage": null,
+   "label": "95.7% exact interval"
+  },
+  "jump|B/same_participants|dz_mean/asymmetry": {
+   "method": "student_t",
+   "null_coverage": 0.9455,
+   "null_mc_se": 0.0035892112643309253,
+   "positive_control_coverage": 0.95375,
+   "label": "95% CI"
+  },
+  "jump|B/same_participants|dz2_mean/asymmetry": {
+   "method": "student_t",
+   "null_coverage": 0.95025,
+   "null_mc_se": 0.003437838619685338,
+   "positive_control_coverage": 0.95625,
+   "label": "95% CI"
+  },
+  "jump|B/same_participants|personal_rank_mean/S0": {
+   "method": "student_t",
+   "null_coverage": 0.95525,
+   "null_mc_se": 0.0032690762265508567,
+   "positive_control_coverage": 0.95575,
+   "label": "95% CI"
+  },
+  "jump|B/same_participants|personal_rank_median/S0": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.95775,
+   "null_mc_se": 0.003180602832011567,
+   "positive_control_coverage": null,
+   "label": "95.7% exact interval"
+  },
+  "jump|B/same_participants|personal_rank_share1/S0": {
+   "method": "wilson",
+   "null_coverage": 0.942,
+   "null_mc_se": 0.0036958084365940843,
+   "positive_control_coverage": 0.9705,
+   "label": "95% CI"
+  },
+  "jump|B/same_participants|personal_true_mean/S0": {
+   "method": "student_t",
+   "null_coverage": 0.961,
+   "null_mc_se": 0.0030610047370103837,
+   "positive_control_coverage": 0.959,
+   "label": "95% CI"
+  },
+  "jump|B/same_participants|personal_rank_mean/S-P2": {
+   "method": "student_t",
+   "null_coverage": 0.95375,
+   "null_mc_se": 0.0033208032725531938,
+   "positive_control_coverage": 0.956,
+   "label": "95% CI"
+  },
+  "jump|B/same_participants|personal_rank_median/S-P2": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.9595,
+   "null_mc_se": 0.0031168794490643997,
+   "positive_control_coverage": null,
+   "label": "95.7% exact interval"
+  },
+  "jump|B/same_participants|personal_rank_share1/S-P2": {
+   "method": "wilson",
+   "null_coverage": 0.94275,
+   "null_mc_se": 0.0036732967991982357,
+   "positive_control_coverage": 0.96975,
+   "label": "95% CI"
+  },
+  "jump|B/same_participants|personal_true_mean/S-P2": {
+   "method": "student_t",
+   "null_coverage": 0.96275,
+   "null_mc_se": 0.002994262743147301,
+   "positive_control_coverage": 0.95875,
+   "label": "95% CI"
+  },
+  "jump|B/same_participants|personal_rank_mean/S-P3": {
+   "method": "student_t",
+   "null_coverage": 0.95125,
+   "null_mc_se": 0.003404902256306338,
+   "positive_control_coverage": 0.9575,
+   "label": "95% CI"
+  },
+  "jump|B/same_participants|personal_rank_median/S-P3": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.95575,
+   "null_mc_se": 0.0032516125807051494,
+   "positive_control_coverage": null,
+   "label": "95.7% exact interval"
+  },
+  "jump|B/same_participants|personal_rank_share1/S-P3": {
+   "method": "wilson",
+   "null_coverage": 0.93475,
+   "null_mc_se": 0.0039048827607240663,
+   "positive_control_coverage": 0.9715,
+   "label": "approximate interval (calibrated coverage 93%)"
+  },
+  "jump|B/same_participants|personal_true_mean/S-P3": {
+   "method": "student_t",
+   "null_coverage": 0.95875,
+   "null_mc_se": 0.0031443774224796874,
+   "positive_control_coverage": 0.958,
+   "label": "95% CI"
+  },
+  "jump|B/same_participants|personal_rank_mean/S-P2P3": {
+   "method": "student_t",
+   "null_coverage": 0.94825,
+   "null_mc_se": 0.0035025682541529424,
+   "positive_control_coverage": 0.9555,
+   "label": "95% CI"
+  },
+  "jump|B/same_participants|personal_rank_median/S-P2P3": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.9505,
+   "null_mc_se": 0.0034296410161998,
+   "positive_control_coverage": null,
+   "label": "95.7% exact interval"
+  },
+  "jump|B/same_participants|personal_rank_share1/S-P2P3": {
+   "method": "wilson",
+   "null_coverage": 0.94075,
+   "null_mc_se": 0.003732942455356097,
+   "positive_control_coverage": 0.97075,
+   "label": "95% CI"
+  },
+  "jump|B/same_participants|personal_true_mean/S-P2P3": {
+   "method": "student_t",
+   "null_coverage": 0.96025,
+   "null_mc_se": 0.003089091189168748,
+   "positive_control_coverage": 0.9655,
+   "label": "95% CI"
+  },
+  "jump|B/same_participants|personal_rank_mean/S-valid": {
+   "method": "student_t",
+   "null_coverage": 0.94925,
+   "null_mc_se": 0.003470390377896987,
+   "positive_control_coverage": 0.9505,
+   "label": "95% CI"
+  },
+  "jump|B/same_participants|personal_rank_median/S-valid": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.9545,
+   "null_mc_se": 0.003295062594246124,
+   "positive_control_coverage": null,
+   "label": "95.7% exact interval"
+  },
+  "jump|B/same_participants|personal_rank_share1/S-valid": {
+   "method": "wilson",
+   "null_coverage": 0.93775,
+   "null_mc_se": 0.0038201746524210126,
+   "positive_control_coverage": 0.96,
+   "label": "95% CI"
+  },
+  "jump|B/same_participants|personal_true_mean/S-valid": {
+   "method": "student_t",
+   "null_coverage": 0.96625,
+   "null_mc_se": 0.0028552993494553223,
+   "positive_control_coverage": 0.95675,
+   "label": "95% CI"
+  },
+  "jump|B/at_least_2_plus_2|delta_mean/jumpHeight": {
+   "method": "student_t",
+   "null_coverage": 0.94475,
+   "null_mc_se": 0.003612389704198594,
+   "positive_control_coverage": 0.95475,
+   "label": "95% CI"
+  },
+  "jump|B/at_least_2_plus_2|delta_median/jumpHeight": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.95975,
+   "null_mc_se": 0.003107649332695052,
+   "positive_control_coverage": 0.962,
+   "label": "96.2% exact interval"
+  },
+  "jump|B/at_least_2_plus_2|delta_mean/countermovementDepth": {
+   "method": "student_t",
+   "null_coverage": 0.94725,
+   "null_mc_se": 0.0035343824602043273,
+   "positive_control_coverage": 0.9505,
+   "label": "95% CI"
+  },
+  "jump|B/at_least_2_plus_2|delta_median/countermovementDepth": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.96125,
+   "null_mc_se": 0.003051574900768452,
+   "positive_control_coverage": null,
+   "label": "96.2% exact interval"
+  },
+  "jump|B/at_least_2_plus_2|delta_mean/trunkLean": {
+   "method": "student_t",
+   "null_coverage": 0.949,
+   "null_mc_se": 0.003478469491026191,
+   "positive_control_coverage": 0.951,
+   "label": "95% CI"
+  },
+  "jump|B/at_least_2_plus_2|delta_median/trunkLean": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.964,
+   "null_mc_se": 0.0029455050500720595,
+   "positive_control_coverage": 0.9625,
+   "label": "96.2% exact interval"
+  },
+  "jump|B/at_least_2_plus_2|delta_mean/landingKneeFlex": {
+   "method": "student_t",
+   "null_coverage": 0.95025,
+   "null_mc_se": 0.003437838619685338,
+   "positive_control_coverage": 0.95425,
+   "label": "95% CI"
+  },
+  "jump|B/at_least_2_plus_2|delta_median/landingKneeFlex": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.95875,
+   "null_mc_se": 0.0031443774224796874,
+   "positive_control_coverage": null,
+   "label": "96.2% exact interval"
+  },
+  "jump|B/at_least_2_plus_2|delta_mean/rsiMod": {
+   "method": "student_t",
+   "null_coverage": 0.9515,
+   "null_mc_se": 0.0033966067626382654,
+   "positive_control_coverage": 0.9465,
+   "label": "95% CI"
+  },
+  "jump|B/at_least_2_plus_2|delta_median/rsiMod": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.95625,
+   "null_mc_se": 0.0032340353082488124,
+   "positive_control_coverage": null,
+   "label": "96.2% exact interval"
+  },
+  "jump|B/at_least_2_plus_2|delta_mean/eccentricDuration": {
+   "method": "student_t",
+   "null_coverage": 0.957,
+   "null_mc_se": 0.0032074522599720807,
+   "positive_control_coverage": 0.95575,
+   "label": "95% CI"
+  },
+  "jump|B/at_least_2_plus_2|delta_median/eccentricDuration": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.95975,
+   "null_mc_se": 0.003107649332695052,
+   "positive_control_coverage": null,
+   "label": "96.2% exact interval"
+  },
+  "jump|B/at_least_2_plus_2|delta_mean/flightTime": {
+   "method": "student_t",
+   "null_coverage": 0.95325,
+   "null_mc_se": 0.0033378300398612254,
+   "positive_control_coverage": 0.94475,
+   "label": "95% CI"
+  },
+  "jump|B/at_least_2_plus_2|delta_median/flightTime": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.99725,
+   "null_mc_se": 0.0008280153229258548,
+   "positive_control_coverage": null,
+   "label": "96.2% exact interval"
+  },
+  "jump|B/at_least_2_plus_2|delta_mean/concentricDuration": {
+   "method": "student_t",
+   "null_coverage": 0.95625,
+   "null_mc_se": 0.0032340353082488124,
+   "positive_control_coverage": 0.9595,
+   "label": "95% CI"
+  },
+  "jump|B/at_least_2_plus_2|delta_median/concentricDuration": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.98325,
+   "null_mc_se": 0.002029127737477365,
+   "positive_control_coverage": null,
+   "label": "96.2% exact interval"
+  },
+  "jump|B/at_least_2_plus_2|delta_mean/asymmetry": {
+   "method": "student_t",
+   "null_coverage": 0.96,
+   "null_mc_se": 0.003098386676965935,
+   "positive_control_coverage": 0.95075,
+   "label": "95% CI"
+  },
+  "jump|B/at_least_2_plus_2|delta_median/asymmetry": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.9605,
+   "null_mc_se": 0.0030797625720175243,
+   "positive_control_coverage": null,
+   "label": "96.2% exact interval"
+  },
+  "jump|B/at_least_1_plus_1|delta_mean/jumpHeight": {
+   "method": "student_t",
+   "null_coverage": 0.9535,
+   "null_mc_se": 0.0033293298875299213,
+   "positive_control_coverage": 0.951,
+   "label": "95% CI"
+  },
+  "jump|B/at_least_1_plus_1|delta_median/jumpHeight": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.971,
+   "null_mc_se": 0.002653252720718478,
+   "positive_control_coverage": 0.96925,
+   "label": "96.8% exact interval"
+  },
+  "jump|B/at_least_1_plus_1|delta_mean/countermovementDepth": {
+   "method": "student_t",
+   "null_coverage": 0.95125,
+   "null_mc_se": 0.003404902256306338,
+   "positive_control_coverage": 0.9555,
+   "label": "95% CI"
+  },
+  "jump|B/at_least_1_plus_1|delta_median/countermovementDepth": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.96575,
+   "null_mc_se": 0.002875627648879458,
+   "positive_control_coverage": null,
+   "label": "96.8% exact interval"
+  },
+  "jump|B/at_least_1_plus_1|delta_mean/trunkLean": {
+   "method": "student_t",
+   "null_coverage": 0.9535,
+   "null_mc_se": 0.0033293298875299213,
+   "positive_control_coverage": 0.95575,
+   "label": "95% CI"
+  },
+  "jump|B/at_least_1_plus_1|delta_median/trunkLean": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.9695,
+   "null_mc_se": 0.0027189037312858274,
+   "positive_control_coverage": 0.9725,
+   "label": "96.8% exact interval"
+  },
+  "jump|B/at_least_1_plus_1|delta_mean/landingKneeFlex": {
+   "method": "student_t",
+   "null_coverage": 0.961,
+   "null_mc_se": 0.0030610047370103837,
+   "positive_control_coverage": 0.95925,
+   "label": "95% CI"
+  },
+  "jump|B/at_least_1_plus_1|delta_median/landingKneeFlex": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.96975,
+   "null_mc_se": 0.0027080868477580254,
+   "positive_control_coverage": null,
+   "label": "96.8% exact interval"
+  },
+  "jump|B/at_least_1_plus_1|delta_mean/rsiMod": {
+   "method": "student_t",
+   "null_coverage": 0.9535,
+   "null_mc_se": 0.0033293298875299213,
+   "positive_control_coverage": 0.94825,
+   "label": "95% CI"
+  },
+  "jump|B/at_least_1_plus_1|delta_median/rsiMod": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.97025,
+   "null_mc_se": 0.002686304966864338,
+   "positive_control_coverage": null,
+   "label": "96.8% exact interval"
+  },
+  "jump|B/at_least_1_plus_1|delta_mean/eccentricDuration": {
+   "method": "student_t",
+   "null_coverage": 0.94925,
+   "null_mc_se": 0.003470390377896987,
+   "positive_control_coverage": 0.9505,
+   "label": "95% CI"
+  },
+  "jump|B/at_least_1_plus_1|delta_median/eccentricDuration": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.97,
+   "null_mc_se": 0.0026972207918522367,
+   "positive_control_coverage": null,
+   "label": "96.8% exact interval"
+  },
+  "jump|B/at_least_1_plus_1|delta_mean/flightTime": {
+   "method": "student_t",
+   "null_coverage": 0.9505,
+   "null_mc_se": 0.0034296410161998,
+   "positive_control_coverage": 0.9505,
+   "label": "95% CI"
+  },
+  "jump|B/at_least_1_plus_1|delta_median/flightTime": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.996,
+   "null_mc_se": 0.0009979979959899722,
+   "positive_control_coverage": null,
+   "label": "96.8% exact interval"
+  },
+  "jump|B/at_least_1_plus_1|delta_mean/concentricDuration": {
+   "method": "student_t",
+   "null_coverage": 0.95475,
+   "null_mc_se": 0.0032864280571769716,
+   "positive_control_coverage": 0.959,
+   "label": "95% CI"
+  },
+  "jump|B/at_least_1_plus_1|delta_median/concentricDuration": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.98525,
+   "null_mc_se": 0.0019060717129740974,
+   "positive_control_coverage": null,
+   "label": "96.8% exact interval"
+  },
+  "jump|B/at_least_1_plus_1|delta_mean/asymmetry": {
+   "method": "student_t",
+   "null_coverage": 0.9565,
+   "null_mc_se": 0.0032252034819527276,
+   "positive_control_coverage": 0.95125,
+   "label": "95% CI"
+  },
+  "jump|B/at_least_1_plus_1|delta_median/asymmetry": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.9635,
+   "null_mc_se": 0.0029651201493362785,
+   "positive_control_coverage": null,
+   "label": "96.8% exact interval"
+  },
+  "jump|B/side_3_plus_3|delta_mean/jumpHeight": {
+   "method": "student_t",
+   "null_coverage": 0.947,
+   "null_mc_se": 0.003542280338990692,
+   "positive_control_coverage": 0.9515,
+   "label": "95% CI"
+  },
+  "jump|B/side_3_plus_3|delta_median/jumpHeight": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.9525,
+   "null_mc_se": 0.0033631737243264726,
+   "positive_control_coverage": 0.95025,
+   "label": "95.3% exact interval"
+  },
+  "jump|B/side_3_plus_3|dz_mean/jumpHeight": {
+   "method": "student_t",
+   "null_coverage": 0.95125,
+   "null_mc_se": 0.003404902256306338,
+   "positive_control_coverage": 0.95875,
+   "label": "95% CI"
+  },
+  "jump|B/side_3_plus_3|dz2_mean/jumpHeight": {
+   "method": "student_t",
+   "null_coverage": 0.943,
+   "null_mc_se": 0.003665753674212168,
+   "positive_control_coverage": 0.965,
+   "label": "95% CI"
+  },
+  "jump|B/side_3_plus_3|delta_mean/countermovementDepth": {
+   "method": "student_t",
+   "null_coverage": 0.947,
+   "null_mc_se": 0.003542280338990692,
+   "positive_control_coverage": 0.948,
+   "label": "95% CI"
+  },
+  "jump|B/side_3_plus_3|delta_median/countermovementDepth": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.951,
+   "null_mc_se": 0.003413173010557773,
+   "positive_control_coverage": null,
+   "label": "95.3% exact interval"
+  },
+  "jump|B/side_3_plus_3|dz_mean/countermovementDepth": {
+   "method": "student_t",
+   "null_coverage": 0.9495,
+   "null_mc_se": 0.003462287899640929,
+   "positive_control_coverage": 0.95275,
+   "label": "95% CI"
+  },
+  "jump|B/side_3_plus_3|dz2_mean/countermovementDepth": {
+   "method": "student_t",
+   "null_coverage": 0.95225,
+   "null_mc_se": 0.0033715700163277035,
+   "positive_control_coverage": 0.955,
+   "label": "95% CI"
+  },
+  "jump|B/side_3_plus_3|delta_mean/trunkLean": {
+   "method": "student_t",
+   "null_coverage": 0.94625,
+   "null_mc_se": 0.003565842729986839,
+   "positive_control_coverage": 0.94775,
+   "label": "95% CI"
+  },
+  "jump|B/side_3_plus_3|delta_median/trunkLean": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.9535,
+   "null_mc_se": 0.0033293298875299213,
+   "positive_control_coverage": 0.952,
+   "label": "95.3% exact interval"
+  },
+  "jump|B/side_3_plus_3|dz_mean/trunkLean": {
+   "method": "student_t",
+   "null_coverage": 0.9475,
+   "null_mc_se": 0.0035264624625820132,
+   "positive_control_coverage": 0.95625,
+   "label": "95% CI"
+  },
+  "jump|B/side_3_plus_3|dz2_mean/trunkLean": {
+   "method": "student_t",
+   "null_coverage": 0.955,
+   "null_mc_se": 0.003277766007511825,
+   "positive_control_coverage": 0.96825,
+   "label": "95% CI"
+  },
+  "jump|B/side_3_plus_3|delta_mean/landingKneeFlex": {
+   "method": "student_t",
+   "null_coverage": 0.951,
+   "null_mc_se": 0.003413173010557773,
+   "positive_control_coverage": 0.95,
+   "label": "95% CI"
+  },
+  "jump|B/side_3_plus_3|delta_median/landingKneeFlex": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.95925,
+   "null_mc_se": 0.0031260773143030212,
+   "positive_control_coverage": null,
+   "label": "95.3% exact interval"
+  },
+  "jump|B/side_3_plus_3|dz_mean/landingKneeFlex": {
+   "method": "student_t",
+   "null_coverage": 0.95475,
+   "null_mc_se": 0.0032864280571769716,
+   "positive_control_coverage": 0.95025,
+   "label": "95% CI"
+  },
+  "jump|B/side_3_plus_3|dz2_mean/landingKneeFlex": {
+   "method": "student_t",
+   "null_coverage": 0.95425,
+   "null_mc_se": 0.003303669834441691,
+   "positive_control_coverage": 0.95,
+   "label": "95% CI"
+  },
+  "jump|B/side_3_plus_3|delta_mean/rsiMod": {
+   "method": "student_t",
+   "null_coverage": 0.95125,
+   "null_mc_se": 0.003404902256306338,
+   "positive_control_coverage": 0.95725,
+   "label": "95% CI"
+  },
+  "jump|B/side_3_plus_3|delta_median/rsiMod": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.9475,
+   "null_mc_se": 0.0035264624625820132,
+   "positive_control_coverage": null,
+   "label": "95.3% exact interval"
+  },
+  "jump|B/side_3_plus_3|dz_mean/rsiMod": {
+   "method": "student_t",
+   "null_coverage": 0.9475,
+   "null_mc_se": 0.0035264624625820132,
+   "positive_control_coverage": 0.9485,
+   "label": "95% CI"
+  },
+  "jump|B/side_3_plus_3|dz2_mean/rsiMod": {
+   "method": "student_t",
+   "null_coverage": 0.953,
+   "null_mc_se": 0.003346303931205295,
+   "positive_control_coverage": 0.946,
+   "label": "95% CI"
+  },
+  "jump|B/side_3_plus_3|delta_mean/eccentricDuration": {
+   "method": "student_t",
+   "null_coverage": 0.96175,
+   "null_mc_se": 0.00303261180750191,
+   "positive_control_coverage": 0.95425,
+   "label": "95% CI"
+  },
+  "jump|B/side_3_plus_3|delta_median/eccentricDuration": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.95575,
+   "null_mc_se": 0.0032516125807051494,
+   "positive_control_coverage": null,
+   "label": "95.3% exact interval"
+  },
+  "jump|B/side_3_plus_3|dz_mean/eccentricDuration": {
+   "method": "student_t",
+   "null_coverage": 0.94925,
+   "null_mc_se": 0.003470390377896987,
+   "positive_control_coverage": 0.953,
+   "label": "95% CI"
+  },
+  "jump|B/side_3_plus_3|dz2_mean/eccentricDuration": {
+   "method": "student_t",
+   "null_coverage": 0.951,
+   "null_mc_se": 0.003413173010557773,
+   "positive_control_coverage": 0.956,
+   "label": "95% CI"
+  },
+  "jump|B/side_3_plus_3|delta_mean/flightTime": {
+   "method": "student_t",
+   "null_coverage": 0.9595,
+   "null_mc_se": 0.0031168794490643997,
+   "positive_control_coverage": 0.95975,
+   "label": "95% CI"
+  },
+  "jump|B/side_3_plus_3|delta_median/flightTime": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.9955,
+   "null_mc_se": 0.0010582709955394164,
+   "positive_control_coverage": null,
+   "label": "95.3% exact interval"
+  },
+  "jump|B/side_3_plus_3|dz_mean/flightTime": {
+   "method": "student_t",
+   "null_coverage": 0.94575,
+   "null_mc_se": 0.0035814430576235614,
+   "positive_control_coverage": 0.941,
+   "label": "95% CI"
+  },
+  "jump|B/side_3_plus_3|dz2_mean/flightTime": {
+   "method": "student_t",
+   "null_coverage": 0.94675,
+   "null_mc_se": 0.0035501562465615516,
+   "positive_control_coverage": 0.9485,
+   "label": "95% CI"
+  },
+  "jump|B/side_3_plus_3|delta_mean/concentricDuration": {
+   "method": "student_t",
+   "null_coverage": 0.95875,
+   "null_mc_se": 0.0031443774224796874,
+   "positive_control_coverage": 0.96025,
+   "label": "95% CI"
+  },
+  "jump|B/side_3_plus_3|delta_median/concentricDuration": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.98,
+   "null_mc_se": 0.0022135943621178662,
+   "positive_control_coverage": null,
+   "label": "95.3% exact interval"
+  },
+  "jump|B/side_3_plus_3|dz_mean/concentricDuration": {
+   "method": "student_t",
+   "null_coverage": 0.95925,
+   "null_mc_se": 0.0031260773143030212,
+   "positive_control_coverage": 0.95925,
+   "label": "95% CI"
+  },
+  "jump|B/side_3_plus_3|dz2_mean/concentricDuration": {
+   "method": "student_t",
+   "null_coverage": 0.94875,
+   "null_mc_se": 0.0034865254014562986,
+   "positive_control_coverage": 0.95575,
+   "label": "95% CI"
+  },
+  "jump|B/side_3_plus_3|delta_mean/asymmetry": {
+   "method": "student_t",
+   "null_coverage": 0.96775,
+   "null_mc_se": 0.0027932927478157388,
+   "positive_control_coverage": 0.96625,
+   "label": "95% CI"
+  },
+  "jump|B/side_3_plus_3|delta_median/asymmetry": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.95625,
+   "null_mc_se": 0.0032340353082488124,
+   "positive_control_coverage": null,
+   "label": "95.3% exact interval"
+  },
+  "jump|B/side_3_plus_3|dz_mean/asymmetry": {
+   "method": "student_t",
+   "null_coverage": 0.95175,
+   "null_mc_se": 0.0033882863478460618,
+   "positive_control_coverage": 0.94525,
+   "label": "95% CI"
+  },
+  "jump|B/side_3_plus_3|dz2_mean/asymmetry": {
+   "method": "student_t",
+   "null_coverage": 0.95275,
+   "null_mc_se": 0.0033547517605629186,
+   "positive_control_coverage": 0.95325,
+   "label": "95% CI"
+  },
+  "jump|B/side_3_plus_3|personal_rank_mean/S0": {
+   "method": "student_t",
+   "null_coverage": 0.9525,
+   "null_mc_se": 0.0033631737243264726,
+   "positive_control_coverage": 0.95725,
+   "label": "95% CI"
+  },
+  "jump|B/side_3_plus_3|personal_rank_median/S0": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.95475,
+   "null_mc_se": 0.0032864280571769716,
+   "positive_control_coverage": null,
+   "label": "95.3% exact interval"
+  },
+  "jump|B/side_3_plus_3|personal_rank_share1/S0": {
+   "method": "wilson",
+   "null_coverage": 0.96525,
+   "null_mc_se": 0.0028957916663669,
+   "positive_control_coverage": 0.95975,
+   "label": "95% CI"
+  },
+  "jump|B/side_3_plus_3|personal_true_mean/S0": {
+   "method": "student_t",
+   "null_coverage": 0.9655,
+   "null_mc_se": 0.0028857299769728968,
+   "positive_control_coverage": 0.958,
+   "label": "95% CI"
+  },
+  "jump|B/side_3_plus_3|personal_rank_mean/S-P2": {
+   "method": "student_t",
+   "null_coverage": 0.945,
+   "null_mc_se": 0.003604684452209376,
+   "positive_control_coverage": 0.9585,
+   "label": "95% CI"
+  },
+  "jump|B/side_3_plus_3|personal_rank_median/S-P2": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.95625,
+   "null_mc_se": 0.0032340353082488124,
+   "positive_control_coverage": null,
+   "label": "95.3% exact interval"
+  },
+  "jump|B/side_3_plus_3|personal_rank_share1/S-P2": {
+   "method": "wilson",
+   "null_coverage": 0.9625,
+   "null_mc_se": 0.0030039037101744783,
+   "positive_control_coverage": 0.951,
+   "label": "95% CI"
+  },
+  "jump|B/side_3_plus_3|personal_true_mean/S-P2": {
+   "method": "student_t",
+   "null_coverage": 0.965,
+   "null_mc_se": 0.0029058131392090594,
+   "positive_control_coverage": 0.9575,
+   "label": "95% CI"
+  },
+  "jump|B/side_3_plus_3|personal_rank_mean/S-P3": {
+   "method": "student_t",
+   "null_coverage": 0.94825,
+   "null_mc_se": 0.0035025682541529424,
+   "positive_control_coverage": 0.95275,
+   "label": "95% CI"
+  },
+  "jump|B/side_3_plus_3|personal_rank_median/S-P3": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.95425,
+   "null_mc_se": 0.003303669834441691,
+   "positive_control_coverage": null,
+   "label": "95.3% exact interval"
+  },
+  "jump|B/side_3_plus_3|personal_rank_share1/S-P3": {
+   "method": "wilson",
+   "null_coverage": 0.96725,
+   "null_mc_se": 0.0028141356355015986,
+   "positive_control_coverage": 0.956,
+   "label": "95% CI"
+  },
+  "jump|B/side_3_plus_3|personal_true_mean/S-P3": {
+   "method": "student_t",
+   "null_coverage": 0.96975,
+   "null_mc_se": 0.0027080868477580254,
+   "positive_control_coverage": 0.9605,
+   "label": "95% CI"
+  },
+  "jump|B/side_3_plus_3|personal_rank_mean/S-P2P3": {
+   "method": "student_t",
+   "null_coverage": 0.9465,
+   "null_mc_se": 0.0035580103288214327,
+   "positive_control_coverage": 0.959,
+   "label": "95% CI"
+  },
+  "jump|B/side_3_plus_3|personal_rank_median/S-P2P3": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.952,
+   "null_mc_se": 0.0033799408278844187,
+   "positive_control_coverage": null,
+   "label": "95.3% exact interval"
+  },
+  "jump|B/side_3_plus_3|personal_rank_share1/S-P2P3": {
+   "method": "wilson",
+   "null_coverage": 0.968,
+   "null_mc_se": 0.0027828043409481753,
+   "positive_control_coverage": 0.9495,
+   "label": "95% CI"
+  },
+  "jump|B/side_3_plus_3|personal_true_mean/S-P2P3": {
+   "method": "student_t",
+   "null_coverage": 0.96825,
+   "null_mc_se": 0.0027722706172017167,
+   "positive_control_coverage": 0.95875,
+   "label": "95% CI"
+  },
+  "jump|B/side_3_plus_3|personal_rank_mean/S-valid": {
+   "method": "student_t",
+   "null_coverage": 0.94875,
+   "null_mc_se": 0.0034865254014562986,
+   "positive_control_coverage": 0.952,
+   "label": "95% CI"
+  },
+  "jump|B/side_3_plus_3|personal_rank_median/S-valid": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.95325,
+   "null_mc_se": 0.0033378300398612254,
+   "positive_control_coverage": null,
+   "label": "95.3% exact interval"
+  },
+  "jump|B/side_3_plus_3|personal_rank_share1/S-valid": {
+   "method": "wilson",
+   "null_coverage": 0.96675,
+   "null_mc_se": 0.0028348032339123646,
+   "positive_control_coverage": 0.9655,
+   "label": "95% CI"
+  },
+  "jump|B/side_3_plus_3|personal_true_mean/S-valid": {
+   "method": "student_t",
+   "null_coverage": 0.962,
+   "null_mc_se": 0.003023077901741867,
+   "positive_control_coverage": 0.96,
+   "label": "95% CI"
+  },
+  "jump|A/primary|delta_mean/jumpHeight": {
+   "method": "student_t",
+   "null_coverage": 0.9435,
+   "null_mc_se": 0.003650607826102387,
+   "positive_control_coverage": 0.9565,
+   "label": "95% CI"
+  },
+  "jump|A/primary|delta_median/jumpHeight": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.95275,
+   "null_mc_se": 0.0033547517605629186,
+   "positive_control_coverage": 0.9585,
+   "label": "95.7% exact interval"
+  },
+  "jump|A/primary|dz_mean/jumpHeight": {
+   "method": "student_t",
+   "null_coverage": 0.95225,
+   "null_mc_se": 0.0033715700163277035,
+   "positive_control_coverage": 0.96625,
+   "label": "95% CI"
+  },
+  "jump|A/primary|dz2_mean/jumpHeight": {
+   "method": "student_t",
+   "null_coverage": 0.947,
+   "null_mc_se": 0.003542280338990692,
+   "positive_control_coverage": 0.961,
+   "label": "95% CI"
+  },
+  "jump|A/primary|delta_mean/countermovementDepth": {
+   "method": "student_t",
+   "null_coverage": 0.94675,
+   "null_mc_se": 0.0035501562465615516,
+   "positive_control_coverage": 0.95325,
+   "label": "95% CI"
+  },
+  "jump|A/primary|delta_median/countermovementDepth": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.95475,
+   "null_mc_se": 0.0032864280571769716,
+   "positive_control_coverage": null,
+   "label": "95.7% exact interval"
+  },
+  "jump|A/primary|dz_mean/countermovementDepth": {
+   "method": "student_t",
+   "null_coverage": 0.95575,
+   "null_mc_se": 0.0032516125807051494,
+   "positive_control_coverage": 0.958,
+   "label": "95% CI"
+  },
+  "jump|A/primary|dz2_mean/countermovementDepth": {
+   "method": "student_t",
+   "null_coverage": 0.953,
+   "null_mc_se": 0.003346303931205295,
+   "positive_control_coverage": 0.95125,
+   "label": "95% CI"
+  },
+  "jump|A/primary|delta_mean/trunkLean": {
+   "method": "student_t",
+   "null_coverage": 0.95275,
+   "null_mc_se": 0.0033547517605629186,
+   "positive_control_coverage": 0.9535,
+   "label": "95% CI"
+  },
+  "jump|A/primary|delta_median/trunkLean": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.9555,
+   "null_mc_se": 0.003260358492558755,
+   "positive_control_coverage": 0.95375,
+   "label": "95.7% exact interval"
+  },
+  "jump|A/primary|dz_mean/trunkLean": {
+   "method": "student_t",
+   "null_coverage": 0.958,
+   "null_mc_se": 0.0031715926598477316,
+   "positive_control_coverage": 0.95775,
+   "label": "95% CI"
+  },
+  "jump|A/primary|dz2_mean/trunkLean": {
+   "method": "student_t",
+   "null_coverage": 0.94525,
+   "null_mc_se": 0.0035969583504677936,
+   "positive_control_coverage": 0.96,
+   "label": "95% CI"
+  },
+  "jump|A/primary|delta_mean/landingKneeFlex": {
+   "method": "student_t",
+   "null_coverage": 0.95125,
+   "null_mc_se": 0.003404902256306338,
+   "positive_control_coverage": 0.95575,
+   "label": "95% CI"
+  },
+  "jump|A/primary|delta_median/landingKneeFlex": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.958,
+   "null_mc_se": 0.0031715926598477316,
+   "positive_control_coverage": null,
+   "label": "95.7% exact interval"
+  },
+  "jump|A/primary|dz_mean/landingKneeFlex": {
+   "method": "student_t",
+   "null_coverage": 0.95375,
+   "null_mc_se": 0.0033208032725531938,
+   "positive_control_coverage": 0.956,
+   "label": "95% CI"
+  },
+  "jump|A/primary|dz2_mean/landingKneeFlex": {
+   "method": "student_t",
+   "null_coverage": 0.952,
+   "null_mc_se": 0.0033799408278844187,
+   "positive_control_coverage": 0.95075,
+   "label": "95% CI"
+  },
+  "jump|A/primary|delta_mean/rsiMod": {
+   "method": "student_t",
+   "null_coverage": 0.94725,
+   "null_mc_se": 0.0035343824602043273,
+   "positive_control_coverage": 0.9565,
+   "label": "95% CI"
+  },
+  "jump|A/primary|delta_median/rsiMod": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.9525,
+   "null_mc_se": 0.0033631737243264726,
+   "positive_control_coverage": null,
+   "label": "95.7% exact interval"
+  },
+  "jump|A/primary|dz_mean/rsiMod": {
+   "method": "student_t",
+   "null_coverage": 0.9565,
+   "null_mc_se": 0.0032252034819527276,
+   "positive_control_coverage": 0.952,
+   "label": "95% CI"
+  },
+  "jump|A/primary|dz2_mean/rsiMod": {
+   "method": "student_t",
+   "null_coverage": 0.95225,
+   "null_mc_se": 0.0033715700163277035,
+   "positive_control_coverage": 0.9445,
+   "label": "95% CI"
+  },
+  "jump|A/primary|delta_mean/eccentricDuration": {
+   "method": "student_t",
+   "null_coverage": 0.96475,
+   "null_mc_se": 0.002915794810167547,
+   "positive_control_coverage": 0.95725,
+   "label": "95% CI"
+  },
+  "jump|A/primary|delta_median/eccentricDuration": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.961,
+   "null_mc_se": 0.0030610047370103837,
+   "positive_control_coverage": null,
+   "label": "95.7% exact interval"
+  },
+  "jump|A/primary|dz_mean/eccentricDuration": {
+   "method": "student_t",
+   "null_coverage": 0.95525,
+   "null_mc_se": 0.0032690762265508567,
+   "positive_control_coverage": 0.94875,
+   "label": "95% CI"
+  },
+  "jump|A/primary|dz2_mean/eccentricDuration": {
+   "method": "student_t",
+   "null_coverage": 0.95275,
+   "null_mc_se": 0.0033547517605629186,
+   "positive_control_coverage": 0.953,
+   "label": "95% CI"
+  },
+  "jump|A/primary|delta_mean/flightTime": {
+   "method": "student_t",
+   "null_coverage": 0.95725,
+   "null_mc_se": 0.003198532378294769,
+   "positive_control_coverage": 0.95475,
+   "label": "95% CI"
+  },
+  "jump|A/primary|delta_median/flightTime": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.98525,
+   "null_mc_se": 0.0019060717129740974,
+   "positive_control_coverage": null,
+   "label": "95.7% exact interval"
+  },
+  "jump|A/primary|dz_mean/flightTime": {
+   "method": "student_t",
+   "null_coverage": 0.9545,
+   "null_mc_se": 0.003295062594246124,
+   "positive_control_coverage": 0.95425,
+   "label": "95% CI"
+  },
+  "jump|A/primary|dz2_mean/flightTime": {
+   "method": "student_t",
+   "null_coverage": 0.95175,
+   "null_mc_se": 0.0033882863478460618,
+   "positive_control_coverage": 0.94925,
+   "label": "95% CI"
+  },
+  "jump|A/primary|delta_mean/concentricDuration": {
+   "method": "student_t",
+   "null_coverage": 0.9525,
+   "null_mc_se": 0.0033631737243264726,
+   "positive_control_coverage": 0.95575,
+   "label": "95% CI"
+  },
+  "jump|A/primary|delta_median/concentricDuration": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.9815,
+   "null_mc_se": 0.0021305955740121094,
+   "positive_control_coverage": null,
+   "label": "95.7% exact interval"
+  },
+  "jump|A/primary|dz_mean/concentricDuration": {
+   "method": "student_t",
+   "null_coverage": 0.95075,
+   "null_mc_se": 0.003421419204803762,
+   "positive_control_coverage": 0.95125,
+   "label": "95% CI"
+  },
+  "jump|A/primary|dz2_mean/concentricDuration": {
+   "method": "student_t",
+   "null_coverage": 0.94675,
+   "null_mc_se": 0.0035501562465615516,
+   "positive_control_coverage": 0.9575,
+   "label": "95% CI"
+  },
+  "jump|A/primary|delta_mean/asymmetry": {
+   "method": "student_t",
+   "null_coverage": 0.947,
+   "null_mc_se": 0.003542280338990692,
+   "positive_control_coverage": 0.9495,
+   "label": "95% CI"
+  },
+  "jump|A/primary|delta_median/asymmetry": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.958,
+   "null_mc_se": 0.0031715926598477316,
+   "positive_control_coverage": null,
+   "label": "95.7% exact interval"
+  },
+  "jump|A/primary|dz_mean/asymmetry": {
+   "method": "student_t",
+   "null_coverage": 0.95325,
+   "null_mc_se": 0.0033378300398612254,
+   "positive_control_coverage": 0.952,
+   "label": "95% CI"
+  },
+  "jump|A/primary|dz2_mean/asymmetry": {
+   "method": "student_t",
+   "null_coverage": 0.94925,
+   "null_mc_se": 0.003470390377896987,
+   "positive_control_coverage": 0.9475,
+   "label": "95% CI"
+  },
+  "jump|A/primary|personal_rank_mean/S0": {
+   "method": "student_t",
+   "null_coverage": 0.9405,
+   "null_mc_se": 0.0037403124869454423,
+   "positive_control_coverage": 0.95775,
+   "label": "95% CI"
+  },
+  "jump|A/primary|personal_rank_median/S0": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.95,
+   "null_mc_se": 0.003446012188022557,
+   "positive_control_coverage": null,
+   "label": "95.7% exact interval"
+  },
+  "jump|A/primary|personal_rank_share1/S0": {
+   "method": "wilson",
+   "null_coverage": 0.939,
+   "null_mc_se": 0.003784144553264319,
+   "positive_control_coverage": 0.96075,
+   "label": "95% CI"
+  },
+  "jump|A/primary|personal_true_mean/S0": {
+   "method": "student_t",
+   "null_coverage": 0.96675,
+   "null_mc_se": 0.0028348032339123646,
+   "positive_control_coverage": 0.95975,
+   "label": "95% CI"
+  },
+  "jump|A/primary|personal_rank_mean/S-P2": {
+   "method": "student_t",
+   "null_coverage": 0.94775,
+   "null_mc_se": 0.0035185201967588594,
+   "positive_control_coverage": 0.96,
+   "label": "95% CI"
+  },
+  "jump|A/primary|personal_rank_median/S-P2": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.95575,
+   "null_mc_se": 0.0032516125807051494,
+   "positive_control_coverage": null,
+   "label": "95.7% exact interval"
+  },
+  "jump|A/primary|personal_rank_share1/S-P2": {
+   "method": "wilson",
+   "null_coverage": 0.939,
+   "null_mc_se": 0.003784144553264319,
+   "positive_control_coverage": 0.965,
+   "label": "95% CI"
+  },
+  "jump|A/primary|personal_true_mean/S-P2": {
+   "method": "student_t",
+   "null_coverage": 0.97075,
+   "null_mc_se": 0.00266432155998483,
+   "positive_control_coverage": 0.95825,
+   "label": "95% CI"
+  },
+  "jump|A/primary|personal_rank_mean/S-P3": {
+   "method": "student_t",
+   "null_coverage": 0.94775,
+   "null_mc_se": 0.0035185201967588594,
+   "positive_control_coverage": 0.95575,
+   "label": "95% CI"
+  },
+  "jump|A/primary|personal_rank_median/S-P3": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.95625,
+   "null_mc_se": 0.0032340353082488124,
+   "positive_control_coverage": null,
+   "label": "95.7% exact interval"
+  },
+  "jump|A/primary|personal_rank_share1/S-P3": {
+   "method": "wilson",
+   "null_coverage": 0.946,
+   "null_mc_se": 0.0035736535926135893,
+   "positive_control_coverage": 0.962,
+   "label": "95% CI"
+  },
+  "jump|A/primary|personal_true_mean/S-P3": {
+   "method": "student_t",
+   "null_coverage": 0.96875,
+   "null_mc_se": 0.00275106513463422,
+   "positive_control_coverage": 0.96275,
+   "label": "95% CI"
+  },
+  "jump|A/primary|personal_rank_mean/S-P2P3": {
+   "method": "student_t",
+   "null_coverage": 0.939,
+   "null_mc_se": 0.003784144553264319,
+   "positive_control_coverage": 0.955,
+   "label": "95% CI"
+  },
+  "jump|A/primary|personal_rank_median/S-P2P3": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.95425,
+   "null_mc_se": 0.003303669834441691,
+   "positive_control_coverage": null,
+   "label": "95.7% exact interval"
+  },
+  "jump|A/primary|personal_rank_share1/S-P2P3": {
+   "method": "wilson",
+   "null_coverage": 0.936,
+   "null_mc_se": 0.0038698837191833025,
+   "positive_control_coverage": 0.96175,
+   "label": "95% CI"
+  },
+  "jump|A/primary|personal_true_mean/S-P2P3": {
+   "method": "student_t",
+   "null_coverage": 0.96775,
+   "null_mc_se": 0.0027932927478157388,
+   "positive_control_coverage": 0.96,
+   "label": "95% CI"
+  },
+  "jump|A/primary|personal_rank_mean/S-valid": {
+   "method": "student_t",
+   "null_coverage": 0.95,
+   "null_mc_se": 0.003446012188022557,
+   "positive_control_coverage": 0.96125,
+   "label": "95% CI"
+  },
+  "jump|A/primary|personal_rank_median/S-valid": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.955,
+   "null_mc_se": 0.003277766007511825,
+   "positive_control_coverage": null,
+   "label": "95.7% exact interval"
+  },
+  "jump|A/primary|personal_rank_share1/S-valid": {
+   "method": "wilson",
+   "null_coverage": 0.93925,
+   "null_mc_se": 0.0037768848771176484,
+   "positive_control_coverage": 0.96,
+   "label": "95% CI"
+  },
+  "jump|A/primary|personal_true_mean/S-valid": {
+   "method": "student_t",
+   "null_coverage": 0.961,
+   "null_mc_se": 0.0030610047370103837,
+   "positive_control_coverage": 0.958,
+   "label": "95% CI"
+  },
+  "jump|A/same_participants|delta_mean/jumpHeight": {
+   "method": "student_t",
+   "null_coverage": 0.954,
+   "null_mc_se": 0.003312249990565327,
+   "positive_control_coverage": 0.949,
+   "label": "95% CI"
+  },
+  "jump|A/same_participants|delta_median/jumpHeight": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.958,
+   "null_mc_se": 0.0031715926598477316,
+   "positive_control_coverage": 0.95875,
+   "label": "95.7% exact interval"
+  },
+  "jump|A/same_participants|dz_mean/jumpHeight": {
+   "method": "student_t",
+   "null_coverage": 0.9535,
+   "null_mc_se": 0.0033293298875299213,
+   "positive_control_coverage": 0.96225,
+   "label": "95% CI"
+  },
+  "jump|A/same_participants|dz2_mean/jumpHeight": {
+   "method": "student_t",
+   "null_coverage": 0.9405,
+   "null_mc_se": 0.0037403124869454423,
+   "positive_control_coverage": 0.9605,
+   "label": "95% CI"
+  },
+  "jump|A/same_participants|delta_mean/countermovementDepth": {
+   "method": "student_t",
+   "null_coverage": 0.95075,
+   "null_mc_se": 0.003421419204803762,
+   "positive_control_coverage": 0.956,
+   "label": "95% CI"
+  },
+  "jump|A/same_participants|delta_median/countermovementDepth": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.95425,
+   "null_mc_se": 0.003303669834441691,
+   "positive_control_coverage": null,
+   "label": "95.7% exact interval"
+  },
+  "jump|A/same_participants|dz_mean/countermovementDepth": {
+   "method": "student_t",
+   "null_coverage": 0.954,
+   "null_mc_se": 0.003312249990565327,
+   "positive_control_coverage": 0.95725,
+   "label": "95% CI"
+  },
+  "jump|A/same_participants|dz2_mean/countermovementDepth": {
+   "method": "student_t",
+   "null_coverage": 0.952,
+   "null_mc_se": 0.0033799408278844187,
+   "positive_control_coverage": 0.9495,
+   "label": "95% CI"
+  },
+  "jump|A/same_participants|delta_mean/trunkLean": {
+   "method": "student_t",
+   "null_coverage": 0.95075,
+   "null_mc_se": 0.003421419204803762,
+   "positive_control_coverage": 0.94775,
+   "label": "95% CI"
+  },
+  "jump|A/same_participants|delta_median/trunkLean": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.95675,
+   "null_mc_se": 0.003216342546278304,
+   "positive_control_coverage": 0.953,
+   "label": "95.7% exact interval"
+  },
+  "jump|A/same_participants|dz_mean/trunkLean": {
+   "method": "student_t",
+   "null_coverage": 0.955,
+   "null_mc_se": 0.003277766007511825,
+   "positive_control_coverage": 0.95975,
+   "label": "95% CI"
+  },
+  "jump|A/same_participants|dz2_mean/trunkLean": {
+   "method": "student_t",
+   "null_coverage": 0.954,
+   "null_mc_se": 0.003312249990565327,
+   "positive_control_coverage": 0.9715,
+   "label": "95% CI"
+  },
+  "jump|A/same_participants|delta_mean/landingKneeFlex": {
+   "method": "student_t",
+   "null_coverage": 0.95025,
+   "null_mc_se": 0.003437838619685338,
+   "positive_control_coverage": 0.95225,
+   "label": "95% CI"
+  },
+  "jump|A/same_participants|delta_median/landingKneeFlex": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.96,
+   "null_mc_se": 0.003098386676965935,
+   "positive_control_coverage": null,
+   "label": "95.7% exact interval"
+  },
+  "jump|A/same_participants|dz_mean/landingKneeFlex": {
+   "method": "student_t",
+   "null_coverage": 0.955,
+   "null_mc_se": 0.003277766007511825,
+   "positive_control_coverage": 0.95125,
+   "label": "95% CI"
+  },
+  "jump|A/same_participants|dz2_mean/landingKneeFlex": {
+   "method": "student_t",
+   "null_coverage": 0.95075,
+   "null_mc_se": 0.003421419204803762,
+   "positive_control_coverage": 0.95525,
+   "label": "95% CI"
+  },
+  "jump|A/same_participants|delta_mean/rsiMod": {
+   "method": "student_t",
+   "null_coverage": 0.95075,
+   "null_mc_se": 0.003421419204803762,
+   "positive_control_coverage": 0.94925,
+   "label": "95% CI"
+  },
+  "jump|A/same_participants|delta_median/rsiMod": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.95,
+   "null_mc_se": 0.003446012188022557,
+   "positive_control_coverage": null,
+   "label": "95.7% exact interval"
+  },
+  "jump|A/same_participants|dz_mean/rsiMod": {
+   "method": "student_t",
+   "null_coverage": 0.95175,
+   "null_mc_se": 0.0033882863478460618,
+   "positive_control_coverage": 0.958,
+   "label": "95% CI"
+  },
+  "jump|A/same_participants|dz2_mean/rsiMod": {
+   "method": "student_t",
+   "null_coverage": 0.95375,
+   "null_mc_se": 0.0033208032725531938,
+   "positive_control_coverage": 0.9515,
+   "label": "95% CI"
+  },
+  "jump|A/same_participants|delta_mean/eccentricDuration": {
+   "method": "student_t",
+   "null_coverage": 0.96025,
+   "null_mc_se": 0.003089091189168748,
+   "positive_control_coverage": 0.95625,
+   "label": "95% CI"
+  },
+  "jump|A/same_participants|delta_median/eccentricDuration": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.953,
+   "null_mc_se": 0.003346303931205295,
+   "positive_control_coverage": null,
+   "label": "95.7% exact interval"
+  },
+  "jump|A/same_participants|dz_mean/eccentricDuration": {
+   "method": "student_t",
+   "null_coverage": 0.95175,
+   "null_mc_se": 0.0033882863478460618,
+   "positive_control_coverage": 0.95525,
+   "label": "95% CI"
+  },
+  "jump|A/same_participants|dz2_mean/eccentricDuration": {
+   "method": "student_t",
+   "null_coverage": 0.94925,
+   "null_mc_se": 0.003470390377896987,
+   "positive_control_coverage": 0.95125,
+   "label": "95% CI"
+  },
+  "jump|A/same_participants|delta_mean/flightTime": {
+   "method": "student_t",
+   "null_coverage": 0.9465,
+   "null_mc_se": 0.0035580103288214327,
+   "positive_control_coverage": 0.9545,
+   "label": "95% CI"
+  },
+  "jump|A/same_participants|delta_median/flightTime": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.983,
+   "null_mc_se": 0.0020439545004720637,
+   "positive_control_coverage": null,
+   "label": "95.7% exact interval"
+  },
+  "jump|A/same_participants|dz_mean/flightTime": {
+   "method": "student_t",
+   "null_coverage": 0.9475,
+   "null_mc_se": 0.0035264624625820132,
+   "positive_control_coverage": 0.9465,
+   "label": "95% CI"
+  },
+  "jump|A/same_participants|dz2_mean/flightTime": {
+   "method": "student_t",
+   "null_coverage": 0.9495,
+   "null_mc_se": 0.003462287899640929,
+   "positive_control_coverage": 0.951,
+   "label": "95% CI"
+  },
+  "jump|A/same_participants|delta_mean/concentricDuration": {
+   "method": "student_t",
+   "null_coverage": 0.9575,
+   "null_mc_se": 0.0031895826529500684,
+   "positive_control_coverage": 0.95475,
+   "label": "95% CI"
+  },
+  "jump|A/same_participants|delta_median/concentricDuration": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.98475,
+   "null_mc_se": 0.0019376169319553326,
+   "positive_control_coverage": null,
+   "label": "95.7% exact interval"
+  },
+  "jump|A/same_participants|dz_mean/concentricDuration": {
+   "method": "student_t",
+   "null_coverage": 0.94725,
+   "null_mc_se": 0.0035343824602043273,
+   "positive_control_coverage": 0.94925,
+   "label": "95% CI"
+  },
+  "jump|A/same_participants|dz2_mean/concentricDuration": {
+   "method": "student_t",
+   "null_coverage": 0.95025,
+   "null_mc_se": 0.003437838619685338,
+   "positive_control_coverage": 0.9545,
+   "label": "95% CI"
+  },
+  "jump|A/same_participants|delta_mean/asymmetry": {
+   "method": "student_t",
+   "null_coverage": 0.94825,
+   "null_mc_se": 0.0035025682541529424,
+   "positive_control_coverage": 0.9515,
+   "label": "95% CI"
+  },
+  "jump|A/same_participants|delta_median/asymmetry": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.95375,
+   "null_mc_se": 0.0033208032725531938,
+   "positive_control_coverage": null,
+   "label": "95.7% exact interval"
+  },
+  "jump|A/same_participants|dz_mean/asymmetry": {
+   "method": "student_t",
+   "null_coverage": 0.94775,
+   "null_mc_se": 0.0035185201967588594,
+   "positive_control_coverage": 0.95025,
+   "label": "95% CI"
+  },
+  "jump|A/same_participants|dz2_mean/asymmetry": {
+   "method": "student_t",
+   "null_coverage": 0.95075,
+   "null_mc_se": 0.003421419204803762,
+   "positive_control_coverage": 0.9525,
+   "label": "95% CI"
+  },
+  "jump|A/same_participants|personal_rank_mean/S0": {
+   "method": "student_t",
+   "null_coverage": 0.94625,
+   "null_mc_se": 0.003565842729986839,
+   "positive_control_coverage": 0.95925,
+   "label": "95% CI"
+  },
+  "jump|A/same_participants|personal_rank_median/S0": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.95475,
+   "null_mc_se": 0.0032864280571769716,
+   "positive_control_coverage": null,
+   "label": "95.7% exact interval"
+  },
+  "jump|A/same_participants|personal_rank_share1/S0": {
+   "method": "wilson",
+   "null_coverage": 0.9395,
+   "null_mc_se": 0.003769607075014583,
+   "positive_control_coverage": 0.9595,
+   "label": "95% CI"
+  },
+  "jump|A/same_participants|personal_true_mean/S0": {
+   "method": "student_t",
+   "null_coverage": 0.97275,
+   "null_mc_se": 0.0025742687068369533,
+   "positive_control_coverage": 0.95875,
+   "label": "95% CI"
+  },
+  "jump|A/same_participants|personal_rank_mean/S-P2": {
+   "method": "student_t",
+   "null_coverage": 0.94675,
+   "null_mc_se": 0.0035501562465615516,
+   "positive_control_coverage": 0.95375,
+   "label": "95% CI"
+  },
+  "jump|A/same_participants|personal_rank_median/S-P2": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.94925,
+   "null_mc_se": 0.003470390377896987,
+   "positive_control_coverage": null,
+   "label": "95.7% exact interval"
+  },
+  "jump|A/same_participants|personal_rank_share1/S-P2": {
+   "method": "wilson",
+   "null_coverage": 0.93225,
+   "null_mc_se": 0.0039736613311906685,
+   "positive_control_coverage": 0.96775,
+   "label": "approximate interval (calibrated coverage 93%)"
+  },
+  "jump|A/same_participants|personal_true_mean/S-P2": {
+   "method": "student_t",
+   "null_coverage": 0.96475,
+   "null_mc_se": 0.002915794810167547,
+   "positive_control_coverage": 0.9615,
+   "label": "95% CI"
+  },
+  "jump|A/same_participants|personal_rank_mean/S-P3": {
+   "method": "student_t",
+   "null_coverage": 0.94925,
+   "null_mc_se": 0.003470390377896987,
+   "positive_control_coverage": 0.9595,
+   "label": "95% CI"
+  },
+  "jump|A/same_participants|personal_rank_median/S-P3": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.959,
+   "null_mc_se": 0.0031352432122564284,
+   "positive_control_coverage": null,
+   "label": "95.7% exact interval"
+  },
+  "jump|A/same_participants|personal_rank_share1/S-P3": {
+   "method": "wilson",
+   "null_coverage": 0.93275,
+   "null_mc_se": 0.00396003274923327,
+   "positive_control_coverage": 0.9555,
+   "label": "approximate interval (calibrated coverage 93%)"
+  },
+  "jump|A/same_participants|personal_true_mean/S-P3": {
+   "method": "student_t",
+   "null_coverage": 0.96325,
+   "null_mc_se": 0.0029748713207464936,
+   "positive_control_coverage": 0.95425,
+   "label": "95% CI"
+  },
+  "jump|A/same_participants|personal_rank_mean/S-P2P3": {
+   "method": "student_t",
+   "null_coverage": 0.95025,
+   "null_mc_se": 0.003437838619685338,
+   "positive_control_coverage": 0.951,
+   "label": "95% CI"
+  },
+  "jump|A/same_participants|personal_rank_median/S-P2P3": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.955,
+   "null_mc_se": 0.003277766007511825,
+   "positive_control_coverage": null,
+   "label": "95.7% exact interval"
+  },
+  "jump|A/same_participants|personal_rank_share1/S-P2P3": {
+   "method": "wilson",
+   "null_coverage": 0.9325,
+   "null_mc_se": 0.003966854862482367,
+   "positive_control_coverage": 0.96325,
+   "label": "approximate interval (calibrated coverage 93%)"
+  },
+  "jump|A/same_participants|personal_true_mean/S-P2P3": {
+   "method": "student_t",
+   "null_coverage": 0.9625,
+   "null_mc_se": 0.0030039037101744783,
+   "positive_control_coverage": 0.963,
+   "label": "95% CI"
+  },
+  "jump|A/same_participants|personal_rank_mean/S-valid": {
+   "method": "student_t",
+   "null_coverage": 0.9465,
+   "null_mc_se": 0.0035580103288214327,
+   "positive_control_coverage": 0.9535,
+   "label": "95% CI"
+  },
+  "jump|A/same_participants|personal_rank_median/S-valid": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.9585,
+   "null_mc_se": 0.00315348022032801,
+   "positive_control_coverage": null,
+   "label": "95.7% exact interval"
+  },
+  "jump|A/same_participants|personal_rank_share1/S-valid": {
+   "method": "wilson",
+   "null_coverage": 0.9385,
+   "null_mc_se": 0.003798609943123932,
+   "positive_control_coverage": 0.96225,
+   "label": "95% CI"
+  },
+  "jump|A/same_participants|personal_true_mean/S-valid": {
+   "method": "student_t",
+   "null_coverage": 0.9645,
+   "null_mc_se": 0.0029257370866159513,
+   "positive_control_coverage": 0.9595,
+   "label": "95% CI"
+  },
+  "jump|A/at_least_2_plus_2|delta_mean/jumpHeight": {
+   "method": "student_t",
+   "null_coverage": 0.95225,
+   "null_mc_se": 0.0033715700163277035,
+   "positive_control_coverage": 0.95,
+   "label": "95% CI"
+  },
+  "jump|A/at_least_2_plus_2|delta_median/jumpHeight": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.97475,
+   "null_mc_se": 0.002480546184814949,
+   "positive_control_coverage": 0.97225,
+   "label": "97.1% exact interval"
+  },
+  "jump|A/at_least_2_plus_2|delta_mean/countermovementDepth": {
+   "method": "student_t",
+   "null_coverage": 0.959,
+   "null_mc_se": 0.0031352432122564284,
+   "positive_control_coverage": 0.95575,
+   "label": "95% CI"
+  },
+  "jump|A/at_least_2_plus_2|delta_median/countermovementDepth": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.9745,
+   "null_mc_se": 0.0024924761784217704,
+   "positive_control_coverage": null,
+   "label": "97.1% exact interval"
+  },
+  "jump|A/at_least_2_plus_2|delta_mean/trunkLean": {
+   "method": "student_t",
+   "null_coverage": 0.93725,
+   "null_mc_se": 0.0038344633751021787,
+   "positive_control_coverage": 0.9525,
+   "label": "95% CI"
+  },
+  "jump|A/at_least_2_plus_2|delta_median/trunkLean": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.96575,
+   "null_mc_se": 0.002875627648879458,
+   "positive_control_coverage": 0.968,
+   "label": "97.1% exact interval"
+  },
+  "jump|A/at_least_2_plus_2|delta_mean/landingKneeFlex": {
+   "method": "student_t",
+   "null_coverage": 0.965,
+   "null_mc_se": 0.0029058131392090594,
+   "positive_control_coverage": 0.95825,
+   "label": "95% CI"
+  },
+  "jump|A/at_least_2_plus_2|delta_median/landingKneeFlex": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.9765,
+   "null_mc_se": 0.0023951904934681064,
+   "positive_control_coverage": null,
+   "label": "97.1% exact interval"
+  },
+  "jump|A/at_least_2_plus_2|delta_mean/rsiMod": {
+   "method": "student_t",
+   "null_coverage": 0.94875,
+   "null_mc_se": 0.0034865254014562986,
+   "positive_control_coverage": 0.954,
+   "label": "95% CI"
+  },
+  "jump|A/at_least_2_plus_2|delta_median/rsiMod": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.97125,
+   "null_mc_se": 0.002642131596836163,
+   "positive_control_coverage": null,
+   "label": "97.1% exact interval"
+  },
+  "jump|A/at_least_2_plus_2|delta_mean/eccentricDuration": {
+   "method": "student_t",
+   "null_coverage": 0.958,
+   "null_mc_se": 0.0031715926598477316,
+   "positive_control_coverage": 0.957,
+   "label": "95% CI"
+  },
+  "jump|A/at_least_2_plus_2|delta_median/eccentricDuration": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.97275,
+   "null_mc_se": 0.0025742687068369533,
+   "positive_control_coverage": null,
+   "label": "97.1% exact interval"
+  },
+  "jump|A/at_least_2_plus_2|delta_mean/flightTime": {
+   "method": "student_t",
+   "null_coverage": 0.9475,
+   "null_mc_se": 0.0035264624625820132,
+   "positive_control_coverage": 0.95325,
+   "label": "95% CI"
+  },
+  "jump|A/at_least_2_plus_2|delta_median/flightTime": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.9875,
+   "null_mc_se": 0.0017566836653193966,
+   "positive_control_coverage": null,
+   "label": "97.1% exact interval"
+  },
+  "jump|A/at_least_2_plus_2|delta_mean/concentricDuration": {
+   "method": "student_t",
+   "null_coverage": 0.954,
+   "null_mc_se": 0.003312249990565327,
+   "positive_control_coverage": 0.95175,
+   "label": "95% CI"
+  },
+  "jump|A/at_least_2_plus_2|delta_median/concentricDuration": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.98475,
+   "null_mc_se": 0.0019376169319553326,
+   "positive_control_coverage": null,
+   "label": "97.1% exact interval"
+  },
+  "jump|A/at_least_2_plus_2|delta_mean/asymmetry": {
+   "method": "student_t",
+   "null_coverage": 0.954,
+   "null_mc_se": 0.003312249990565327,
+   "positive_control_coverage": 0.95475,
+   "label": "95% CI"
+  },
+  "jump|A/at_least_2_plus_2|delta_median/asymmetry": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.97575,
+   "null_mc_se": 0.00243217687987531,
+   "positive_control_coverage": null,
+   "label": "97.1% exact interval"
+  },
+  "jump|A/at_least_1_plus_1|delta_mean/jumpHeight": {
+   "method": "student_t",
+   "null_coverage": 0.95825,
+   "null_mc_se": 0.0031625518770448634,
+   "positive_control_coverage": 0.94975,
+   "label": "95% CI"
+  },
+  "jump|A/at_least_1_plus_1|delta_median/jumpHeight": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.9555,
+   "null_mc_se": 0.003260358492558755,
+   "positive_control_coverage": 0.95325,
+   "label": "95.6% exact interval"
+  },
+  "jump|A/at_least_1_plus_1|delta_mean/countermovementDepth": {
+   "method": "student_t",
+   "null_coverage": 0.94725,
+   "null_mc_se": 0.0035343824602043273,
+   "positive_control_coverage": 0.94875,
+   "label": "95% CI"
+  },
+  "jump|A/at_least_1_plus_1|delta_median/countermovementDepth": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.95575,
+   "null_mc_se": 0.0032516125807051494,
+   "positive_control_coverage": null,
+   "label": "95.6% exact interval"
+  },
+  "jump|A/at_least_1_plus_1|delta_mean/trunkLean": {
+   "method": "student_t",
+   "null_coverage": 0.95175,
+   "null_mc_se": 0.0033882863478460618,
+   "positive_control_coverage": 0.95075,
+   "label": "95% CI"
+  },
+  "jump|A/at_least_1_plus_1|delta_median/trunkLean": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.9585,
+   "null_mc_se": 0.00315348022032801,
+   "positive_control_coverage": 0.95075,
+   "label": "95.6% exact interval"
+  },
+  "jump|A/at_least_1_plus_1|delta_mean/landingKneeFlex": {
+   "method": "student_t",
+   "null_coverage": 0.96925,
+   "null_mc_se": 0.0027296720270025138,
+   "positive_control_coverage": 0.9585,
+   "label": "95% CI"
+  },
+  "jump|A/at_least_1_plus_1|delta_median/landingKneeFlex": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.961,
+   "null_mc_se": 0.0030610047370103837,
+   "positive_control_coverage": null,
+   "label": "95.6% exact interval"
+  },
+  "jump|A/at_least_1_plus_1|delta_mean/rsiMod": {
+   "method": "student_t",
+   "null_coverage": 0.9505,
+   "null_mc_se": 0.0034296410161998,
+   "positive_control_coverage": 0.9475,
+   "label": "95% CI"
+  },
+  "jump|A/at_least_1_plus_1|delta_median/rsiMod": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.95925,
+   "null_mc_se": 0.0031260773143030212,
+   "positive_control_coverage": null,
+   "label": "95.6% exact interval"
+  },
+  "jump|A/at_least_1_plus_1|delta_mean/eccentricDuration": {
+   "method": "student_t",
+   "null_coverage": 0.955,
+   "null_mc_se": 0.003277766007511825,
+   "positive_control_coverage": 0.9575,
+   "label": "95% CI"
+  },
+  "jump|A/at_least_1_plus_1|delta_median/eccentricDuration": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.95875,
+   "null_mc_se": 0.0031443774224796874,
+   "positive_control_coverage": null,
+   "label": "95.6% exact interval"
+  },
+  "jump|A/at_least_1_plus_1|delta_mean/flightTime": {
+   "method": "student_t",
+   "null_coverage": 0.948,
+   "null_mc_se": 0.0035105555115964213,
+   "positive_control_coverage": 0.94725,
+   "label": "95% CI"
+  },
+  "jump|A/at_least_1_plus_1|delta_median/flightTime": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.98025,
+   "null_mc_se": 0.002199996448860773,
+   "positive_control_coverage": null,
+   "label": "95.6% exact interval"
+  },
+  "jump|A/at_least_1_plus_1|delta_mean/concentricDuration": {
+   "method": "student_t",
+   "null_coverage": 0.948,
+   "null_mc_se": 0.0035105555115964213,
+   "positive_control_coverage": 0.95625,
+   "label": "95% CI"
+  },
+  "jump|A/at_least_1_plus_1|delta_median/concentricDuration": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.9765,
+   "null_mc_se": 0.0023951904934681064,
+   "positive_control_coverage": null,
+   "label": "95.6% exact interval"
+  },
+  "jump|A/at_least_1_plus_1|delta_mean/asymmetry": {
+   "method": "student_t",
+   "null_coverage": 0.951,
+   "null_mc_se": 0.003413173010557773,
+   "positive_control_coverage": 0.95725,
+   "label": "95% CI"
+  },
+  "jump|A/at_least_1_plus_1|delta_median/asymmetry": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.9515,
+   "null_mc_se": 0.0033966067626382654,
+   "positive_control_coverage": null,
+   "label": "95.6% exact interval"
+  },
+  "jump|A/side_3_plus_3|delta_mean/jumpHeight": {
+   "method": "student_t",
+   "null_coverage": 0.94825,
+   "null_mc_se": 0.0035025682541529424,
+   "positive_control_coverage": 0.94975,
+   "label": "95% CI"
+  },
+  "jump|A/side_3_plus_3|delta_median/jumpHeight": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.976,
+   "null_mc_se": 0.002419917353960669,
+   "positive_control_coverage": 0.97275,
+   "label": "97.7% exact interval"
+  },
+  "jump|A/side_3_plus_3|dz_mean/jumpHeight": {
+   "method": "student_t",
+   "null_coverage": 0.94875,
+   "null_mc_se": 0.0034865254014562986,
+   "positive_control_coverage": 0.9615,
+   "label": "95% CI"
+  },
+  "jump|A/side_3_plus_3|dz2_mean/jumpHeight": {
+   "method": "student_t",
+   "null_coverage": 0.951,
+   "null_mc_se": 0.003413173010557773,
+   "positive_control_coverage": 0.95575,
+   "label": "95% CI"
+  },
+  "jump|A/side_3_plus_3|delta_mean/countermovementDepth": {
+   "method": "student_t",
+   "null_coverage": 0.9535,
+   "null_mc_se": 0.0033293298875299213,
+   "positive_control_coverage": 0.9485,
+   "label": "95% CI"
+  },
+  "jump|A/side_3_plus_3|delta_median/countermovementDepth": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.977,
+   "null_mc_se": 0.002370179318110764,
+   "positive_control_coverage": null,
+   "label": "97.7% exact interval"
+  },
+  "jump|A/side_3_plus_3|dz_mean/countermovementDepth": {
+   "method": "student_t",
+   "null_coverage": 0.9525,
+   "null_mc_se": 0.0033631737243264726,
+   "positive_control_coverage": 0.95225,
+   "label": "95% CI"
+  },
+  "jump|A/side_3_plus_3|dz2_mean/countermovementDepth": {
+   "method": "student_t",
+   "null_coverage": 0.952,
+   "null_mc_se": 0.0033799408278844187,
+   "positive_control_coverage": 0.9465,
+   "label": "95% CI"
+  },
+  "jump|A/side_3_plus_3|delta_mean/trunkLean": {
+   "method": "student_t",
+   "null_coverage": 0.95025,
+   "null_mc_se": 0.003437838619685338,
+   "positive_control_coverage": 0.951,
+   "label": "95% CI"
+  },
+  "jump|A/side_3_plus_3|delta_median/trunkLean": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.9785,
+   "null_mc_se": 0.0022933463541297008,
+   "positive_control_coverage": 0.97625,
+   "label": "97.7% exact interval"
+  },
+  "jump|A/side_3_plus_3|dz_mean/trunkLean": {
+   "method": "student_t",
+   "null_coverage": 0.94675,
+   "null_mc_se": 0.0035501562465615516,
+   "positive_control_coverage": 0.95025,
+   "label": "95% CI"
+  },
+  "jump|A/side_3_plus_3|dz2_mean/trunkLean": {
+   "method": "student_t",
+   "null_coverage": 0.94875,
+   "null_mc_se": 0.0034865254014562986,
+   "positive_control_coverage": 0.9585,
+   "label": "95% CI"
+  },
+  "jump|A/side_3_plus_3|delta_mean/landingKneeFlex": {
+   "method": "student_t",
+   "null_coverage": 0.9455,
+   "null_mc_se": 0.0035892112643309253,
+   "positive_control_coverage": 0.952,
+   "label": "95% CI"
+  },
+  "jump|A/side_3_plus_3|delta_median/landingKneeFlex": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.97675,
+   "null_mc_se": 0.0023827210023416503,
+   "positive_control_coverage": null,
+   "label": "97.7% exact interval"
+  },
+  "jump|A/side_3_plus_3|dz_mean/landingKneeFlex": {
+   "method": "student_t",
+   "null_coverage": 0.953,
+   "null_mc_se": 0.003346303931205295,
+   "positive_control_coverage": 0.95325,
+   "label": "95% CI"
+  },
+  "jump|A/side_3_plus_3|dz2_mean/landingKneeFlex": {
+   "method": "student_t",
+   "null_coverage": 0.9545,
+   "null_mc_se": 0.003295062594246124,
+   "positive_control_coverage": 0.94425,
+   "label": "95% CI"
+  },
+  "jump|A/side_3_plus_3|delta_mean/rsiMod": {
+   "method": "student_t",
+   "null_coverage": 0.95375,
+   "null_mc_se": 0.0033208032725531938,
+   "positive_control_coverage": 0.9515,
+   "label": "95% CI"
+  },
+  "jump|A/side_3_plus_3|delta_median/rsiMod": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.977,
+   "null_mc_se": 0.002370179318110764,
+   "positive_control_coverage": null,
+   "label": "97.7% exact interval"
+  },
+  "jump|A/side_3_plus_3|dz_mean/rsiMod": {
+   "method": "student_t",
+   "null_coverage": 0.95325,
+   "null_mc_se": 0.0033378300398612254,
+   "positive_control_coverage": 0.96025,
+   "label": "95% CI"
+  },
+  "jump|A/side_3_plus_3|dz2_mean/rsiMod": {
+   "method": "student_t",
+   "null_coverage": 0.955,
+   "null_mc_se": 0.003277766007511825,
+   "positive_control_coverage": 0.9525,
+   "label": "95% CI"
+  },
+  "jump|A/side_3_plus_3|delta_mean/eccentricDuration": {
+   "method": "student_t",
+   "null_coverage": 0.9595,
+   "null_mc_se": 0.0031168794490643997,
+   "positive_control_coverage": 0.96375,
+   "label": "95% CI"
+  },
+  "jump|A/side_3_plus_3|delta_median/eccentricDuration": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.9795,
+   "null_mc_se": 0.0022405217026398097,
+   "positive_control_coverage": null,
+   "label": "97.7% exact interval"
+  },
+  "jump|A/side_3_plus_3|dz_mean/eccentricDuration": {
+   "method": "student_t",
+   "null_coverage": 0.9535,
+   "null_mc_se": 0.0033293298875299213,
+   "positive_control_coverage": 0.94575,
+   "label": "95% CI"
+  },
+  "jump|A/side_3_plus_3|dz2_mean/eccentricDuration": {
+   "method": "student_t",
+   "null_coverage": 0.9515,
+   "null_mc_se": 0.0033966067626382654,
+   "positive_control_coverage": 0.953,
+   "label": "95% CI"
+  },
+  "jump|A/side_3_plus_3|delta_mean/flightTime": {
+   "method": "student_t",
+   "null_coverage": 0.9455,
+   "null_mc_se": 0.0035892112643309253,
+   "positive_control_coverage": 0.94925,
+   "label": "95% CI"
+  },
+  "jump|A/side_3_plus_3|delta_median/flightTime": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.98775,
+   "null_mc_se": 0.0017392482212151307,
+   "positive_control_coverage": null,
+   "label": "97.7% exact interval"
+  },
+  "jump|A/side_3_plus_3|dz_mean/flightTime": {
+   "method": "student_t",
+   "null_coverage": 0.95675,
+   "null_mc_se": 0.003216342546278304,
+   "positive_control_coverage": 0.94875,
+   "label": "95% CI"
+  },
+  "jump|A/side_3_plus_3|dz2_mean/flightTime": {
+   "method": "student_t",
+   "null_coverage": 0.95175,
+   "null_mc_se": 0.0033882863478460618,
+   "positive_control_coverage": 0.94725,
+   "label": "95% CI"
+  },
+  "jump|A/side_3_plus_3|delta_mean/concentricDuration": {
+   "method": "student_t",
+   "null_coverage": 0.961,
+   "null_mc_se": 0.0030610047370103837,
+   "positive_control_coverage": 0.958,
+   "label": "95% CI"
+  },
+  "jump|A/side_3_plus_3|delta_median/concentricDuration": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.991,
+   "null_mc_se": 0.0014932347437693787,
+   "positive_control_coverage": null,
+   "label": "97.7% exact interval"
+  },
+  "jump|A/side_3_plus_3|dz_mean/concentricDuration": {
+   "method": "student_t",
+   "null_coverage": 0.95025,
+   "null_mc_se": 0.003437838619685338,
+   "positive_control_coverage": 0.9575,
+   "label": "95% CI"
+  },
+  "jump|A/side_3_plus_3|dz2_mean/concentricDuration": {
+   "method": "student_t",
+   "null_coverage": 0.9555,
+   "null_mc_se": 0.003260358492558755,
+   "positive_control_coverage": 0.95075,
+   "label": "95% CI"
+  },
+  "jump|A/side_3_plus_3|delta_mean/asymmetry": {
+   "method": "student_t",
+   "null_coverage": 0.945,
+   "null_mc_se": 0.003604684452209376,
+   "positive_control_coverage": 0.954,
+   "label": "95% CI"
+  },
+  "jump|A/side_3_plus_3|delta_median/asymmetry": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.975,
+   "null_mc_se": 0.0024685522072664385,
+   "positive_control_coverage": null,
+   "label": "97.7% exact interval"
+  },
+  "jump|A/side_3_plus_3|dz_mean/asymmetry": {
+   "method": "student_t",
+   "null_coverage": 0.9525,
+   "null_mc_se": 0.0033631737243264726,
+   "positive_control_coverage": 0.95475,
+   "label": "95% CI"
+  },
+  "jump|A/side_3_plus_3|dz2_mean/asymmetry": {
+   "method": "student_t",
+   "null_coverage": 0.9525,
+   "null_mc_se": 0.0033631737243264726,
+   "positive_control_coverage": 0.946,
+   "label": "95% CI"
+  },
+  "jump|A/side_3_plus_3|personal_rank_mean/S0": {
+   "method": "student_t",
+   "null_coverage": 0.94775,
+   "null_mc_se": 0.0035185201967588594,
+   "positive_control_coverage": 0.956,
+   "label": "95% CI"
+  },
+  "jump|A/side_3_plus_3|personal_rank_median/S0": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.9775,
+   "null_mc_se": 0.0023448747301295205,
+   "positive_control_coverage": null,
+   "label": "97.7% exact interval"
+  },
+  "jump|A/side_3_plus_3|personal_rank_share1/S0": {
+   "method": "wilson",
+   "null_coverage": 0.96875,
+   "null_mc_se": 0.00275106513463422,
+   "positive_control_coverage": 0.9725,
+   "label": "95% CI"
+  },
+  "jump|A/side_3_plus_3|personal_true_mean/S0": {
+   "method": "student_t",
+   "null_coverage": 0.96625,
+   "null_mc_se": 0.0028552993494553223,
+   "positive_control_coverage": 0.9575,
+   "label": "95% CI"
+  },
+  "jump|A/side_3_plus_3|personal_rank_mean/S-P2": {
+   "method": "student_t",
+   "null_coverage": 0.95225,
+   "null_mc_se": 0.0033715700163277035,
+   "positive_control_coverage": 0.96,
+   "label": "95% CI"
+  },
+  "jump|A/side_3_plus_3|personal_rank_median/S-P2": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.9795,
+   "null_mc_se": 0.0022405217026398097,
+   "positive_control_coverage": null,
+   "label": "97.7% exact interval"
+  },
+  "jump|A/side_3_plus_3|personal_rank_share1/S-P2": {
+   "method": "wilson",
+   "null_coverage": 0.971,
+   "null_mc_se": 0.002653252720718478,
+   "positive_control_coverage": 0.95025,
+   "label": "95% CI"
+  },
+  "jump|A/side_3_plus_3|personal_true_mean/S-P2": {
+   "method": "student_t",
+   "null_coverage": 0.96725,
+   "null_mc_se": 0.0028141356355015986,
+   "positive_control_coverage": 0.95325,
+   "label": "95% CI"
+  },
+  "jump|A/side_3_plus_3|personal_rank_mean/S-P3": {
+   "method": "student_t",
+   "null_coverage": 0.94875,
+   "null_mc_se": 0.0034865254014562986,
+   "positive_control_coverage": 0.957,
+   "label": "95% CI"
+  },
+  "jump|A/side_3_plus_3|personal_rank_median/S-P3": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.97525,
+   "null_mc_se": 0.002456493308559991,
+   "positive_control_coverage": null,
+   "label": "97.7% exact interval"
+  },
+  "jump|A/side_3_plus_3|personal_rank_share1/S-P3": {
+   "method": "wilson",
+   "null_coverage": 0.968,
+   "null_mc_se": 0.0027828043409481753,
+   "positive_control_coverage": 0.974,
+   "label": "95% CI"
+  },
+  "jump|A/side_3_plus_3|personal_true_mean/S-P3": {
+   "method": "student_t",
+   "null_coverage": 0.96,
+   "null_mc_se": 0.003098386676965935,
+   "positive_control_coverage": 0.95625,
+   "label": "95% CI"
+  },
+  "jump|A/side_3_plus_3|personal_rank_mean/S-P2P3": {
+   "method": "student_t",
+   "null_coverage": 0.95225,
+   "null_mc_se": 0.0033715700163277035,
+   "positive_control_coverage": 0.95725,
+   "label": "95% CI"
+  },
+  "jump|A/side_3_plus_3|personal_rank_median/S-P2P3": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.981,
+   "null_mc_se": 0.0021586454085838194,
+   "positive_control_coverage": null,
+   "label": "97.7% exact interval"
+  },
+  "jump|A/side_3_plus_3|personal_rank_share1/S-P2P3": {
+   "method": "wilson",
+   "null_coverage": 0.9745,
+   "null_mc_se": 0.0024924761784217704,
+   "positive_control_coverage": 0.969,
+   "label": "95% CI"
+  },
+  "jump|A/side_3_plus_3|personal_true_mean/S-P2P3": {
+   "method": "student_t",
+   "null_coverage": 0.96475,
+   "null_mc_se": 0.002915794810167547,
+   "positive_control_coverage": 0.9525,
+   "label": "95% CI"
+  },
+  "jump|A/side_3_plus_3|personal_rank_mean/S-valid": {
+   "method": "student_t",
+   "null_coverage": 0.94925,
+   "null_mc_se": 0.003470390377896987,
+   "positive_control_coverage": 0.96225,
+   "label": "95% CI"
+  },
+  "jump|A/side_3_plus_3|personal_rank_median/S-valid": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.9805,
+   "null_mc_se": 0.0021863068174435146,
+   "positive_control_coverage": null,
+   "label": "97.7% exact interval"
+  },
+  "jump|A/side_3_plus_3|personal_rank_share1/S-valid": {
+   "method": "wilson",
+   "null_coverage": 0.96825,
+   "null_mc_se": 0.0027722706172017167,
+   "positive_control_coverage": 0.96825,
+   "label": "95% CI"
+  },
+  "jump|A/side_3_plus_3|personal_true_mean/S-valid": {
+   "method": "student_t",
+   "null_coverage": 0.9695,
+   "null_mc_se": 0.0027189037312858274,
+   "positive_control_coverage": 0.95625,
+   "label": "95% CI"
+  },
+  "jump|paired_same_participants|paired_B_minus_A_dz_mean/jumpHeight": {
+   "method": "student_t",
+   "null_coverage": 0.95075,
+   "null_mc_se": 0.003421419204803762,
+   "positive_control_coverage": 0.978,
+   "label": "95% CI"
+  },
+  "jump|paired_same_participants|paired_B_minus_A_dz2_mean/jumpHeight": {
+   "method": "student_t",
+   "null_coverage": 0.9465,
+   "null_mc_se": 0.0035580103288214327,
+   "positive_control_coverage": 0.98475,
+   "label": "95% CI"
+  },
+  "jump|paired_same_participants|paired_B_minus_A_dz_mean/countermovementDepth": {
+   "method": "student_t",
+   "null_coverage": 0.9535,
+   "null_mc_se": 0.0033293298875299213,
+   "positive_control_coverage": 0.95825,
+   "label": "95% CI"
+  },
+  "jump|paired_same_participants|paired_B_minus_A_dz2_mean/countermovementDepth": {
+   "method": "student_t",
+   "null_coverage": 0.95075,
+   "null_mc_se": 0.003421419204803762,
+   "positive_control_coverage": 0.9455,
+   "label": "95% CI"
+  },
+  "jump|paired_same_participants|paired_B_minus_A_dz_mean/trunkLean": {
+   "method": "student_t",
+   "null_coverage": 1.0,
+   "null_mc_se": 0.0,
+   "positive_control_coverage": 1.0,
+   "label": "95% CI"
+  },
+  "jump|paired_same_participants|paired_B_minus_A_dz2_mean/trunkLean": {
+   "method": "student_t",
+   "null_coverage": 1.0,
+   "null_mc_se": 0.0,
+   "positive_control_coverage": 1.0,
+   "label": "95% CI"
+  },
+  "jump|paired_same_participants|paired_B_minus_A_dz_mean/landingKneeFlex": {
+   "method": "student_t",
+   "null_coverage": 0.96,
+   "null_mc_se": 0.003098386676965935,
+   "positive_control_coverage": 0.95675,
+   "label": "95% CI"
+  },
+  "jump|paired_same_participants|paired_B_minus_A_dz2_mean/landingKneeFlex": {
+   "method": "student_t",
+   "null_coverage": 0.95,
+   "null_mc_se": 0.003446012188022557,
+   "positive_control_coverage": 0.95425,
+   "label": "95% CI"
+  },
+  "jump|paired_same_participants|paired_B_minus_A_dz_mean/rsiMod": {
+   "method": "student_t",
+   "null_coverage": 0.96025,
+   "null_mc_se": 0.003089091189168748,
+   "positive_control_coverage": 0.958,
+   "label": "95% CI"
+  },
+  "jump|paired_same_participants|paired_B_minus_A_dz2_mean/rsiMod": {
+   "method": "student_t",
+   "null_coverage": 0.951,
+   "null_mc_se": 0.003413173010557773,
+   "positive_control_coverage": 0.95175,
+   "label": "95% CI"
+  },
+  "jump|paired_same_participants|paired_B_minus_A_dz_mean/eccentricDuration": {
+   "method": "student_t",
+   "null_coverage": 0.952,
+   "null_mc_se": 0.0033799408278844187,
+   "positive_control_coverage": 0.9515,
+   "label": "95% CI"
+  },
+  "jump|paired_same_participants|paired_B_minus_A_dz2_mean/eccentricDuration": {
+   "method": "student_t",
+   "null_coverage": 0.9465,
+   "null_mc_se": 0.0035580103288214327,
+   "positive_control_coverage": 0.95475,
+   "label": "95% CI"
+  },
+  "jump|A/at_least_1_plus_1|pop_delta_mean/S0": {
+   "method": "student_t",
+   "null_coverage": 0.9575,
+   "null_mc_se": 0.004510751046111944,
+   "positive_control_coverage": 0.9705,
+   "label": "95% CI"
+  },
+  "jump|A/at_least_1_plus_1|pop_delta_mean/S-P2": {
+   "method": "student_t",
+   "null_coverage": 0.9575,
+   "null_mc_se": 0.004510751046111944,
+   "positive_control_coverage": 0.9725,
+   "label": "95% CI"
+  },
+  "jump|A/at_least_1_plus_1|pop_delta_mean/S-P3": {
+   "method": "student_t",
+   "null_coverage": 0.9515,
+   "null_mc_se": 0.004803527349771207,
+   "positive_control_coverage": 0.9675,
+   "label": "95% CI"
+  },
+  "jump|A/at_least_1_plus_1|pop_delta_mean/S-P2P3": {
+   "method": "student_t",
+   "null_coverage": 0.9575,
+   "null_mc_se": 0.004510751046111944,
+   "positive_control_coverage": 0.9715,
+   "label": "95% CI"
+  },
+  "jump|A/at_least_1_plus_1|pop_delta_mean/S-valid": {
+   "method": "student_t",
+   "null_coverage": 0.9585,
+   "null_mc_se": 0.004459694496263168,
+   "positive_control_coverage": 0.9725,
+   "label": "95% CI"
+  },
+  "jump|A/at_least_2_plus_2|pop_delta_mean/S0": {
+   "method": "student_t",
+   "null_coverage": 0.953,
+   "null_mc_se": 0.004732388403332932,
+   "positive_control_coverage": 0.968,
+   "label": "95% CI"
+  },
+  "jump|A/at_least_2_plus_2|pop_delta_mean/S-P2": {
+   "method": "student_t",
+   "null_coverage": 0.9535,
+   "null_mc_se": 0.004708383480558906,
+   "positive_control_coverage": 0.9705,
+   "label": "95% CI"
+  },
+  "jump|A/at_least_2_plus_2|pop_delta_mean/S-P3": {
+   "method": "student_t",
+   "null_coverage": 0.9545,
+   "null_mc_se": 0.004659922209651143,
+   "positive_control_coverage": 0.9705,
+   "label": "95% CI"
+  },
+  "jump|A/at_least_2_plus_2|pop_delta_mean/S-P2P3": {
+   "method": "student_t",
+   "null_coverage": 0.9575,
+   "null_mc_se": 0.004510751046111944,
+   "positive_control_coverage": 0.97,
+   "label": "95% CI"
+  },
+  "jump|A/at_least_2_plus_2|pop_delta_mean/S-valid": {
+   "method": "student_t",
+   "null_coverage": 0.947,
+   "null_mc_se": 0.005009540897128201,
+   "positive_control_coverage": 0.9765,
+   "label": "95% CI"
+  },
+  "jump|A/primary|pop_delta_mean/S0": {
+   "method": "student_t",
+   "null_coverage": 0.95,
+   "null_mc_se": 0.004873397172404485,
+   "positive_control_coverage": 0.9675,
+   "label": "95% CI"
+  },
+  "jump|A/primary|pop_rank_mean/S0": {
+   "method": "student_t",
+   "null_coverage": 0.9495,
+   "null_mc_se": 0.0048964145045124596,
+   "positive_control_coverage": 0.973,
+   "label": "95% CI"
+  },
+  "jump|A/primary|pop_delta_mean/S-P2": {
+   "method": "student_t",
+   "null_coverage": 0.953,
+   "null_mc_se": 0.004732388403332932,
+   "positive_control_coverage": 0.9735,
+   "label": "95% CI"
+  },
+  "jump|A/primary|pop_rank_mean/S-P2": {
+   "method": "student_t",
+   "null_coverage": 0.946,
+   "null_mc_se": 0.005053909377897473,
+   "positive_control_coverage": 0.9775,
+   "label": "95% CI"
+  },
+  "jump|A/primary|pop_delta_mean/S-P3": {
+   "method": "student_t",
+   "null_coverage": 0.9485,
+   "null_mc_se": 0.004942051699446293,
+   "positive_control_coverage": 0.967,
+   "label": "95% CI"
+  },
+  "jump|A/primary|pop_rank_mean/S-P3": {
+   "method": "student_t",
+   "null_coverage": 0.9485,
+   "null_mc_se": 0.004942051699446293,
+   "positive_control_coverage": 0.9765,
+   "label": "95% CI"
+  },
+  "jump|A/primary|pop_delta_mean/S-P2P3": {
+   "method": "student_t",
+   "null_coverage": 0.953,
+   "null_mc_se": 0.004732388403332932,
+   "positive_control_coverage": 0.9755,
+   "label": "95% CI"
+  },
+  "jump|A/primary|pop_rank_mean/S-P2P3": {
+   "method": "student_t",
+   "null_coverage": 0.947,
+   "null_mc_se": 0.005009540897128201,
+   "positive_control_coverage": 0.9825,
+   "label": "95% CI"
+  },
+  "jump|A/primary|pop_delta_mean/S-valid": {
+   "method": "student_t",
+   "null_coverage": 0.948,
+   "null_mc_se": 0.0049646752159632785,
+   "positive_control_coverage": 0.9755,
+   "label": "95% CI"
+  },
+  "jump|A/primary|pop_rank_mean/S-valid": {
+   "method": "student_t",
+   "null_coverage": 0.9485,
+   "null_mc_se": 0.004942051699446293,
+   "positive_control_coverage": 0.9805,
+   "label": "95% CI"
+  },
+  "jump|A/same_participants|pop_delta_mean/S0": {
+   "method": "student_t",
+   "null_coverage": 0.952,
+   "null_mc_se": 0.004779958158812692,
+   "positive_control_coverage": 0.9665,
+   "label": "95% CI"
+  },
+  "jump|A/same_participants|pop_rank_mean/S0": {
+   "method": "student_t",
+   "null_coverage": 0.9435,
+   "null_mc_se": 0.005162739098579358,
+   "positive_control_coverage": 0.978,
+   "label": "95% CI"
+  },
+  "jump|A/same_participants|pop_delta_mean/S-P2": {
+   "method": "student_t",
+   "null_coverage": 0.9545,
+   "null_mc_se": 0.004659922209651143,
+   "positive_control_coverage": 0.971,
+   "label": "95% CI"
+  },
+  "jump|A/same_participants|pop_rank_mean/S-P2": {
+   "method": "student_t",
+   "null_coverage": 0.951,
+   "null_mc_se": 0.004826955562256609,
+   "positive_control_coverage": 0.9795,
+   "label": "95% CI"
+  },
+  "jump|A/same_participants|pop_delta_mean/S-P3": {
+   "method": "student_t",
+   "null_coverage": 0.9475,
+   "null_mc_se": 0.004987171041783106,
+   "positive_control_coverage": 0.9665,
+   "label": "95% CI"
+  },
+  "jump|A/same_participants|pop_rank_mean/S-P3": {
+   "method": "student_t",
+   "null_coverage": 0.9465,
+   "null_mc_se": 0.005031786462082825,
+   "positive_control_coverage": 0.979,
+   "label": "95% CI"
+  },
+  "jump|A/same_participants|pop_delta_mean/S-P2P3": {
+   "method": "student_t",
+   "null_coverage": 0.9505,
+   "null_mc_se": 0.004850244839180801,
+   "positive_control_coverage": 0.971,
+   "label": "95% CI"
+  },
+  "jump|A/same_participants|pop_rank_mean/S-P2P3": {
+   "method": "student_t",
+   "null_coverage": 0.946,
+   "null_mc_se": 0.005053909377897473,
+   "positive_control_coverage": 0.982,
+   "label": "95% CI"
+  },
+  "jump|A/same_participants|pop_delta_mean/S-valid": {
+   "method": "student_t",
+   "null_coverage": 0.9475,
+   "null_mc_se": 0.004987171041783106,
+   "positive_control_coverage": 0.975,
+   "label": "95% CI"
+  },
+  "jump|A/same_participants|pop_rank_mean/S-valid": {
+   "method": "student_t",
+   "null_coverage": 0.946,
+   "null_mc_se": 0.005053909377897473,
+   "positive_control_coverage": 0.9785,
+   "label": "95% CI"
+  },
+  "jump|A/side_3_plus_3|pop_delta_mean/S0": {
+   "method": "student_t",
+   "null_coverage": 0.962,
+   "null_mc_se": 0.004275277768753747,
+   "positive_control_coverage": 0.9865,
+   "label": "95% CI"
+  },
+  "jump|A/side_3_plus_3|pop_rank_mean/S0": {
+   "method": "student_t",
+   "null_coverage": 0.952,
+   "null_mc_se": 0.004779958158812692,
+   "positive_control_coverage": 0.9895,
+   "label": "95% CI"
+  },
+  "jump|A/side_3_plus_3|pop_delta_mean/S-P2": {
+   "method": "student_t",
+   "null_coverage": 0.965,
+   "null_mc_se": 0.00410944035119139,
+   "positive_control_coverage": 0.9865,
+   "label": "95% CI"
+  },
+  "jump|A/side_3_plus_3|pop_rank_mean/S-P2": {
+   "method": "student_t",
+   "null_coverage": 0.952,
+   "null_mc_se": 0.004779958158812692,
+   "positive_control_coverage": 0.9925,
+   "label": "95% CI"
+  },
+  "jump|A/side_3_plus_3|pop_delta_mean/S-P3": {
+   "method": "student_t",
+   "null_coverage": 0.9625,
+   "null_mc_se": 0.004248161366991606,
+   "positive_control_coverage": 0.983,
+   "label": "95% CI"
+  },
+  "jump|A/side_3_plus_3|pop_rank_mean/S-P3": {
+   "method": "student_t",
+   "null_coverage": 0.95,
+   "null_mc_se": 0.004873397172404485,
+   "positive_control_coverage": 0.9865,
+   "label": "95% CI"
+  },
+  "jump|A/side_3_plus_3|pop_delta_mean/S-P2P3": {
+   "method": "student_t",
+   "null_coverage": 0.9595,
+   "null_mc_se": 0.004407933189148855,
+   "positive_control_coverage": 0.9855,
+   "label": "95% CI"
+  },
+  "jump|A/side_3_plus_3|pop_rank_mean/S-P2P3": {
+   "method": "student_t",
+   "null_coverage": 0.949,
+   "null_mc_se": 0.004919298730510276,
+   "positive_control_coverage": 0.9885,
+   "label": "95% CI"
+  },
+  "jump|A/side_3_plus_3|pop_delta_mean/S-valid": {
+   "method": "student_t",
+   "null_coverage": 0.9695,
+   "null_mc_se": 0.0038451105315712303,
+   "positive_control_coverage": 0.991,
+   "label": "95% CI"
+  },
+  "jump|A/side_3_plus_3|pop_rank_mean/S-valid": {
+   "method": "student_t",
+   "null_coverage": 0.954,
+   "null_mc_se": 0.0046842288586276416,
+   "positive_control_coverage": 0.9895,
+   "label": "95% CI"
+  },
+  "jump|B/at_least_1_plus_1|pop_delta_mean/S0": {
+   "method": "student_t",
+   "null_coverage": 0.9475,
+   "null_mc_se": 0.004987171041783106,
+   "positive_control_coverage": 0.9585,
+   "label": "95% CI"
+  },
+  "jump|B/at_least_1_plus_1|pop_delta_mean/S-P2": {
+   "method": "student_t",
+   "null_coverage": 0.9505,
+   "null_mc_se": 0.004850244839180801,
+   "positive_control_coverage": 0.964,
+   "label": "95% CI"
+  },
+  "jump|B/at_least_1_plus_1|pop_delta_mean/S-P3": {
+   "method": "student_t",
+   "null_coverage": 0.948,
+   "null_mc_se": 0.0049646752159632785,
+   "positive_control_coverage": 0.9575,
+   "label": "95% CI"
+  },
+  "jump|B/at_least_1_plus_1|pop_delta_mean/S-P2P3": {
+   "method": "student_t",
+   "null_coverage": 0.9445,
+   "null_mc_se": 0.005119558086397692,
+   "positive_control_coverage": 0.9645,
+   "label": "95% CI"
+  },
+  "jump|B/at_least_1_plus_1|pop_delta_mean/S-valid": {
+   "method": "student_t",
+   "null_coverage": 0.9495,
+   "null_mc_se": 0.0048964145045124596,
+   "positive_control_coverage": 0.968,
+   "label": "95% CI"
+  },
+  "jump|B/at_least_2_plus_2|pop_delta_mean/S0": {
+   "method": "student_t",
+   "null_coverage": 0.9525,
+   "null_mc_se": 0.00475624589355933,
+   "positive_control_coverage": 0.966,
+   "label": "95% CI"
+  },
+  "jump|B/at_least_2_plus_2|pop_delta_mean/S-P2": {
+   "method": "student_t",
+   "null_coverage": 0.9465,
+   "null_mc_se": 0.005031786462082825,
+   "positive_control_coverage": 0.9715,
+   "label": "95% CI"
+  },
+  "jump|B/at_least_2_plus_2|pop_delta_mean/S-P3": {
+   "method": "student_t",
+   "null_coverage": 0.956,
+   "null_mc_se": 0.004586065852122058,
+   "positive_control_coverage": 0.9695,
+   "label": "95% CI"
+  },
+  "jump|B/at_least_2_plus_2|pop_delta_mean/S-P2P3": {
+   "method": "student_t",
+   "null_coverage": 0.954,
+   "null_mc_se": 0.0046842288586276416,
+   "positive_control_coverage": 0.9735,
+   "label": "95% CI"
+  },
+  "jump|B/at_least_2_plus_2|pop_delta_mean/S-valid": {
+   "method": "student_t",
+   "null_coverage": 0.953,
+   "null_mc_se": 0.004732388403332932,
+   "positive_control_coverage": 0.978,
+   "label": "95% CI"
+  },
+  "jump|B/primary|pop_delta_mean/S0": {
+   "method": "student_t",
+   "null_coverage": 0.9545,
+   "null_mc_se": 0.004659922209651143,
+   "positive_control_coverage": 0.9675,
+   "label": "95% CI"
+  },
+  "jump|B/primary|pop_rank_mean/S0": {
+   "method": "student_t",
+   "null_coverage": 0.951,
+   "null_mc_se": 0.004826955562256609,
+   "positive_control_coverage": 0.978,
+   "label": "95% CI"
+  },
+  "jump|B/primary|pop_delta_mean/S-P2": {
+   "method": "student_t",
+   "null_coverage": 0.9575,
+   "null_mc_se": 0.004510751046111944,
+   "positive_control_coverage": 0.9765,
+   "label": "95% CI"
+  },
+  "jump|B/primary|pop_rank_mean/S-P2": {
+   "method": "student_t",
+   "null_coverage": 0.9485,
+   "null_mc_se": 0.004942051699446293,
+   "positive_control_coverage": 0.982,
+   "label": "95% CI"
+  },
+  "jump|B/primary|pop_delta_mean/S-P3": {
+   "method": "student_t",
+   "null_coverage": 0.953,
+   "null_mc_se": 0.004732388403332932,
+   "positive_control_coverage": 0.971,
+   "label": "95% CI"
+  },
+  "jump|B/primary|pop_rank_mean/S-P3": {
+   "method": "student_t",
+   "null_coverage": 0.9475,
+   "null_mc_se": 0.004987171041783106,
+   "positive_control_coverage": 0.981,
+   "label": "95% CI"
+  },
+  "jump|B/primary|pop_delta_mean/S-P2P3": {
+   "method": "student_t",
+   "null_coverage": 0.9565,
+   "null_mc_se": 0.004561126505590477,
+   "positive_control_coverage": 0.976,
+   "label": "95% CI"
+  },
+  "jump|B/primary|pop_rank_mean/S-P2P3": {
+   "method": "student_t",
+   "null_coverage": 0.9515,
+   "null_mc_se": 0.004803527349771207,
+   "positive_control_coverage": 0.984,
+   "label": "95% CI"
+  },
+  "jump|B/primary|pop_delta_mean/S-valid": {
+   "method": "student_t",
+   "null_coverage": 0.947,
+   "null_mc_se": 0.005009540897128201,
+   "positive_control_coverage": 0.9815,
+   "label": "95% CI"
+  },
+  "jump|B/primary|pop_rank_mean/S-valid": {
+   "method": "student_t",
+   "null_coverage": 0.947,
+   "null_mc_se": 0.005009540897128201,
+   "positive_control_coverage": 0.984,
+   "label": "95% CI"
+  },
+  "jump|B/same_participants|pop_delta_mean/S0": {
+   "method": "student_t",
+   "null_coverage": 0.9435,
+   "null_mc_se": 0.005162739098579358,
+   "positive_control_coverage": 0.9595,
+   "label": "95% CI"
+  },
+  "jump|B/same_participants|pop_rank_mean/S0": {
+   "method": "student_t",
+   "null_coverage": 0.941,
+   "null_mc_se": 0.005268728499363013,
+   "positive_control_coverage": 0.9695,
+   "label": "95% CI"
+  },
+  "jump|B/same_participants|pop_delta_mean/S-P2": {
+   "method": "student_t",
+   "null_coverage": 0.943,
+   "null_mc_se": 0.005184158562389852,
+   "positive_control_coverage": 0.9615,
+   "label": "95% CI"
+  },
+  "jump|B/same_participants|pop_rank_mean/S-P2": {
+   "method": "student_t",
+   "null_coverage": 0.944,
+   "null_mc_se": 0.005141206084179083,
+   "positive_control_coverage": 0.976,
+   "label": "95% CI"
+  },
+  "jump|B/same_participants|pop_delta_mean/S-P3": {
+   "method": "student_t",
+   "null_coverage": 0.9395,
+   "null_mc_se": 0.005331029450303197,
+   "positive_control_coverage": 0.955,
+   "label": "95% CI"
+  },
+  "jump|B/same_participants|pop_rank_mean/S-P3": {
+   "method": "student_t",
+   "null_coverage": 0.9415,
+   "null_mc_se": 0.0052477495176503994,
+   "positive_control_coverage": 0.9675,
+   "label": "95% CI"
+  },
+  "jump|B/same_participants|pop_delta_mean/S-P2P3": {
+   "method": "student_t",
+   "null_coverage": 0.941,
+   "null_mc_se": 0.005268728499363013,
+   "positive_control_coverage": 0.9555,
+   "label": "95% CI"
+  },
+  "jump|B/same_participants|pop_rank_mean/S-P2P3": {
+   "method": "student_t",
+   "null_coverage": 0.938,
+   "null_mc_se": 0.005392402062161169,
+   "positive_control_coverage": 0.9765,
+   "label": "95% CI"
+  },
+  "jump|B/same_participants|pop_delta_mean/S-valid": {
+   "method": "student_t",
+   "null_coverage": 0.9445,
+   "null_mc_se": 0.005119558086397692,
+   "positive_control_coverage": 0.9645,
+   "label": "95% CI"
+  },
+  "jump|B/same_participants|pop_rank_mean/S-valid": {
+   "method": "student_t",
+   "null_coverage": 0.942,
+   "null_mc_se": 0.005226662414964259,
+   "positive_control_coverage": 0.978,
+   "label": "95% CI"
+  },
+  "jump|B/side_3_plus_3|pop_delta_mean/S0": {
+   "method": "student_t",
+   "null_coverage": 0.9425,
+   "null_mc_se": 0.005205465877325487,
+   "positive_control_coverage": 0.964,
+   "label": "95% CI"
+  },
+  "jump|B/side_3_plus_3|pop_rank_mean/S0": {
+   "method": "student_t",
+   "null_coverage": 0.9415,
+   "null_mc_se": 0.0052477495176503994,
+   "positive_control_coverage": 0.9795,
+   "label": "95% CI"
+  },
+  "jump|B/side_3_plus_3|pop_delta_mean/S-P2": {
+   "method": "student_t",
+   "null_coverage": 0.9465,
+   "null_mc_se": 0.005031786462082825,
+   "positive_control_coverage": 0.969,
+   "label": "95% CI"
+  },
+  "jump|B/side_3_plus_3|pop_rank_mean/S-P2": {
+   "method": "student_t",
+   "null_coverage": 0.94,
+   "null_mc_se": 0.005310367218940704,
+   "positive_control_coverage": 0.9855,
+   "label": "95% CI"
+  },
+  "jump|B/side_3_plus_3|pop_delta_mean/S-P3": {
+   "method": "student_t",
+   "null_coverage": 0.947,
+   "null_mc_se": 0.005009540897128201,
+   "positive_control_coverage": 0.9685,
+   "label": "95% CI"
+  },
+  "jump|B/side_3_plus_3|pop_rank_mean/S-P3": {
+   "method": "student_t",
+   "null_coverage": 0.943,
+   "null_mc_se": 0.005184158562389852,
+   "positive_control_coverage": 0.984,
+   "label": "95% CI"
+  },
+  "jump|B/side_3_plus_3|pop_delta_mean/S-P2P3": {
+   "method": "student_t",
+   "null_coverage": 0.952,
+   "null_mc_se": 0.004779958158812692,
+   "positive_control_coverage": 0.9755,
+   "label": "95% CI"
+  },
+  "jump|B/side_3_plus_3|pop_rank_mean/S-P2P3": {
+   "method": "student_t",
+   "null_coverage": 0.939,
+   "null_mc_se": 0.005351588549206677,
+   "positive_control_coverage": 0.9855,
+   "label": "95% CI"
+  },
+  "jump|B/side_3_plus_3|pop_delta_mean/S-valid": {
+   "method": "student_t",
+   "null_coverage": 0.9505,
+   "null_mc_se": 0.004850244839180801,
+   "positive_control_coverage": 0.9775,
+   "label": "95% CI"
+  },
+  "jump|B/side_3_plus_3|pop_rank_mean/S-valid": {
+   "method": "student_t",
+   "null_coverage": 0.937,
+   "null_mc_se": 0.00543281694887652,
+   "positive_control_coverage": 0.9865,
+   "label": "95% CI"
+  },
+  "rehab|squat_primary|aucA_mean": {
+   "method": "student_t",
+   "null_coverage": 0.9575,
+   "null_mc_se": 0.004510751046111944,
+   "positive_control_coverage": 0.953,
+   "label": "95% CI"
+  },
+  "rehab|squat_primary|aucB_mean": {
+   "method": "student_t",
+   "null_coverage": 0.95,
+   "null_mc_se": 0.004873397172404485,
+   "positive_control_coverage": 0.953,
+   "label": "95% CI"
+  },
+  "rehab|squat_primary|aucB_median": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.967,
+   "null_mc_se": 0.003994433626936366,
+   "positive_control_coverage": null,
+   "label": "96.1% exact interval"
+  },
+  "rehab|squat_primary|aucPop_mean": {
+   "method": "student_t",
+   "null_coverage": 0.958,
+   "null_mc_se": 0.00448530935387962,
+   "positive_control_coverage": 0.9695,
+   "label": "95% CI"
+  },
+  "rehab|squat_primary|aucPop_median": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.9645,
+   "null_mc_se": 0.0041376170678302255,
+   "positive_control_coverage": null,
+   "label": "96.1% exact interval"
+  },
+  "rehab|squat_primary|std_mean/kneeRomL": {
+   "method": "student_t",
+   "null_coverage": 0.9535,
+   "null_mc_se": 0.004708383480558906,
+   "positive_control_coverage": 0.9535,
+   "label": "95% CI"
+  },
+  "rehab|squat_primary|std2_mean/kneeRomL": {
+   "method": "student_t",
+   "null_coverage": 0.9585,
+   "null_mc_se": 0.004459694496263168,
+   "positive_control_coverage": 0.9585,
+   "label": "95% CI"
+  },
+  "rehab|squat_primary|std2_median/kneeRomL": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.962,
+   "null_mc_se": 0.004275277768753747,
+   "positive_control_coverage": 0.962,
+   "label": "96.1% exact interval"
+  },
+  "rehab|squat_primary|std_mean/kneeRomR": {
+   "method": "student_t",
+   "null_coverage": 0.958,
+   "null_mc_se": 0.00448530935387962,
+   "positive_control_coverage": 0.958,
+   "label": "95% CI"
+  },
+  "rehab|squat_primary|std2_mean/kneeRomR": {
+   "method": "student_t",
+   "null_coverage": 0.956,
+   "null_mc_se": 0.004586065852122058,
+   "positive_control_coverage": 0.957,
+   "label": "95% CI"
+  },
+  "rehab|squat_primary|std2_median/kneeRomR": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.9625,
+   "null_mc_se": 0.004248161366991606,
+   "positive_control_coverage": 0.9625,
+   "label": "96.1% exact interval"
+  },
+  "rehab|squat_primary|std_mean/hipRom": {
+   "method": "student_t",
+   "null_coverage": 0.946,
+   "null_mc_se": 0.005053909377897473,
+   "positive_control_coverage": 0.946,
+   "label": "95% CI"
+  },
+  "rehab|squat_primary|std2_mean/hipRom": {
+   "method": "student_t",
+   "null_coverage": 0.946,
+   "null_mc_se": 0.005053909377897473,
+   "positive_control_coverage": 0.9465,
+   "label": "95% CI"
+  },
+  "rehab|squat_primary|std2_median/hipRom": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.9655,
+   "null_mc_se": 0.00408103847078167,
+   "positive_control_coverage": 0.9655,
+   "label": "96.1% exact interval"
+  },
+  "rehab|squat_primary|std_mean/depth": {
+   "method": "student_t",
+   "null_coverage": 0.957,
+   "null_mc_se": 0.004536022486716751,
+   "positive_control_coverage": 0.9615,
+   "label": "95% CI"
+  },
+  "rehab|squat_primary|std2_mean/depth": {
+   "method": "student_t",
+   "null_coverage": 0.9525,
+   "null_mc_se": 0.00475624589355933,
+   "positive_control_coverage": 0.975,
+   "label": "95% CI"
+  },
+  "rehab|squat_primary|std2_median/depth": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.9575,
+   "null_mc_se": 0.004510751046111944,
+   "positive_control_coverage": 0.9855,
+   "label": "96.1% exact interval"
+  },
+  "rehab|squat_primary|std_mean/trunkLean": {
+   "method": "student_t",
+   "null_coverage": 0.9495,
+   "null_mc_se": 0.0048964145045124596,
+   "positive_control_coverage": 0.959,
+   "label": "95% CI"
+  },
+  "rehab|squat_primary|std2_mean/trunkLean": {
+   "method": "student_t",
+   "null_coverage": 0.9495,
+   "null_mc_se": 0.0048964145045124596,
+   "positive_control_coverage": 0.976,
+   "label": "95% CI"
+  },
+  "rehab|squat_primary|std2_median/trunkLean": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.957,
+   "null_mc_se": 0.004536022486716751,
+   "positive_control_coverage": 0.979,
+   "label": "96.1% exact interval"
+  },
+  "rehab|squat_primary|std_mean/repDuration": {
+   "method": "student_t",
+   "null_coverage": 0.958,
+   "null_mc_se": 0.00448530935387962,
+   "positive_control_coverage": 0.958,
+   "label": "95% CI"
+  },
+  "rehab|squat_primary|std2_mean/repDuration": {
+   "method": "student_t",
+   "null_coverage": 0.956,
+   "null_mc_se": 0.004586065852122058,
+   "positive_control_coverage": 0.9555,
+   "label": "95% CI"
+  },
+  "rehab|squat_primary|std2_median/repDuration": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.9575,
+   "null_mc_se": 0.004510751046111944,
+   "positive_control_coverage": 0.9575,
+   "label": "96.1% exact interval"
+  },
+  "rehab|squat_primary|std_mean/eccentricDuration": {
+   "method": "student_t",
+   "null_coverage": 0.9565,
+   "null_mc_se": 0.004561126505590477,
+   "positive_control_coverage": 0.9565,
+   "label": "95% CI"
+  },
+  "rehab|squat_primary|std2_mean/eccentricDuration": {
+   "method": "student_t",
+   "null_coverage": 0.951,
+   "null_mc_se": 0.004826955562256609,
+   "positive_control_coverage": 0.952,
+   "label": "95% CI"
+  },
+  "rehab|squat_primary|std2_median/eccentricDuration": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.964,
+   "null_mc_se": 0.0041655731898503495,
+   "positive_control_coverage": 0.964,
+   "label": "96.1% exact interval"
+  },
+  "rehab|squat_primary|std_mean/concentricDuration": {
+   "method": "student_t",
+   "null_coverage": 0.9645,
+   "null_mc_se": 0.0041376170678302255,
+   "positive_control_coverage": 0.9645,
+   "label": "95% CI"
+  },
+  "rehab|squat_primary|std2_mean/concentricDuration": {
+   "method": "student_t",
+   "null_coverage": 0.965,
+   "null_mc_se": 0.00410944035119139,
+   "positive_control_coverage": 0.965,
+   "label": "95% CI"
+  },
+  "rehab|squat_primary|std2_median/concentricDuration": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.9585,
+   "null_mc_se": 0.004459694496263168,
+   "positive_control_coverage": 0.9585,
+   "label": "96.1% exact interval"
+  },
+  "rehab|squat_primary|std_mean/peakVelocity": {
+   "method": "student_t",
+   "null_coverage": 0.956,
+   "null_mc_se": 0.004586065852122058,
+   "positive_control_coverage": 0.956,
+   "label": "95% CI"
+  },
+  "rehab|squat_primary|std2_mean/peakVelocity": {
+   "method": "student_t",
+   "null_coverage": 0.959,
+   "null_mc_se": 0.00443390347211123,
+   "positive_control_coverage": 0.9605,
+   "label": "95% CI"
+  },
+  "rehab|squat_primary|std2_median/peakVelocity": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.9615,
+   "null_mc_se": 0.004302194207610808,
+   "positive_control_coverage": 0.9615,
+   "label": "96.1% exact interval"
+  },
+  "rehab|squat_primary|std_mean/asymmetry": {
+   "method": "student_t",
+   "null_coverage": 0.961,
+   "null_mc_se": 0.004328914413568374,
+   "positive_control_coverage": 0.961,
+   "label": "95% CI"
+  },
+  "rehab|squat_primary|std2_mean/asymmetry": {
+   "method": "student_t",
+   "null_coverage": 0.951,
+   "null_mc_se": 0.004826955562256609,
+   "positive_control_coverage": 0.952,
+   "label": "95% CI"
+  },
+  "rehab|squat_primary|std2_median/asymmetry": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.9635,
+   "null_mc_se": 0.004193313129257102,
+   "positive_control_coverage": 0.9635,
+   "label": "96.1% exact interval"
+  },
+  "rehab|squat_without_person_2|aucA_mean": {
+   "method": "student_t",
+   "null_coverage": 0.947,
+   "null_mc_se": 0.005009540897128201,
+   "positive_control_coverage": 0.948,
+   "label": "95% CI"
+  },
+  "rehab|squat_without_person_2|aucB_mean": {
+   "method": "student_t",
+   "null_coverage": 0.9425,
+   "null_mc_se": 0.005205465877325487,
+   "positive_control_coverage": 0.9455,
+   "label": "95% CI"
+  },
+  "rehab|squat_without_person_2|aucB_median": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.991,
+   "null_mc_se": 0.002111752826445369,
+   "positive_control_coverage": null,
+   "label": "99.2% exact interval"
+  },
+  "rehab|squat_without_person_2|aucPop_mean": {
+   "method": "student_t",
+   "null_coverage": 0.949,
+   "null_mc_se": 0.004919298730510276,
+   "positive_control_coverage": 0.968,
+   "label": "95% CI"
+  },
+  "rehab|squat_without_person_2|aucPop_median": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.9935,
+   "null_mc_se": 0.0017969070649312877,
+   "positive_control_coverage": null,
+   "label": "99.2% exact interval"
+  },
+  "rehab|squat_without_person_2|std_mean/kneeRomL": {
+   "method": "student_t",
+   "null_coverage": 0.9565,
+   "null_mc_se": 0.004561126505590477,
+   "positive_control_coverage": 0.9565,
+   "label": "95% CI"
+  },
+  "rehab|squat_without_person_2|std2_mean/kneeRomL": {
+   "method": "student_t",
+   "null_coverage": 0.954,
+   "null_mc_se": 0.0046842288586276416,
+   "positive_control_coverage": 0.9535,
+   "label": "95% CI"
+  },
+  "rehab|squat_without_person_2|std2_median/kneeRomL": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.9925,
+   "null_mc_se": 0.0019292161620720412,
+   "positive_control_coverage": 0.9925,
+   "label": "99.2% exact interval"
+  },
+  "rehab|squat_without_person_2|std_mean/kneeRomR": {
+   "method": "student_t",
+   "null_coverage": 0.95,
+   "null_mc_se": 0.004873397172404485,
+   "positive_control_coverage": 0.95,
+   "label": "95% CI"
+  },
+  "rehab|squat_without_person_2|std2_mean/kneeRomR": {
+   "method": "student_t",
+   "null_coverage": 0.9425,
+   "null_mc_se": 0.005205465877325487,
+   "positive_control_coverage": 0.9425,
+   "label": "95% CI"
+  },
+  "rehab|squat_without_person_2|std2_median/kneeRomR": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.988,
+   "null_mc_se": 0.0024347484469653133,
+   "positive_control_coverage": 0.988,
+   "label": "99.2% exact interval"
+  },
+  "rehab|squat_without_person_2|std_mean/hipRom": {
+   "method": "student_t",
+   "null_coverage": 0.9615,
+   "null_mc_se": 0.004302194207610808,
+   "positive_control_coverage": 0.9615,
+   "label": "95% CI"
+  },
+  "rehab|squat_without_person_2|std2_mean/hipRom": {
+   "method": "student_t",
+   "null_coverage": 0.958,
+   "null_mc_se": 0.00448530935387962,
+   "positive_control_coverage": 0.959,
+   "label": "95% CI"
+  },
+  "rehab|squat_without_person_2|std2_median/hipRom": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.9935,
+   "null_mc_se": 0.0017969070649312877,
+   "positive_control_coverage": 0.9935,
+   "label": "99.2% exact interval"
+  },
+  "rehab|squat_without_person_2|std_mean/depth": {
+   "method": "student_t",
+   "null_coverage": 0.951,
+   "null_mc_se": 0.004826955562256609,
+   "positive_control_coverage": 0.976,
+   "label": "95% CI"
+  },
+  "rehab|squat_without_person_2|std2_mean/depth": {
+   "method": "student_t",
+   "null_coverage": 0.945,
+   "null_mc_se": 0.005097793640389931,
+   "positive_control_coverage": 0.9775,
+   "label": "95% CI"
+  },
+  "rehab|squat_without_person_2|std2_median/depth": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.9895,
+   "null_mc_se": 0.0022792268425937726,
+   "positive_control_coverage": 0.997,
+   "label": "99.2% exact interval"
+  },
+  "rehab|squat_without_person_2|std_mean/trunkLean": {
+   "method": "student_t",
+   "null_coverage": 0.9515,
+   "null_mc_se": 0.004803527349771207,
+   "positive_control_coverage": 0.969,
+   "label": "95% CI"
+  },
+  "rehab|squat_without_person_2|std2_mean/trunkLean": {
+   "method": "student_t",
+   "null_coverage": 0.954,
+   "null_mc_se": 0.0046842288586276416,
+   "positive_control_coverage": 0.974,
+   "label": "95% CI"
+  },
+  "rehab|squat_without_person_2|std2_median/trunkLean": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.9935,
+   "null_mc_se": 0.0017969070649312877,
+   "positive_control_coverage": 0.9985,
+   "label": "99.2% exact interval"
+  },
+  "rehab|squat_without_person_2|std_mean/repDuration": {
+   "method": "student_t",
+   "null_coverage": 0.953,
+   "null_mc_se": 0.004732388403332932,
+   "positive_control_coverage": 0.953,
+   "label": "95% CI"
+  },
+  "rehab|squat_without_person_2|std2_mean/repDuration": {
+   "method": "student_t",
+   "null_coverage": 0.9545,
+   "null_mc_se": 0.004659922209651143,
+   "positive_control_coverage": 0.955,
+   "label": "95% CI"
+  },
+  "rehab|squat_without_person_2|std2_median/repDuration": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.9935,
+   "null_mc_se": 0.0017969070649312877,
+   "positive_control_coverage": 0.9935,
+   "label": "99.2% exact interval"
+  },
+  "rehab|squat_without_person_2|std_mean/eccentricDuration": {
+   "method": "student_t",
+   "null_coverage": 0.9525,
+   "null_mc_se": 0.00475624589355933,
+   "positive_control_coverage": 0.9525,
+   "label": "95% CI"
+  },
+  "rehab|squat_without_person_2|std2_mean/eccentricDuration": {
+   "method": "student_t",
+   "null_coverage": 0.9475,
+   "null_mc_se": 0.004987171041783106,
+   "positive_control_coverage": 0.9475,
+   "label": "95% CI"
+  },
+  "rehab|squat_without_person_2|std2_median/eccentricDuration": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.9925,
+   "null_mc_se": 0.0019292161620720412,
+   "positive_control_coverage": 0.9925,
+   "label": "99.2% exact interval"
+  },
+  "rehab|squat_without_person_2|std_mean/concentricDuration": {
+   "method": "student_t",
+   "null_coverage": 0.948,
+   "null_mc_se": 0.0049646752159632785,
+   "positive_control_coverage": 0.948,
+   "label": "95% CI"
+  },
+  "rehab|squat_without_person_2|std2_mean/concentricDuration": {
+   "method": "student_t",
+   "null_coverage": 0.948,
+   "null_mc_se": 0.0049646752159632785,
+   "positive_control_coverage": 0.9475,
+   "label": "95% CI"
+  },
+  "rehab|squat_without_person_2|std2_median/concentricDuration": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.993,
+   "null_mc_se": 0.0018642692938521525,
+   "positive_control_coverage": 0.993,
+   "label": "99.2% exact interval"
+  },
+  "rehab|squat_without_person_2|std_mean/peakVelocity": {
+   "method": "student_t",
+   "null_coverage": 0.952,
+   "null_mc_se": 0.004779958158812692,
+   "positive_control_coverage": 0.952,
+   "label": "95% CI"
+  },
+  "rehab|squat_without_person_2|std2_mean/peakVelocity": {
+   "method": "student_t",
+   "null_coverage": 0.953,
+   "null_mc_se": 0.004732388403332932,
+   "positive_control_coverage": 0.953,
+   "label": "95% CI"
+  },
+  "rehab|squat_without_person_2|std2_median/peakVelocity": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.993,
+   "null_mc_se": 0.0018642692938521525,
+   "positive_control_coverage": 0.993,
+   "label": "99.2% exact interval"
+  },
+  "rehab|squat_without_person_2|std_mean/asymmetry": {
+   "method": "student_t",
+   "null_coverage": 0.9455,
+   "null_mc_se": 0.005075911248239078,
+   "positive_control_coverage": 0.9455,
+   "label": "95% CI"
+  },
+  "rehab|squat_without_person_2|std2_mean/asymmetry": {
+   "method": "student_t",
+   "null_coverage": 0.945,
+   "null_mc_se": 0.005097793640389931,
+   "positive_control_coverage": 0.945,
+   "label": "95% CI"
+  },
+  "rehab|squat_without_person_2|std2_median/asymmetry": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.9925,
+   "null_mc_se": 0.0019292161620720412,
+   "positive_control_coverage": 0.9925,
+   "label": "99.2% exact interval"
+  },
+  "rehab|squat_side|aucA_mean": {
+   "method": "student_t",
+   "null_coverage": 0.964,
+   "null_mc_se": 0.0041655731898503495,
+   "positive_control_coverage": 0.9625,
+   "label": "95% CI"
+  },
+  "rehab|squat_side|aucB_mean": {
+   "method": "student_t",
+   "null_coverage": 0.958,
+   "null_mc_se": 0.00448530935387962,
+   "positive_control_coverage": 0.9605,
+   "label": "95% CI"
+  },
+  "rehab|squat_side|aucB_median": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.9685,
+   "null_mc_se": 0.0039056209493497944,
+   "positive_control_coverage": null,
+   "label": "96.1% exact interval"
+  },
+  "rehab|squat_side|aucPop_mean": {
+   "method": "student_t",
+   "null_coverage": 0.9585,
+   "null_mc_se": 0.004459694496263168,
+   "positive_control_coverage": 0.9615,
+   "label": "95% CI"
+  },
+  "rehab|squat_side|aucPop_median": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.965,
+   "null_mc_se": 0.00410944035119139,
+   "positive_control_coverage": null,
+   "label": "96.1% exact interval"
+  },
+  "rehab|squat_side|std_mean/kneeRomL": {
+   "method": "student_t",
+   "null_coverage": 0.957,
+   "null_mc_se": 0.004536022486716751,
+   "positive_control_coverage": 0.957,
+   "label": "95% CI"
+  },
+  "rehab|squat_side|std2_mean/kneeRomL": {
+   "method": "student_t",
+   "null_coverage": 0.9565,
+   "null_mc_se": 0.004561126505590477,
+   "positive_control_coverage": 0.958,
+   "label": "95% CI"
+  },
+  "rehab|squat_side|std2_median/kneeRomL": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.964,
+   "null_mc_se": 0.0041655731898503495,
+   "positive_control_coverage": 0.964,
+   "label": "96.1% exact interval"
+  },
+  "rehab|squat_side|std_mean/kneeRomR": {
+   "method": "student_t",
+   "null_coverage": 0.96,
+   "null_mc_se": 0.004381780460041331,
+   "positive_control_coverage": 0.96,
+   "label": "95% CI"
+  },
+  "rehab|squat_side|std2_mean/kneeRomR": {
+   "method": "student_t",
+   "null_coverage": 0.9575,
+   "null_mc_se": 0.004510751046111944,
+   "positive_control_coverage": 0.958,
+   "label": "95% CI"
+  },
+  "rehab|squat_side|std2_median/kneeRomR": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.964,
+   "null_mc_se": 0.0041655731898503495,
+   "positive_control_coverage": 0.964,
+   "label": "96.1% exact interval"
+  },
+  "rehab|squat_side|std_mean/hipRom": {
+   "method": "student_t",
+   "null_coverage": 0.948,
+   "null_mc_se": 0.0049646752159632785,
+   "positive_control_coverage": 0.948,
+   "label": "95% CI"
+  },
+  "rehab|squat_side|std2_mean/hipRom": {
+   "method": "student_t",
+   "null_coverage": 0.9465,
+   "null_mc_se": 0.005031786462082825,
+   "positive_control_coverage": 0.9465,
+   "label": "95% CI"
+  },
+  "rehab|squat_side|std2_median/hipRom": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.959,
+   "null_mc_se": 0.00443390347211123,
+   "positive_control_coverage": 0.959,
+   "label": "96.1% exact interval"
+  },
+  "rehab|squat_side|std_mean/depth": {
+   "method": "student_t",
+   "null_coverage": 0.9565,
+   "null_mc_se": 0.004561126505590477,
+   "positive_control_coverage": 0.969,
+   "label": "95% CI"
+  },
+  "rehab|squat_side|std2_mean/depth": {
+   "method": "student_t",
+   "null_coverage": 0.953,
+   "null_mc_se": 0.004732388403332932,
+   "positive_control_coverage": 0.9815,
+   "label": "95% CI"
+  },
+  "rehab|squat_side|std2_median/depth": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.965,
+   "null_mc_se": 0.00410944035119139,
+   "positive_control_coverage": 0.987,
+   "label": "96.1% exact interval"
+  },
+  "rehab|squat_side|std_mean/trunkLean": {
+   "method": "student_t",
+   "null_coverage": 0.955,
+   "null_mc_se": 0.004635461142108735,
+   "positive_control_coverage": 0.9645,
+   "label": "95% CI"
+  },
+  "rehab|squat_side|std2_mean/trunkLean": {
+   "method": "student_t",
+   "null_coverage": 0.957,
+   "null_mc_se": 0.004536022486716751,
+   "positive_control_coverage": 0.977,
+   "label": "95% CI"
+  },
+  "rehab|squat_side|std2_median/trunkLean": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.964,
+   "null_mc_se": 0.0041655731898503495,
+   "positive_control_coverage": 0.9775,
+   "label": "96.1% exact interval"
+  },
+  "rehab|squat_side|std_mean/repDuration": {
+   "method": "student_t",
+   "null_coverage": 0.961,
+   "null_mc_se": 0.004328914413568374,
+   "positive_control_coverage": 0.961,
+   "label": "95% CI"
+  },
+  "rehab|squat_side|std2_mean/repDuration": {
+   "method": "student_t",
+   "null_coverage": 0.9605,
+   "null_mc_se": 0.004355441998236229,
+   "positive_control_coverage": 0.961,
+   "label": "95% CI"
+  },
+  "rehab|squat_side|std2_median/repDuration": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.96,
+   "null_mc_se": 0.004381780460041331,
+   "positive_control_coverage": 0.96,
+   "label": "96.1% exact interval"
+  },
+  "rehab|squat_side|std_mean/eccentricDuration": {
+   "method": "student_t",
+   "null_coverage": 0.961,
+   "null_mc_se": 0.004328914413568374,
+   "positive_control_coverage": 0.961,
+   "label": "95% CI"
+  },
+  "rehab|squat_side|std2_mean/eccentricDuration": {
+   "method": "student_t",
+   "null_coverage": 0.9535,
+   "null_mc_se": 0.004708383480558906,
+   "positive_control_coverage": 0.954,
+   "label": "95% CI"
+  },
+  "rehab|squat_side|std2_median/eccentricDuration": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.9605,
+   "null_mc_se": 0.004355441998236229,
+   "positive_control_coverage": 0.9605,
+   "label": "96.1% exact interval"
+  },
+  "rehab|squat_side|std_mean/concentricDuration": {
+   "method": "student_t",
+   "null_coverage": 0.961,
+   "null_mc_se": 0.004328914413568374,
+   "positive_control_coverage": 0.961,
+   "label": "95% CI"
+  },
+  "rehab|squat_side|std2_mean/concentricDuration": {
+   "method": "student_t",
+   "null_coverage": 0.9585,
+   "null_mc_se": 0.004459694496263168,
+   "positive_control_coverage": 0.96,
+   "label": "95% CI"
+  },
+  "rehab|squat_side|std2_median/concentricDuration": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.9705,
+   "null_mc_se": 0.0037835003634200943,
+   "positive_control_coverage": 0.9705,
+   "label": "96.1% exact interval"
+  },
+  "rehab|squat_side|std_mean/peakVelocity": {
+   "method": "student_t",
+   "null_coverage": 0.944,
+   "null_mc_se": 0.005141206084179083,
+   "positive_control_coverage": 0.944,
+   "label": "95% CI"
+  },
+  "rehab|squat_side|std2_mean/peakVelocity": {
+   "method": "student_t",
+   "null_coverage": 0.943,
+   "null_mc_se": 0.005184158562389852,
+   "positive_control_coverage": 0.943,
+   "label": "95% CI"
+  },
+  "rehab|squat_side|std2_median/peakVelocity": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.9625,
+   "null_mc_se": 0.004248161366991606,
+   "positive_control_coverage": 0.9625,
+   "label": "96.1% exact interval"
+  },
+  "rehab|squat_side|std_mean/asymmetry": {
+   "method": "student_t",
+   "null_coverage": 0.947,
+   "null_mc_se": 0.005009540897128201,
+   "positive_control_coverage": 0.947,
+   "label": "95% CI"
+  },
+  "rehab|squat_side|std2_mean/asymmetry": {
+   "method": "student_t",
+   "null_coverage": 0.945,
+   "null_mc_se": 0.005097793640389931,
+   "positive_control_coverage": 0.948,
+   "label": "95% CI"
+  },
+  "rehab|squat_side|std2_median/asymmetry": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.955,
+   "null_mc_se": 0.004635461142108735,
+   "positive_control_coverage": 0.955,
+   "label": "96.1% exact interval"
+  },
+  "rehab|split_squat_side|aucA_mean": {
+   "method": "student_t",
+   "null_coverage": 0.9535,
+   "null_mc_se": 0.004708383480558906,
+   "positive_control_coverage": 0.955,
+   "label": "95% CI"
+  },
+  "rehab|split_squat_side|aucB_mean": {
+   "method": "student_t",
+   "null_coverage": 0.9545,
+   "null_mc_se": 0.004659922209651143,
+   "positive_control_coverage": 0.9535,
+   "label": "95% CI"
+  },
+  "rehab|split_squat_side|aucB_median": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.9425,
+   "null_mc_se": 0.005205465877325487,
+   "positive_control_coverage": null,
+   "label": "93.8% exact interval"
+  },
+  "rehab|split_squat_side|aucPop_mean": {
+   "method": "student_t",
+   "null_coverage": 0.9485,
+   "null_mc_se": 0.004942051699446293,
+   "positive_control_coverage": 0.9885,
+   "label": "95% CI"
+  },
+  "rehab|split_squat_side|aucPop_median": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.9485,
+   "null_mc_se": 0.004942051699446293,
+   "positive_control_coverage": null,
+   "label": "93.8% exact interval"
+  },
+  "rehab|split_squat_side|std_mean/kneeRomL": {
+   "method": "student_t",
+   "null_coverage": 0.96,
+   "null_mc_se": 0.004381780460041331,
+   "positive_control_coverage": 0.96,
+   "label": "95% CI"
+  },
+  "rehab|split_squat_side|std2_mean/kneeRomL": {
+   "method": "student_t",
+   "null_coverage": 0.956,
+   "null_mc_se": 0.004586065852122058,
+   "positive_control_coverage": 0.9555,
+   "label": "95% CI"
+  },
+  "rehab|split_squat_side|std2_median/kneeRomL": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.9405,
+   "null_mc_se": 0.005289600646551685,
+   "positive_control_coverage": 0.9405,
+   "label": "93.8% exact interval"
+  },
+  "rehab|split_squat_side|std_mean/kneeRomR": {
+   "method": "student_t",
+   "null_coverage": 0.9575,
+   "null_mc_se": 0.004510751046111944,
+   "positive_control_coverage": 0.9575,
+   "label": "95% CI"
+  },
+  "rehab|split_squat_side|std2_mean/kneeRomR": {
+   "method": "student_t",
+   "null_coverage": 0.9475,
+   "null_mc_se": 0.004987171041783106,
+   "positive_control_coverage": 0.9475,
+   "label": "95% CI"
+  },
+  "rehab|split_squat_side|std2_median/kneeRomR": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.939,
+   "null_mc_se": 0.005351588549206677,
+   "positive_control_coverage": 0.939,
+   "label": "93.8% exact interval"
+  },
+  "rehab|split_squat_side|std_mean/hipRom": {
+   "method": "student_t",
+   "null_coverage": 0.9635,
+   "null_mc_se": 0.004193313129257102,
+   "positive_control_coverage": 0.9635,
+   "label": "95% CI"
+  },
+  "rehab|split_squat_side|std2_mean/hipRom": {
+   "method": "student_t",
+   "null_coverage": 0.9535,
+   "null_mc_se": 0.004708383480558906,
+   "positive_control_coverage": 0.9535,
+   "label": "95% CI"
+  },
+  "rehab|split_squat_side|std2_median/hipRom": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.9385,
+   "null_mc_se": 0.005372045699731156,
+   "positive_control_coverage": 0.9385,
+   "label": "93.8% exact interval"
+  },
+  "rehab|split_squat_side|std_mean/depth": {
+   "method": "student_t",
+   "null_coverage": 0.957,
+   "null_mc_se": 0.004536022486716751,
+   "positive_control_coverage": 0.9715,
+   "label": "95% CI"
+  },
+  "rehab|split_squat_side|std2_mean/depth": {
+   "method": "student_t",
+   "null_coverage": 0.952,
+   "null_mc_se": 0.004779958158812692,
+   "positive_control_coverage": 0.971,
+   "label": "95% CI"
+  },
+  "rehab|split_squat_side|std2_median/depth": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.935,
+   "null_mc_se": 0.005512485827646179,
+   "positive_control_coverage": 0.9635,
+   "label": "93.8% exact interval"
+  },
+  "rehab|split_squat_side|std_mean/stepLength": {
+   "method": "student_t",
+   "null_coverage": 0.9575,
+   "null_mc_se": 0.004510751046111944,
+   "positive_control_coverage": 0.9575,
+   "label": "95% CI"
+  },
+  "rehab|split_squat_side|std2_mean/stepLength": {
+   "method": "student_t",
+   "null_coverage": 0.955,
+   "null_mc_se": 0.004635461142108735,
+   "positive_control_coverage": 0.9555,
+   "label": "95% CI"
+  },
+  "rehab|split_squat_side|std2_median/stepLength": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.9415,
+   "null_mc_se": 0.0052477495176503994,
+   "positive_control_coverage": 0.9415,
+   "label": "93.8% exact interval"
+  },
+  "rehab|split_squat_side|std_mean/trunkLean": {
+   "method": "student_t",
+   "null_coverage": 0.9495,
+   "null_mc_se": 0.0048964145045124596,
+   "positive_control_coverage": 0.9425,
+   "label": "95% CI"
+  },
+  "rehab|split_squat_side|std2_mean/trunkLean": {
+   "method": "student_t",
+   "null_coverage": 0.9455,
+   "null_mc_se": 0.005075911248239078,
+   "positive_control_coverage": 0.97,
+   "label": "95% CI"
+  },
+  "rehab|split_squat_side|std2_median/trunkLean": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.932,
+   "null_mc_se": 0.005629209535982825,
+   "positive_control_coverage": 0.97,
+   "label": "approximate interval (calibrated coverage 93%)"
+  },
+  "rehab|split_squat_side|std_mean/repDuration": {
+   "method": "student_t",
+   "null_coverage": 0.9345,
+   "null_mc_se": 0.005532167296819575,
+   "positive_control_coverage": 0.9345,
+   "label": "approximate interval (calibrated coverage 93%)"
+  },
+  "rehab|split_squat_side|std2_mean/repDuration": {
+   "method": "student_t",
+   "null_coverage": 0.947,
+   "null_mc_se": 0.005009540897128201,
+   "positive_control_coverage": 0.9485,
+   "label": "95% CI"
+  },
+  "rehab|split_squat_side|std2_median/repDuration": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.9335,
+   "null_mc_se": 0.005571254347092763,
+   "positive_control_coverage": 0.9335,
+   "label": "approximate interval (calibrated coverage 93%)"
+  },
+  "rehab|split_squat_side|std_mean/eccentricDuration": {
+   "method": "student_t",
+   "null_coverage": 0.9325,
+   "null_mc_se": 0.005609979946488223,
+   "positive_control_coverage": 0.9325,
+   "label": "approximate interval (calibrated coverage 93%)"
+  },
+  "rehab|split_squat_side|std2_mean/eccentricDuration": {
+   "method": "student_t",
+   "null_coverage": 0.941,
+   "null_mc_se": 0.005268728499363013,
+   "positive_control_coverage": 0.9415,
+   "label": "95% CI"
+  },
+  "rehab|split_squat_side|std2_median/eccentricDuration": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.933,
+   "null_mc_se": 0.0055906618570612885,
+   "positive_control_coverage": 0.933,
+   "label": "approximate interval (calibrated coverage 93%)"
+  },
+  "rehab|split_squat_side|std_mean/concentricDuration": {
+   "method": "student_t",
+   "null_coverage": 0.9035,
+   "null_mc_se": 0.006602565789145914,
+   "positive_control_coverage": 0.9035,
+   "label": "approximate interval (calibrated coverage 90%)"
+  },
+  "rehab|split_squat_side|std2_mean/concentricDuration": {
+   "method": "student_t",
+   "null_coverage": 0.9355,
+   "null_mc_se": 0.005492711079239468,
+   "positive_control_coverage": 0.935,
+   "label": "95% CI"
+  },
+  "rehab|split_squat_side|std2_median/concentricDuration": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.9405,
+   "null_mc_se": 0.005289600646551685,
+   "positive_control_coverage": 0.9405,
+   "label": "93.8% exact interval"
+  },
+  "rehab|split_squat_side|std_mean/recoveryVelocity": {
+   "method": "student_t",
+   "null_coverage": 0.955,
+   "null_mc_se": 0.004635461142108735,
+   "positive_control_coverage": 0.955,
+   "label": "95% CI"
+  },
+  "rehab|split_squat_side|std2_mean/recoveryVelocity": {
+   "method": "student_t",
+   "null_coverage": 0.9465,
+   "null_mc_se": 0.005031786462082825,
+   "positive_control_coverage": 0.947,
+   "label": "95% CI"
+  },
+  "rehab|split_squat_side|std2_median/recoveryVelocity": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.9365,
+   "null_mc_se": 0.005452877680637995,
+   "positive_control_coverage": 0.9365,
+   "label": "93.8% exact interval"
+  },
+  "rehab|split_squat_side|std_mean/asymmetry": {
+   "method": "student_t",
+   "null_coverage": 0.9465,
+   "null_mc_se": 0.005031786462082825,
+   "positive_control_coverage": 0.9465,
+   "label": "95% CI"
+  },
+  "rehab|split_squat_side|std2_mean/asymmetry": {
+   "method": "student_t",
+   "null_coverage": 0.94,
+   "null_mc_se": 0.005310367218940704,
+   "positive_control_coverage": 0.9395,
+   "label": "95% CI"
+  },
+  "rehab|split_squat_side|std2_median/asymmetry": {
+   "method": "exact_order_statistic",
+   "null_coverage": 0.933,
+   "null_mc_se": 0.0055906618570612885,
+   "positive_control_coverage": 0.933,
+   "label": "approximate interval (calibrated coverage 93%)"
+  }
+ }
+}

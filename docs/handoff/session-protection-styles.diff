@@ -1,0 +1,46 @@
+diff --git a/src/styles.css b/src/styles.css
+index caad5e6..7d6c94f 100644
+--- a/src/styles.css
++++ b/src/styles.css
+@@ -81,6 +81,14 @@ p { text-wrap: pretty; }
+ .visually-hidden {
+   position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+ }
++/* Skip link: the first tab stop, visible only while focused. */
++.skip-link {
++  position: absolute; left: 12px; top: -64px; z-index: 100; padding: 10px 16px; border-radius: var(--r-sm);
++  background: var(--panel-2); color: var(--text); border: 1px solid var(--sys); font-weight: 600; text-decoration: none;
++}
++.skip-link:focus { top: 12px; }
++/* <main> is a programmatic focus target for the skip link, not a control: no ring. */
++main:focus { outline: none; }
+ 
+ /* Labels are quiet: sentence case in the text face. */
+ .eyebrow { font-size: 12.5px; font-weight: 500; color: var(--muted); letter-spacing: 0.005em; }
+@@ -125,7 +133,7 @@ p { text-wrap: pretty; }
+ }
+ .brand-name { font-family: var(--font-display); font-weight: 700; font-stretch: 92%; font-size: 19px; letter-spacing: 0.01em; }
+ .brand-name b { color: var(--break); font-weight: 700; }
+-.brand-tag { color: var(--muted); border: 1px solid var(--line-2); border-radius: var(--r-xs); padding: 1px 5px; font-size: 10.5px; }
++.brand-tag { color: var(--muted); border: 1px solid var(--line-2); border-radius: var(--r-xs); padding: 1px 5px; font-size: 11px; }
+ .header-center { display: flex; align-items: center; gap: 16px; margin: 0 auto; min-width: 0; }
+ .header-right { display: flex; align-items: center; gap: 4px; flex: none; }
+ .header-sep { width: 1px; height: 22px; background: var(--line); margin: 0 6px; }
+@@ -258,7 +266,7 @@ p { text-wrap: pretty; }
+ .depth-gauge .track { position: relative; width: 8px; height: 150px; border-radius: 1px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(165, 233, 255, 0.16); }
+ .depth-gauge .fill { position: absolute; left: 0; right: 0; top: 0; background: var(--sys); transition: height 0.08s linear; }
+ .depth-gauge .band { position: absolute; left: -6px; right: -6px; background: rgba(59, 227, 168, 0.16); border: 1px solid rgba(59, 227, 168, 0.6); border-radius: 1px; }
+-.depth-gauge .lbl { font-size: 10.5px; color: var(--muted); text-align: center; line-height: 1.25; }
++.depth-gauge .lbl { font-size: 11px; color: var(--muted); text-align: center; line-height: 1.25; }
+ .speed-ctl { display: flex; align-items: center; gap: 6px; }
+ .athlete-card {
+   background: rgba(8, 12, 22, 0.78); border: 1px solid rgba(165, 233, 255, 0.14); border-radius: var(--r-sm); padding: 9px 12px; min-width: 220px;
+@@ -400,7 +408,7 @@ p { text-wrap: pretty; }
+ .tl-cell .tl-bar { width: 100%; border-radius: 1px; min-height: 3px; }
+ .tl-cell .tl-d { font-size: 11px; color: var(--muted); font-variant-numeric: tabular-nums; }
+ .tl-cell.bp { border-color: rgba(255, 69, 96, 0.75); }
+-.tl-cell .tl-mark { position: absolute; top: -8px; right: -5px; color: var(--break); font-size: 10px; line-height: 1; }
++.tl-cell .tl-mark { position: absolute; top: -8px; right: -5px; color: var(--break); font-size: 11px; line-height: 1; }
+ .tl-empty { color: var(--muted); font-size: 13px; padding: 12px 4px; }
+ .tl-label { color: var(--muted); width: 44px; flex: 0 0 auto; padding-top: 10px; font-size: 11px; }
+ 

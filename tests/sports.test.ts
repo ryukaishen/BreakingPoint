@@ -101,7 +101,7 @@ describe('4-6. jump sports share the existing jump-and-land primitive', () => {
   it('4. soccer CMJ uses the existing CMJ engine', () => {
     expect(soccer.primitive.id).toBe('JUMP_AND_LAND');
     expect(soccer.exercise).toBe('cmj');
-    expect(soccer.title).toBe('Explosive Fatigue Screen');
+    expect(soccer.title).toBe('Explosive Jump Check');
   });
   it('5. basketball repeated jump uses the same primitive', () => {
     expect(basketball.primitive).toBe(soccer.primitive);
@@ -164,11 +164,11 @@ describe('drift-pattern labels (descriptive, non-medical)', () => {
     const soccer = runDemo('soccer');
     const p = sessionPattern('cmj', soccer.s.monitorReps, soccer.s.onsetRep, soccer.s.baseline?.reference.sigma0, soccer.ctx.patternLabels);
     expect(p?.id).toBe('explosive');
-    expect(p?.label).toBe('EXPLOSIVE FATIGUE');
+    expect(p?.label).toBe('EXPLOSIVE OUTPUT DROPPING');
     const bb = resolveLaunch('basketball', 'jump-repeated')!;
     const p2 = sessionPattern('cmj', soccer.s.monitorReps, soccer.s.onsetRep, soccer.s.baseline?.reference.sigma0, bb.patternLabels);
     expect(p2?.id).toBe('explosive');
-    expect(p2?.label).toBe('JUMP CONSISTENCY DRIFT');
+    expect(p2?.label).toBe('JUMP CONSISTENCY CHANGING');
   });
   it('labels never use diagnostic language', () => {
     const text = JSON.stringify([SPORTS, PROTOCOLS]).toLowerCase();

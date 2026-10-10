@@ -15,6 +15,14 @@ venv/
 .pytest_cache/
 
 # Lab outputs: shards and logs are regenerated; keep the curated results
+# New Lab runs write to results/runs/<run-name>/ (see hpc/output_guard.py); copy a run out
+# deliberately if it should become part of the record.
+results/runs/*
+!results/runs/README.md
+
+# External datasets and everything derived from them stay local (see data/README.md)
+data/external/*
+data/processed/*
 results/shards/
 results/logs/
 results/robustness_cache/
@@ -30,5 +38,7 @@ Thumbs.db
 .vscode/
 .idea/
 
-# local editor / agent tooling
-.claude/
+# local editor / agent tooling (the pinned audit skill and shared plugin policy are tracked)
+.claude/*
+!.claude/skills/
+!.claude/settings.json

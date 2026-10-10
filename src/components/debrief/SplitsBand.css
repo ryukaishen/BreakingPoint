@@ -1,0 +1,96 @@
+/* Rep-by-rep comparison band. A major element of the debrief: two full-height lanes,
+   one column per rep. State is carried by pattern and glyph as well as colour, and both
+   lanes keep full contrast (nothing is dimmed to mean "older").
+   Palette-agnostic: uses the semantic state tokens (--stable, --drift, --break). */
+
+.splits { display: grid; gap: 16px; }
+.splits h2, .splits h3 { margin: 0; font-size: 20px; line-height: 1.2; }
+.sb-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+.sb-headline { margin: 6px 0 0; font-size: 17px; font-weight: 600; color: var(--text); text-wrap: pretty; }
+.sb-note { margin: 4px 0 0; font-size: 14px; color: var(--text-2); max-width: 60ch; }
+.sb-empty { margin: 0; color: var(--text-2); }
+
+.sb-chart {
+  --sb-gutter: 148px;
+  --sb-cell-h: clamp(40px, 5vw, 64px);
+  --sb-gap: 3px;
+  position: relative; display: grid; gap: 10px; overflow-x: auto; padding: 14px 4px 6px 0;
+}
+.sb-axis, .sb-lane { display: grid; grid-template-columns: var(--sb-gutter) minmax(0, 1fr) 72px; align-items: center; column-gap: 14px; }
+.sb-gutter { font-size: 14px; color: var(--text-2); }
+.sb-lane-label { font-weight: 600; color: var(--text); }
+
+.sb-cells {
+  position: relative; display: grid; grid-template-columns: repeat(var(--n), minmax(12px, 1fr)); gap: var(--sb-gap);
+  padding-right: 10px; /* room for the 12° lean */
+}
+.sb-tick { font-size: 12px; line-height: 1; color: var(--muted); text-align: center; }
+
+.sb-cell { position: relative; display: block; height: var(--sb-cell-h); }
+.sb-cell > i {
+  position: absolute; inset: 0; display: grid; place-items: center; border-radius: 1px;
+  transform: skewX(-12deg); font-style: normal; font-size: 15px; font-weight: 800; line-height: 1;
+}
+.sb-cell > i > b { transform: skewX(12deg); font-weight: 800; }
+
+/* States: solid / hatched / crossed / outlined, so no state depends on colour alone. */
+.s-stable > i, .sb-sw.s-stable { background: var(--stable); }
+.s-drift > i, .sb-sw.s-drift {
+  background: var(--drift) repeating-linear-gradient(135deg, rgba(5, 7, 13, 0.55) 0 3px, transparent 3px 8px);
+}
+.s-break > i, .sb-sw.s-break { background: var(--break); color: var(--ink, #05070d); }
+.s-unscored > i, .sb-sw.s-unscored { background: transparent; border: 1.5px solid var(--muted); color: var(--muted); }
+/* A rep performed after the warning: kept visible, never counted. Outline only, in its own state colour. */
+.is-after > i, .sb-sw.is-after { background: transparent; border: 1.5px dashed var(--muted); color: var(--muted); }
+.is-after.s-drift > i, .sb-sw.is-after.s-drift { border-color: var(--drift); }
+.is-after.s-break > i { border-color: var(--break); color: var(--break); }
+.is-none > i { background: var(--line); opacity: 0.55; }
+
+/* The end of the held run: the 12° cut, the system's one geometric motif. */
+.sb-held {
+  position: absolute; top: -6px; bottom: -6px; width: 3px; pointer-events: none; background: var(--ice);
+  left: calc(var(--held) * ((100% - 10px - (var(--n) - 1) * var(--sb-gap)) / var(--n) + var(--sb-gap)) - 1.5px);
+  transform: skewX(-12deg);
+}
+.is-record .sb-held { background: var(--lime, #c8ff2e); }
+
+.sb-end { display: grid; justify-items: start; line-height: 1; }
+.sb-end .num { font-size: 26px; font-weight: 700; color: var(--text); }
+.sb-end small { margin-top: 3px; font-size: 12px; color: var(--muted); }
+
+/* Lime: the held-run marker on a genuine new record, plus this optional tag. The result slab owns the headline tag. */
+.sb-tag {
+  position: absolute; top: -4px; right: 0; padding: 3px 10px 3px 14px; font-size: 12px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase;
+  background: var(--lime, #c8ff2e); color: var(--on-lime, #05070d);
+  clip-path: polygon(8px 0, 100% 0, 100% 100%, 0 100%);
+}
+
+.sb-legend { display: flex; flex-wrap: wrap; gap: 8px 20px; margin: 0; padding: 0; list-style: none; font-size: 13px; color: var(--text-2); }
+.sb-legend li { display: inline-flex; align-items: center; gap: 8px; }
+.sb-sw { display: inline-grid; place-items: center; width: 22px; height: 14px; border-radius: 1px; font-style: normal; font-size: 11px; font-weight: 800; transform: skewX(-12deg); }
+.sb-sw > b { transform: skewX(12deg); font-weight: 800; }
+.sb-held-sw { width: 3px; height: 18px; background: var(--ice); }
+
+.sb-facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px 24px; margin: 0; padding-top: 14px; border-top: 1px solid var(--line); }
+.sb-fact dt { font-size: 13px; color: var(--muted); }
+.sb-fact dd { margin: 4px 0 0; display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 10px; }
+.sb-fact-v { font-size: 24px; font-weight: 700; color: var(--text); }
+.sb-vs { font-size: 13px; color: var(--text-2); }
+
+/* Replay: reps land one after another. Transform and opacity only; removed entirely under reduced motion. */
+@keyframes sb-in { from { opacity: 0; transform: scaleY(0.25); } to { opacity: 1; transform: none; } }
+@keyframes sb-fade { from { opacity: 0; } to { opacity: 1; } }
+.sb-chart[data-play] .sb-cell { transform-origin: bottom; animation: sb-in 240ms cubic-bezier(0.2, 0.8, 0.2, 1) both; animation-delay: calc(var(--i) * 60ms); }
+/* The marker keeps its own 12° lean, so it fades (opacity only): a transform keyframe would replace the lean. */
+.sb-chart[data-play] .sb-held { animation: sb-fade 240ms ease-out both; animation-delay: calc(var(--n) * 60ms + 120ms); }
+@media (prefers-reduced-motion: reduce) {
+  .sb-chart .sb-cell, .sb-chart .sb-held { animation: none; }
+}
+
+@media (max-width: 640px) {
+  .sb-chart { --sb-gutter: 0px; }
+  .sb-axis, .sb-lane { grid-template-columns: minmax(0, 1fr) 56px; }
+  .sb-gutter { grid-column: 1 / -1; }
+  .sb-axis .sb-gutter { display: none; }
+  .sb-head { flex-direction: column; }
+}

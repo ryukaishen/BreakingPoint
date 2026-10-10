@@ -1,0 +1,133 @@
+{
+ "all_pass": true,
+ "checks": [
+  {
+   "check": "HEAD is the approved commit",
+   "pass": true,
+   "detail": "b86f22784fd4ab368c1b6e2da012018cea69ec3c"
+  },
+  {
+   "check": "on redesign/breakaway",
+   "pass": true,
+   "detail": "redesign/breakaway"
+  },
+  {
+   "check": "origin/redesign/breakaway equals HEAD",
+   "pass": true,
+   "detail": "b86f22784fd4ab368c1b6e2da012018cea69ec3c"
+  },
+  {
+   "check": "protocol-freeze commit 0fa32fe is an ancestor of HEAD",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "check": "raw SHA-256 research/protocols/phase4b_protocol_freeze.json",
+   "pass": true,
+   "detail": "89032a0a774dbb9d5f803e695ee95e0cd1569552e61925c1dd1dbbe286d83b1a"
+  },
+  {
+   "check": "raw SHA-256 research/protocols/jump_fatigue_v04.md",
+   "pass": true,
+   "detail": "e0699fcf120c48f93e94bb02d624707fa77c2b7185ba36c142accf7d4d27c31d"
+  },
+  {
+   "check": "raw SHA-256 research/protocols/rehab24_6_v04.md",
+   "pass": true,
+   "detail": "3a2b8307ec367341acbc0e17dab9ab8f31e1c3e703992c3491fc0b26f8d67c2f"
+  },
+  {
+   "check": "raw SHA-256 research/protocols/phase4b_preanalysis_checks.md",
+   "pass": true,
+   "detail": "e30fe0142714afa6df763e4ae0eb69cc743a61455a8006a4e16c69e78fc1922a"
+  },
+  {
+   "check": "raw SHA-256 research/protocols/phase4b_inclusion_v04.json",
+   "pass": true,
+   "detail": "d220ce4b3d45c5fbb1f7fbf2728f5f34f206ae2edbf6e7749471d2a8f7245c6d"
+  },
+  {
+   "check": "raw SHA-256 research/protocols/phase4b_analysis_freeze_v2.json",
+   "pass": true,
+   "detail": "d7442a63212a0be865d689193abf111b76443feb3f46b68eceeb609603d3a4f5"
+  },
+  {
+   "check": "raw SHA-256 research/protocols/phase4b_analysis_freeze.json",
+   "pass": true,
+   "detail": "396c3f35b05c6989248b42daf5f1e5ac1fcec0200a6709dbab900894471ea0bf"
+  },
+  {
+   "check": "freeze.py verify-protocol (protocol files, input code, 12 data files)",
+   "pass": true,
+   "detail": "protocol freeze: all files match"
+  },
+  {
+   "check": "run.py verify (analysis freeze v2: code, calibration labels, deviations log, v1 file)",
+   "pass": true,
+   "detail": "analysis freeze v2: all files match"
+  },
+  {
+   "check": "detector config committed bytes",
+   "pass": true,
+   "detail": "543798067d97f96efa6d98baf43d3aaabc49029cafb70cc537755af82d7e1b9e"
+  },
+  {
+   "check": "working tree differs from HEAD only in the 17 Stage 2 files",
+   "pass": true,
+   "detail": "17 changed, outside Stage 2: []"
+  },
+  {
+   "check": "Stage 2 files byte-identical to the snapshot",
+   "pass": true,
+   "detail": "17/17"
+  },
+  {
+   "check": "src/utils/stats.ts equals HEAD (not in a freeze list, pinned by the commit)",
+   "pass": true,
+   "detail": "2117d4597f565f996e35b2008801d942021e3049"
+  },
+  {
+   "check": "shared/default_detector_config.json equals HEAD (not in a freeze list, pinned by the commit)",
+   "pass": true,
+   "detail": "6d641ee6e0cb1971113947a33971432c5120a050"
+  },
+  {
+   "check": "research/results/phase4b does not exist",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "check": "data/processed/phase4b_actual does not exist",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "check": "vite-node present",
+   "pass": true,
+   "detail": ""
+  }
+ ],
+ "closure_files_not_in_freeze_lists": {
+  "src/utils/stats.ts": {
+   "git_blob": "2117d4597f565f996e35b2008801d942021e3049",
+   "sha256_raw": "a458195a7286ef9ec6f180f32720e94d62a64a9f8f251439948d5e33bbb930be"
+  },
+  "shared/default_detector_config.json": {
+   "git_blob": "6d641ee6e0cb1971113947a33971432c5120a050",
+   "sha256_raw": "601754b01bf520d90f8d821b9c805dd6112d78cf144f22b93b8940d42df2733f"
+  }
+ },
+ "environment": {
+  "checked_at": "2026-10-10T00:36:17-0400",
+  "python": "3.12.6",
+  "python_executable": "C:\\Users\\Administrator\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+  "numpy": "2.4.6",
+  "scipy": "1.17.1",
+  "node": "v24.16.0",
+  "vite_node": "vite-node/3.2.4 win32-x64 node-v24.16.0",
+  "os": "Windows-11-10.0.26200-SP0",
+  "machine": "AMD64",
+  "cpu_count": 24,
+  "git": "git version 2.51.2.windows.1"
+ }
+}

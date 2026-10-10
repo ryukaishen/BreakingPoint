@@ -10,9 +10,9 @@ export type SportIconId =
 
 export interface SportProtocolRef {
   protocolId: string;
-  /** Sport-specific screen name, e.g. "Explosive Fatigue Screen". */
+  /** Sport-specific screen name, e.g. "Explosive Jump Check". */
   title?: string;
-  /** Short card tagline, e.g. "Explosive fatigue". */
+  /** Short card tagline, e.g. "Explosive output". */
   tagline?: string;
   purpose?: string;
   /** Featured metrics (feature keys), in display order. */
@@ -60,9 +60,9 @@ export const SPORTS: SportProfile[] = [
     protocols: [
       {
         protocolId: 'jump-repeated',
-        title: 'Explosive Fatigue Screen',
-        tagline: 'Explosive fatigue',
-        purpose: "Track how an athlete's explosive movement signature changes across repeated jumps.",
+        title: 'Explosive Jump Check',
+        tagline: 'Explosive output',
+        purpose: 'Track how jump height, push-off and landing change across repeated jumps.',
         focus: ['jumpHeight', 'rsiMod', 'landingKneeFlex', 'trunkLean', 'concentricDuration', 'asymmetry'],
         session: 'Late-training screen',
       },
@@ -94,7 +94,7 @@ export const SPORTS: SportProfile[] = [
       { protocolId: 'landing-single-leg', tagline: 'Landing control' },
       { protocolId: 'shuffle-defensive', tagline: 'Lateral movement' },
     ],
-    patternLabels: { explosive: 'JUMP CONSISTENCY DRIFT' },
+    patternLabels: { explosive: 'JUMP CONSISTENCY CHANGING' },
     featureLabels: { rsiMod: 'Repeated explosiveness (RSI-mod)', landingKneeFlex: 'Landing knee flexion' },
   },
   {
@@ -115,7 +115,7 @@ export const SPORTS: SportProfile[] = [
       { protocolId: 'jump-approach', tagline: 'Approach mechanics' },
       { protocolId: 'landing-screen', tagline: 'Landing absorption' },
     ],
-    patternLabels: { explosive: 'JUMP CONSISTENCY DRIFT', landing: 'LANDING MECHANICS DRIFT' },
+    patternLabels: { explosive: 'JUMP CONSISTENCY CHANGING', landing: 'LANDING MECHANICS CHANGING' },
     featureLabels: { jumpHeight: 'Jump height proxy', concentricDuration: 'Take-off time', landingKneeFlex: 'Landing depth' },
   },
   {
@@ -239,8 +239,8 @@ export const SPORTS: SportProfile[] = [
     protocols: [
       {
         protocolId: 'jump-repeated',
-        title: 'Explosive Fatigue Screen',
-        tagline: 'Explosive fatigue',
+        title: 'Explosive Jump Check',
+        tagline: 'Explosive output',
         purpose: 'Repeated-jump screen for football, rugby, lacrosse and field hockey (shared jump-and-land primitive).',
         focus: ['jumpHeight', 'rsiMod', 'landingKneeFlex', 'trunkLean', 'asymmetry'],
         session: 'Late-training screen',

@@ -154,13 +154,13 @@ export class SessionEngine {
     const reps = this.snap.calibrationReps;
     if (reps.length < MIN_CALIBRATION_REPS) return;
     const baseline = buildBaseline(reps.map((r) => r.features), this.snap.exercise, this.snap.config, this.snap.athlete);
-    this.set({ phase: 'baseline', baseline, event: this.event('baseline', 'Baseline established.') });
+    this.set({ phase: 'baseline', baseline, event: this.event('baseline', 'Your usual form is set.') });
     this.resetDetector();
   }
 
   /** Use a previously saved baseline (skip calibration). */
   useBaseline(baseline: Baseline) {
-    this.set({ phase: 'baseline', baseline, calibrationReps: [], event: this.event('baseline', 'Saved baseline loaded.') });
+    this.set({ phase: 'baseline', baseline, calibrationReps: [], event: this.event('baseline', 'Saved usual form loaded.') });
     this.resetDetector();
   }
 
@@ -177,7 +177,7 @@ export class SessionEngine {
     this.resetDetector();
     this.set({
       phase: 'monitoring', monitorReps: [], recoveryReps: [], state: 'STABLE', alarmRep: null, onsetRep: null, firstWarnRep: null,
-      breakpointContributors: null, recovery: null, summary: null, event: this.event('info', 'Monitoring started — perform your set.'),
+      breakpointContributors: null, recovery: null, summary: null, event: this.event('info', 'Monitoring started. Do your set.'),
     });
   }
 
@@ -190,7 +190,7 @@ export class SessionEngine {
   startRecovery() {
     if (!this.snap.baseline) return;
     this.segmenter.reset();
-    this.set({ phase: 'recovery', recoveryReps: [], recovery: null, event: this.event('info', `Recovery check — perform ${RECOVERY_REPS} reps.`) });
+    this.set({ phase: 'recovery', recoveryReps: [], recovery: null, event: this.event('info', `Recovery check: do ${RECOVERY_REPS} reps.`) });
   }
 
   resetBaseline() {
@@ -266,13 +266,13 @@ export class SessionEngine {
       monitorReps: [...this.snap.monitorReps, rec],
       state: this.detector!.state,
       firstWarnRep: this.detector!.firstWarnRep,
-      event: drift.score === null ? this.event('discarded', `Rep ${index}: capture too poor to score`) : this.event('rep', `Rep ${index}`),
+      event: drift.score === null ? this.event('discarded', `Rep ${index} not scored: the camera view was too poor`) : this.event('rep', `Rep ${index}`),
     };
     if (step.alarm) {
       patch.alarmRep = this.detector!.alarmRep;
       patch.onsetRep = this.detector!.onsetRep;
       patch.breakpointContributors = drift.ranked.slice(0, 4);
-      patch.event = this.event('breakpoint', `BREAKING POINT detected at rep ${index}`);
+      patch.event = this.event('breakpoint', `Breaking point: the alert triggered at rep ${index}`);
     }
     this.set(patch);
   }

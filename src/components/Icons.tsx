@@ -1,4 +1,5 @@
 import type { SVGProps } from 'react';
+import { C } from '../ui/theme';
 
 type P = SVGProps<SVGSVGElement> & { size?: number };
 const base = (size = 16): SVGProps<SVGSVGElement> => ({
@@ -8,10 +9,10 @@ const base = (size = 16): SVGProps<SVGSVGElement> => ({
 
 export const LogoMark = ({ size = 28 }: { size?: number }) => (
   <svg width={size} height={size} viewBox="0 0 64 64" aria-hidden>
-    <rect width="64" height="64" rx="14" fill="#0e141d" stroke="#263142" />
-    <polyline points="9,41 18,39 26,42 33,37" fill="none" stroke="#2ee59d" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" />
-    <polyline points="37,33 44,26 50,18 56,12" fill="none" stroke="#ff4d5e" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" />
-    <circle cx="35" cy="35" r="3.6" fill="#ffb020" />
+    <path d="M1 1h50l12 12v50H1z" fill={C.abyss} stroke={C.line2} strokeWidth="2" />
+    <polyline points="9,41 18,39 26,42 33,37" fill="none" stroke={C.stable} strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" />
+    <polyline points="37,33 44,26 50,18 56,12" fill="none" stroke={C.break} strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" />
+    <circle cx="35" cy="35" r="3.6" fill={C.drift} />
   </svg>
 );
 
@@ -56,4 +57,7 @@ export const Cpu = ({ size, ...p }: P) => (
 );
 export const Heart = ({ size, ...p }: P) => (
   <svg {...base(size)} {...p}><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21l7.8-7.5 1-1.1a5.5 5.5 0 0 0 0-7.8z" /></svg>
+);
+export const Chevron = ({ size, ...p }: P) => (
+  <svg {...base(size)} {...p}><polyline points="9 6 15 12 9 18" /></svg>
 );

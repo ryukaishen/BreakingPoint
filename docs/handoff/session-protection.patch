@@ -1,0 +1,1869 @@
+diff --git a/scripts/e2e/session-guard.mjs b/scripts/e2e/session-guard.mjs
+new file mode 100644
+index 0000000..7075826
+--- /dev/null
++++ b/scripts/e2e/session-guard.mjs
+@@ -0,0 +1,291 @@
++// End-to-end check of session protection, recovery, landmarks and announcements, in a real browser.
++//
++//   npm run dev -- --port 5174          (in one terminal)
++//   BASE=http://127.0.0.1:5174/ node scripts/e2e/session-guard.mjs
++//
++// It runs in a throwaway browser profile, so nothing of the user's data is touched. A live set is
++// driven by feeding the real SessionEngine synthetic frames through the app's dev hook
++// (window.__breakingpoint, present only under `npm run dev`); no camera is involved, which also
++// means live camera behaviour itself is NOT covered. Exit status 1 when any check fails.
++import { connect, launch, sleep } from '../lib/cdp.mjs';
++
++const BASE = process.env.BASE ?? 'http://127.0.0.1:5173/';
++let fails = 0;
++let total = 0;
++const check = (name, ok, detail = '') => {
++  total++;
++  if (!ok) fails++;
++  console.log(`${ok ? 'PASS' : 'FAIL'}  ${name}${detail ? `   [${detail}]` : ''}`);
++};
++
++const browser = await launch();
++const p = await connect(browser.port);
++
++const E = (js) => p.evaluate(js);
++const phase = () => E(`window.__breakingpoint.engine.getSnapshot().phase`);
++const keys = (prefix) => E(`Object.keys(localStorage).filter((k) => k.startsWith(${JSON.stringify(prefix)}))`);
++const athleteId = () => E(`JSON.parse(localStorage.getItem('bp.v2.athletes') || '[]')[0]?.id ?? null`);
++const dialogTitle = () => E(`document.querySelector('[role=alertdialog] h2')?.textContent ?? null`);
++const view = () => E(`history.state?.bp?.view ?? null`);
++
++async function waitReady() {
++  await p.waitFor(`document.readyState === 'complete' && document.querySelector('.app')`);
++  await sleep(250);
++}
++
++/** Open a live session for the strength protocol and start calibrating. Creates the athlete on first use. */
++async function startLive({ calibrate = true } = {}) {
++  await p.goto(BASE + '?sport=strength');
++  await waitReady();
++  await p.waitFor(`document.querySelector('main.landing h1')`);
++  await p.click('button', 'Start live camera');
++  await sleep(300);
++  if (await E(`!!document.querySelector('#athlete-dialog-title')`)) {
++    await p.click('.field-input');
++    await p.type('E2E Tester');
++    await p.click('form[role=dialog] button', 'Add athlete');
++  }
++  await p.waitFor(`document.querySelector('main#main.dashboard') && window.__breakingpoint?.engine`);
++  if (calibrate) {
++    await p.click('button', 'Start calibration');
++    await p.waitFor(`window.__breakingpoint.engine.getSnapshot().phase === 'calibrating'`);
++  }
++}
++
++/** Feed synthetic frames into the live engine until `pred` (a JS expression over `s`, the snapshot) holds. */
++async function feed(pred, { start = false } = {}) {
++  if (start) {
++    await E(`(async () => {
++      const { DemoController } = await import('/src/demo/demoController.ts');
++      const eng = window.__breakingpoint.engine;
++      window.__demo = new DemoController(eng, eng.getSnapshot().exercise);
++      window.__demo.start();
++    })()`);
++  }
++  const r = await E(`(() => {
++    const d = window.__demo, e = window.__breakingpoint.engine; let n = 0;
++    const done = () => { const s = e.getSnapshot(); return ${pred}; };
++    while (n < 60000 && !done()) { d.advance(3); n += 3; }
++    const s = e.getSnapshot();
++    return { frames: n, phase: s.phase, cal: s.calibrationReps.length, reps: s.monitorReps.length, alarm: s.alarmRep };
++  })()`);
++  await sleep(350); // let React run its effects (checkpoint)
++  return r;
++}
++
++async function run() {
++  // ------------------------------------------------------------ A. landmarks and skip link (landing)
++  console.log('\n-- A. Landmarks, headings, skip link');
++  await p.goto(BASE);
++  await waitReady();
++  await p.waitFor(`document.querySelector('main#main h1')`);
++  check('A1 exactly one <main> landmark, and it is the skip target', (await E(`document.querySelectorAll('main').length`)) === 1 && (await E(`document.querySelector('main').id`)) === 'main');
++  check('A2 landing has one h1, inside main', (await E(`document.querySelectorAll('h1').length`)) === 1 && (await E(`!!document.querySelector('main h1')`)));
++  check('A3 the footer stays outside main (keeps its landmark)', await E(`(() => { const f = document.querySelector('footer'); return !!f && !document.querySelector('main').contains(f); })()`));
++  check('A4 document has a banner (header)', await E(`!!document.querySelector('header')`));
++  const topBefore = await E(`document.querySelector('.skip-link').getBoundingClientRect().top`);
++  await p.press('Tab', 'Tab', 9);
++  const firstFocus = await E(`document.activeElement.className`);
++  const topAfter = await E(`document.querySelector('.skip-link').getBoundingClientRect().top`);
++  check('A5 the skip link is the first tab stop', String(firstFocus).includes('skip-link'), firstFocus);
++  check('A6 it is off-screen until focused, then visible', topBefore < 0 && topAfter >= 0, `top ${topBefore} -> ${topAfter}`);
++  const len0 = await E(`history.length`);
++  await p.press('Enter', 'Enter', 13, '\r');
++  await sleep(200);
++  check('A7 activating it focuses <main> without touching the URL or history', (await E(`document.activeElement.id`)) === 'main' && (await E(`location.hash`)) === '' && (await E(`history.length`)) === len0);
++  check('A8 the first history entry is the landing view', (await view()) === 'landing');
++
++  // ------------------------------------------------------------ B. demo session: history, title, headings
++  console.log('\n-- B. Demo session and browser history');
++  const h0 = await E(`history.length`);
++  await p.click('button', 'Run the soccer demo');
++  await p.waitFor(`document.querySelector('main#main.dashboard') && window.__breakingpoint?.engine`);
++  check('B1 session view: one main with a visually hidden h1 naming it', (await E(`document.querySelectorAll('main').length`)) === 1 && /Soccer.*demo session/.test(await E(`document.querySelector('main#main h1')?.textContent ?? ''`)));
++  check('B2 the tab title names the session', /Soccer/.test(await E(`document.title`)), await E(`document.title`));
++  check('B3 entering the session added one history entry', (await view()) === 'session' && (await E(`history.length`)) === h0 + 1);
++  const liveRegions = await E(`[...document.querySelectorAll('[aria-live],[role=status],[role=alert]')].map((e) => (e.getAttribute('role') || '-') + '/' + (e.getAttribute('aria-live') || '-'))`);
++  check('B4 only the announcer owns live regions in the session', liveRegions.length === 2 && liveRegions.includes('status/polite') && liveRegions.includes('alert/-'), liveRegions.join(' '));
++  await E(`history.back()`);
++  await p.waitFor(`document.querySelector('main#main .hero')`);
++  check('B5 Back from a demo session returns to landing with no prompt', !(await E(`!!document.querySelector('[role=alertdialog]')`)));
++  check('B6 the title is restored', (await E(`document.title`)) === 'BreakingPoint');
++  await E(`history.forward()`);
++  await sleep(500);
++  check('B7 Forward onto the ended session does not bring it back', !(await E(`!!document.querySelector('.dashboard')`)) && (await view()) === 'landing');
++
++  // ------------------------------------------------------------ C. announcer across a whole demo run
++  console.log('\n-- C. Announcements during a full demo run');
++  await p.click('button', 'Run the soccer demo');
++  await p.waitFor(`document.querySelector('main#main.dashboard') && window.__breakingpoint?.engine`);
++  await E(`(() => {
++    window.__polite = []; window.__alerts = [];
++    const watch = (el, sink) => new MutationObserver(() => { const t = el.textContent.trim(); if (t && sink[sink.length - 1] !== t) sink.push(t); }).observe(el, { childList: true, characterData: true, subtree: true });
++    watch(document.querySelector('[role=status][aria-live=polite]'), window.__polite);
++    watch(document.querySelector('[role=alert]'), window.__alerts);
++    window.__breakingpoint.runner.speed = 4;
++  })()`);
++  await p.waitFor(`window.__breakingpoint.engine.getSnapshot().phase === 'summary'`, { timeout: 120000, label: 'demo reaches summary' });
++  await sleep(500);
++  const polite = await E(`window.__polite`);
++  const alerts = await E(`window.__alerts`);
++  const monReps = await E(`window.__breakingpoint.engine.getSnapshot().monitorReps.length`);
++  console.log('   polite:', JSON.stringify(polite));
++  console.log('   alerts:', JSON.stringify(alerts));
++  check('C1 progress is announced politely a handful of times, never once per rep', polite.length >= 3 && polite.length <= 8 && polite.length < monReps, `${polite.length} messages for ${monReps} reps`);
++  check('C2 the first drift is announced', polite.some((m) => /drifting/i.test(m)));
++  check('C3 the stop instruction is a single assertive alert naming the rep', alerts.length === 1 && /^Stop\. Breaking point at rep \d+\. End the set and rest\.$/.test(alerts[0]), alerts[0]);
++  check('C4 the set summary is announced', polite.some((m) => /^Set ended/.test(m)));
++  check('C5 demo sessions write no recovery drafts', (await keys('bp.v2.draft.')).length === 0);
++
++  // ------------------------------------------------------------ D. live protection
++  console.log('\n-- D. Protecting a live session (Back, cancel, confirm, refresh, close)');
++  await startLive();
++  const aid = await athleteId();
++  check('D1 a live athlete exists and the session is calibrating', !!aid && (await phase()) === 'calibrating');
++  await E(`history.back()`);
++  await p.waitFor(`document.querySelector('[role=alertdialog]')`);
++  await sleep(500);
++  check('D2 Back is intercepted: the athlete is asked first', (await dialogTitle()) === 'Leave calibration?', await dialogTitle());
++  check('D3 and they stay in the session meanwhile', (await E(`!!document.querySelector('main.dashboard')`)) && (await view()) === 'session');
++  await p.click('[role=alertdialog] button', 'Cancel');
++  await sleep(300);
++  check('D4 Cancel keeps the calibration running', !(await E(`!!document.querySelector('[role=alertdialog]')`)) && (await phase()) === 'calibrating');
++  await E(`history.back()`);
++  await p.waitFor(`document.querySelector('[role=alertdialog]')`);
++  await sleep(300);
++  await p.click('[role=alertdialog] button', 'Leave');
++  await p.waitFor(`document.querySelector('main.landing h1')`);
++  check('D5 confirming leaves for the previous view (the sport page)', (await view()) === 'sport' && /Strength/.test(await E(`document.title`)));
++
++  await p.click('button', 'Start live camera');
++  await p.waitFor(`document.querySelector('main#main.dashboard') && window.__breakingpoint?.engine`);
++  await p.click('button', 'Start calibration');
++  await p.waitFor(`window.__breakingpoint.engine.getSnapshot().phase === 'calibrating'`);
++  await E(`window.__marker = 'same-page'`);
++  p.policy.accept = false; // dismiss the browser's leave prompt
++  const dlgClose = p.dialogs.length;
++  await p.send('Page.close').catch(() => {});
++  await sleep(900);
++  check('D5b closing the tab mid-calibration asks the browser to confirm, and staying keeps the page alive', p.dialogs.length > dlgClose && p.dialogs.at(-1).type === 'beforeunload' && (await E('1 + 1')) === 2, JSON.stringify(p.dialogs.at(-1)));
++  const dlg0 = p.dialogs.length;
++  await p.send('Page.reload').catch(() => {});
++  await sleep(900);
++  check('D6 refreshing mid-calibration asks the browser to confirm', p.dialogs.length > dlg0 && p.dialogs.at(-1).type === 'beforeunload', JSON.stringify(p.dialogs.at(-1)));
++  check('D7 staying keeps the page and the calibration', (await E(`window.__marker`)) === 'same-page' && (await phase()) === 'calibrating');
++  p.policy.accept = true;
++  await p.send('Page.reload').catch(() => {});
++  await p.waitFor(`window.__marker === undefined && document.readyState === 'complete' && document.querySelector('.app')`, { timeout: 15000, label: 'page reloaded' });
++  await sleep(300);
++  const afterView = await view();
++  check('D8 leaving anyway reloads the page, and the ended session is not resurrected', (await E(`window.__marker`)) === undefined && ['landing', 'sport'].includes(afterView) && !(await E(`!!document.querySelector('.dashboard')`)), `now on: ${afterView} (the URL still names the sport)`);
++  const dlg1 = p.dialogs.length;
++  await p.send('Page.reload').catch(() => {});
++  await sleep(900);
++  await waitReady();
++  check('D9 with nothing at risk, refresh is not interrupted', p.dialogs.length === dlg1);
++
++  // ------------------------------------------------------------ E. recovery
++  console.log('\n-- E. Recovering an interrupted set');
++  await startLive();
++  await feed(`s.phase === 'monitoring' && s.monitorReps.length >= 5`, { start: true });
++  const r1 = await E(`(() => { const s = window.__breakingpoint.engine.getSnapshot(); return { phase: s.phase, reps: s.monitorReps.length }; })()`);
++  const draftRaw = await E(`localStorage.getItem('bp.v2.draft.' + JSON.parse(localStorage.getItem('bp.v2.athletes'))[0].id)`);
++  const draft = draftRaw ? JSON.parse(draftRaw) : null;
++  check('E1 a live set is checkpointed as reps are measured', r1.phase === 'monitoring' && draft?.kind === 'set' && draft.record.totalReps === r1.reps && draft.record.source === 'live', `${r1.reps} reps, draft ${draft?.record?.totalReps}`);
++  p.policy.accept = true;
++  await p.send('Page.reload').catch(() => {});
++  await sleep(900);
++  await waitReady();
++  await p.waitFor(`document.querySelector('#recovery-title')`);
++  const body = await E(`document.querySelector('#recovery-body').textContent`);
++  check('E2 after the refresh the athlete is offered the measured reps', new RegExp(`${draft.record.totalReps} reps? had been measured, ${draft.record.heldReps} held`).test(body), body.slice(0, 120));
++  check('E3 the choice is explicit: Escape and click-away do nothing', await (async () => {
++    await p.press('Escape', 'Escape', 27);
++    await p.clickAt?.(5, 5);
++    await sleep(250);
++    return E(`!!document.querySelector('#recovery-title')`);
++  })());
++  await p.click('#recovery-title ~ .confirm-actions button', 'Keep interrupted set');
++  await p.waitFor(`!document.querySelector('#recovery-title')`);
++  const saved = await E(`(() => { const id = JSON.parse(localStorage.getItem('bp.v2.athletes'))[0].id; return JSON.parse(localStorage.getItem('bp.v2.sessions.' + id) || '[]'); })()`);
++  const kept = saved.find((s) => s.id === draft.record.id);
++  check('E4 keeping it stores the set, marked not eligible for records', !!kept && kept.quality.eligible === false && kept.quality.reasons.includes('Interrupted before the set ended'), JSON.stringify(kept?.quality));
++  check('E5 the stored set holds exactly the measured reps', kept?.reps.length === draft.record.totalReps && kept.source === 'live');
++  check('E6 the draft is gone afterwards', (await keys('bp.v2.draft.')).length === 0);
++
++  // Discard
++  await startLive();
++  await feed(`s.phase === 'monitoring' && s.monitorReps.length >= 3`, { start: true });
++  const before = (await E(`JSON.parse(localStorage.getItem('bp.v2.sessions.' + JSON.parse(localStorage.getItem('bp.v2.athletes'))[0].id) || '[]').length`));
++  await p.send('Page.reload').catch(() => {});
++  await sleep(900);
++  await waitReady();
++  await p.waitFor(`document.querySelector('#recovery-title')`);
++  await p.click('#recovery-title ~ .confirm-actions button', 'Discard set');
++  await p.waitFor(`!document.querySelector('#recovery-title')`);
++  const after = (await E(`JSON.parse(localStorage.getItem('bp.v2.sessions.' + JSON.parse(localStorage.getItem('bp.v2.athletes'))[0].id) || '[]').length`));
++  check('E7 discarding saves nothing and clears the draft', after === before && (await keys('bp.v2.draft.')).length === 0, `${before} -> ${after}`);
++
++  // Normal end clears the draft
++  await startLive();
++  await feed(`s.phase === 'monitoring' && s.monitorReps.length >= 3`, { start: true });
++  const dMid = (await keys('bp.v2.draft.')).length;
++  await E(`window.__demo.runToEnd(false)`);
++  await sleep(600);
++  const finished = await E(`(() => { const id = JSON.parse(localStorage.getItem('bp.v2.athletes'))[0].id; const l = JSON.parse(localStorage.getItem('bp.v2.sessions.' + id) || '[]'); return { n: l.length, last: l.at(-1) }; })()`);
++  check('E8 a set that ends normally is saved as a normal set and leaves no draft behind', dMid === 1 && (await keys('bp.v2.draft.')).length === 0 && finished.last && !finished.last.quality.reasons.includes('Interrupted before the set ended'), `draft mid-set ${dMid}, sessions ${finished.n}`);
++
++  // Calibration interrupted
++  await startLive();
++  const cal = await feed(`s.phase === 'calibrating' && s.calibrationReps.length >= 2`, { start: true });
++  const calDraft = JSON.parse((await E(`localStorage.getItem('bp.v2.draft.' + JSON.parse(localStorage.getItem('bp.v2.athletes'))[0].id)`)) ?? 'null');
++  check('E9 an unfinished calibration is noted, not restored', calDraft?.kind === 'calibration' && calDraft.reps === cal.cal, JSON.stringify(calDraft));
++  await p.send('Page.reload').catch(() => {});
++  await sleep(900);
++  await waitReady();
++  await p.waitFor(`document.querySelector('.toast')`);
++  check('E10 the athlete is told, once, that nothing was saved', /calibration was interrupted/.test(await E(`document.querySelector('.toast').textContent`)) && (await keys('bp.v2.draft.')).length === 0 && !(await E(`!!document.querySelector('#recovery-title')`)));
++
++  // Leaving on purpose during monitoring keeps the existing "end the set and save it" behaviour
++  await startLive();
++  await feed(`s.phase === 'monitoring' && s.monitorReps.length >= 4`, { start: true });
++  const nBefore = await E(`JSON.parse(localStorage.getItem('bp.v2.sessions.' + JSON.parse(localStorage.getItem('bp.v2.athletes'))[0].id) || '[]').length`);
++  await E(`history.back()`);
++  await p.waitFor(`document.querySelector('[role=alertdialog]')`);
++  const t = await dialogTitle();
++  await sleep(300);
++  await p.click('[role=alertdialog] button', 'End set and leave');
++  await p.waitFor(`document.querySelector('main.landing h1')`);
++  await sleep(400);
++  const nAfter = await E(`JSON.parse(localStorage.getItem('bp.v2.sessions.' + JSON.parse(localStorage.getItem('bp.v2.athletes'))[0].id) || '[]').length`);
++  check('E11 Back during a set asks, and confirming ends and saves the set exactly as before', t === 'End this set and leave?' && nAfter === nBefore + 1 && (await keys('bp.v2.draft.')).length === 0, `${t}; sessions ${nBefore} -> ${nAfter}`);
++
++  // Hostile storage
++  console.log('\n-- F. Corrupt or tampered drafts');
++  const id = await athleteId();
++  await E(`localStorage.setItem('bp.v2.draft.${id}', '{ this is not json')`);
++  await p.goto(BASE);
++  await waitReady();
++  check('F1 a corrupt draft is dropped quietly', !(await E(`!!document.querySelector('#recovery-title')`)) && (await keys('bp.v2.draft.')).length === 0);
++  const tampered = JSON.stringify({ v: 1, kind: 'set', savedAt: new Date().toISOString(), record: { schemaVersion: 2, source: 'demo', id: 'x', athleteId: id } });
++  await E(`localStorage.setItem('bp.v2.draft.${id}', ${JSON.stringify(tampered)})`);
++  await p.goto(BASE);
++  await waitReady();
++  check('F2 a draft claiming demo data is refused and removed', !(await E(`!!document.querySelector('#recovery-title')`)) && (await keys('bp.v2.draft.')).length === 0);
++  await E(`localStorage.setItem('bp.v2.draft.ghost_athlete', ${JSON.stringify(JSON.stringify({ v: 1, kind: 'calibration', savedAt: new Date().toISOString(), athleteId: 'ghost_athlete', protocolId: 'squat-bodyweight', reps: 2 }))})`);
++  await p.goto(BASE);
++  await waitReady();
++  check('F3 a draft for an athlete that does not exist is dropped', (await keys('bp.v2.draft.')).length === 0 && !(await E(`!!document.querySelector('#recovery-title')`)));
++}
++
++try {
++  await run();
++} catch (e) {
++  fails++;
++  console.log(`\nABORTED: ${e.message}`);
++} finally {
++  console.log(`\n${total - fails}/${total} checks passed${fails ? `, ${fails} failing` : ''}`);
++  p.close();
++  browser.kill();
++  process.exit(fails ? 1 : 0);
++}
+diff --git a/src/App.tsx b/src/App.tsx
+index 3bcec57..7de707d 100644
+--- a/src/App.tsx
++++ b/src/App.tsx
+@@ -8,11 +8,15 @@ import { FormDrawdown } from './components/FormDrawdown';
+ import { Header } from './components/Header';
+ import { Landing } from './components/Landing';
+ import { ProtocolLibrary } from './components/ProtocolLibrary';
++import { RecoveryDialog } from './components/RecoveryDialog';
+ import { RepTimeline } from './components/RepTimeline';
+ import { ResearchModal, type ResearchTab } from './components/ResearchModal';
++import { SessionAnnouncer } from './components/SessionAnnouncer';
+ import { SidePanel } from './components/SidePanel';
+ import { SportPage } from './components/SportPage';
+ import { SummaryModal } from './components/SummaryModal';
++import { clearDraft, draftAthleteId, interruptedRecord, listDrafts, type SetDraft } from './data/draft';
++import { browserStore } from './data/kv';
+ import { claimLegacyBaseline } from './data/migrate';
+ import { calibrationQuality } from './data/quality';
+ import { SAMPLE_ATHLETE_NAME } from './data/sample';
+@@ -22,8 +26,10 @@ import { LabelProvider, makeLabeler } from './protocols/labels';
+ import { DEFAULT_LAUNCH, getSport, launchForExercise, resolveDemo, resolveLaunch, type LaunchContext } from './protocols/launch';
+ import { sessionPattern } from './protocols/patterns';
+ import { SessionEngine } from './session/engine';
++import { useNavGuard } from './session/useNavGuard';
+ import { DemoRunner, LiveRunner, type Runner } from './session/runners';
+ import { useSessionRecorder } from './session/useSessionRecorder';
++import { useSetDraft } from './session/useSetDraft';
+ import { C } from './ui/theme';
+ import { arrow } from './utils/format';
+ import { useEngine } from './utils/hooks';
+@@ -59,6 +65,9 @@ export default function App() {
+   const [demoPaused, setDemoPaused] = useState(false);
+   const [dialog, setDialog] = useState<Dialog>(null);
+   const [confirm, setConfirm] = useState<Confirm>(null);
++  /** Live sets cut off by a refresh, crash or closed tab, waiting for the athlete to keep or discard them (oldest first). */
++  const [recoveryQueue, setRecoveryQueue] = useState<SetDraft[]>([]);
++  const draftKv = useMemo(() => browserStore(), []);
+   /** A live launch waiting for the user to create their first athlete profile. */
+   const pendingLive = useRef<LaunchContext | null>(null);
+   const videoRef = useRef<HTMLVideoElement>(null);
+@@ -84,6 +93,25 @@ export default function App() {
+     // eslint-disable-next-line react-hooks/exhaustive-deps
+   }, []);
+ 
++  // Work cut off by a refresh, crash or closed tab: offer what was really measured (see data/draft.ts).
++  useEffect(() => {
++    if (!data.persistent) return;
++    const sets: SetDraft[] = [];
++    let lostCalibration = false;
++    for (const d of listDrafts(draftKv)) {
++      const owner = draftAthleteId(d);
++      if (!data.real.athlete(owner)) clearDraft(draftKv, owner); // the profile no longer exists: nothing to attach it to
++      else if (d.kind === 'calibration') {
++        clearDraft(draftKv, owner);
++        lostCalibration = true;
++      } else sets.push(d);
++    }
++    if (sets.length) setRecoveryQueue(sets);
++    else if (lostCalibration)
++      setToast({ text: 'Your last calibration was interrupted before it finished. Nothing was saved, and your saved baseline is unchanged.', kind: '' });
++    // eslint-disable-next-line react-hooks/exhaustive-deps
++  }, []);
++
+   /** The single entry point into analysis — only launchable (READY/BETA) contexts get here. */
+   const startSession = useCallback(
+     (m: Mode, ctx?: LaunchContext) => {
+@@ -166,6 +194,19 @@ export default function App() {
+     onStorageError: (text) => setToast({ text, kind: 'break' }),
+   });
+ 
++  // Checkpoint a live set after every rep so an accidental refresh or close can be recovered (data/draft.ts).
++  const draft = useSetDraft({
++    snap,
++    mode,
++    kv: draftKv,
++    persistent: data.persistent,
++    athleteId: sessionAthlete?.id ?? null,
++    launch,
++    config,
++    active: view === 'session',
++    blocked: recoveryQueue.length > 0,
++  });
++
+   // Frame source lifecycle (sessions start only once the Lab config is loaded)
+   useEffect(() => {
+     if (view !== 'session' || !configReady) return;
+@@ -288,6 +329,9 @@ export default function App() {
+     });
+   };
+ 
++  // Browser Back/Forward, refresh and close get the same protection as the in-app buttons (session/navGuard.ts).
++  useNavGuard({ view, setView, isProtected: liveActive, requestLeave: guardLeave, persist: draft.flush });
++
+   const newSet = () => {
+     setShowSummary(false);
+     setSelectedRep(null);
+@@ -333,6 +377,14 @@ export default function App() {
+   const pattern = snap.alarmRep !== null ? sessionPattern(exercise, snap.monitorReps, snap.onsetRep, snap.baseline?.reference.sigma0, launch.patternLabels) : null;
+   const sportForPage = getSport(sportView.sportId);
+ 
++  // Each view names itself for screen readers, tabs and history.
++  useEffect(() => {
++    document.title =
++      view === 'landing' ? 'BreakingPoint' : view === 'sport' ? `${sportForPage?.name ?? 'Sport'} | BreakingPoint` : `${launch.contextName}: ${launch.title} | BreakingPoint`;
++  }, [view, launch, sportForPage]);
++
++  const pendingRecovery = recoveryQueue[0] ?? null;
++
+   const athleteMenu = (
+     <AthleteMenu
+       scope={data.scope}
+@@ -359,6 +411,19 @@ export default function App() {
+ 
+   return (
+     <div className="app">
++      {/* Focuses <main> directly instead of navigating to #main, so it never adds a history entry (see session/navGuard.ts). */}
++      <a
++        className="skip-link"
++        href="#main"
++        onClick={(e) => {
++          e.preventDefault();
++          const main = document.getElementById('main');
++          main?.focus();
++          main?.scrollIntoView();
++        }}
++      >
++        Skip to main content
++      </a>
+       <Header
+         view={view}
+         snap={view === 'session' ? snap : null}
+@@ -412,7 +477,11 @@ export default function App() {
+ 
+       {view === 'session' && (
+         <LabelProvider value={labeler}>
+-          <main className="dashboard">
++          <main className="dashboard" id="main" tabIndex={-1}>
++            <h1 className="visually-hidden">
++              {launch.contextName}: {launch.title}, {mode === 'demo' ? 'demo' : 'live'} session
++            </h1>
++            <SessionAnnouncer snap={snap} />
+             <div className="stage-col">
+               <CameraStage
+                 snap={snap}
+@@ -580,6 +649,27 @@ export default function App() {
+           onClose={() => setDialog(null)}
+         />
+       )}
++      {pendingRecovery && (
++        <RecoveryDialog
++          athleteName={data.real.athlete(pendingRecovery.record.athleteId)?.name ?? 'Athlete'}
++          draft={pendingRecovery}
++          onKeep={() => {
++            // Never drop a draft that did not reach the history: if saving fails, keep asking.
++            if (!data.real.saveSession(interruptedRecord(pendingRecovery))) {
++              setToast({ text: 'That set could not be saved: browser storage is full or unavailable.', kind: 'break' });
++              return;
++            }
++            clearDraft(draftKv, pendingRecovery.record.athleteId);
++            setRecoveryQueue((q) => q.slice(1));
++            data.refresh();
++            setToast({ text: 'Interrupted set kept. It does not count toward records.', kind: '' });
++          }}
++          onDiscard={() => {
++            clearDraft(draftKv, pendingRecovery.record.athleteId);
++            setRecoveryQueue((q) => q.slice(1));
++          }}
++        />
++      )}
+       {confirm && (
+         <ConfirmDialog
+           title={confirm.title}
+diff --git a/src/components/Landing.tsx b/src/components/Landing.tsx
+index 3ca845d..2c62dab 100644
+--- a/src/components/Landing.tsx
++++ b/src/components/Landing.tsx
+@@ -103,6 +103,7 @@ export function Landing({ config, athlete, onSport, onDemo, onLibrary, onLab }:
+ 
+   return (
+     <div className="landing">
++      <main id="main" tabIndex={-1}>
+       <section className="section hero">
+         <div>
+           <h1>
+@@ -272,6 +273,8 @@ export function Landing({ config, athlete, onSport, onDemo, onLibrary, onLab }:
+         </button>
+       </section>
+ 
++      </main>
++
+       <footer className="section site-foot">
+         <span>{DISCLAIMER}</span>
+         <span>Pose estimation runs in your browser. No video is uploaded or stored.</span>
+diff --git a/src/components/RecoveryDialog.tsx b/src/components/RecoveryDialog.tsx
+new file mode 100644
+index 0000000..67561b1
+--- /dev/null
++++ b/src/components/RecoveryDialog.tsx
+@@ -0,0 +1,47 @@
++import { heldReps } from '../data/progress';
++import type { SetDraft } from '../data/draft';
++import { resolveLaunch } from '../protocols/launch';
++import { useDialog } from '../utils/hooks';
++
++interface Props {
++  athleteName: string;
++  draft: SetDraft;
++  onKeep: () => void;
++  onDiscard: () => void;
++}
++
++/**
++ * Offered once after a live set was cut off (refresh, crash, closed tab). Both choices are explicit:
++ * there is no click-away or Escape, so a decision can never be made by accident. Focus starts on
++ * the choice that loses nothing.
++ */
++export function RecoveryDialog({ athleteName, draft, onKeep, onDiscard }: Props) {
++  const keepRef = useDialog<HTMLButtonElement>(() => {});
++  const r = draft.record;
++  const ctx = resolveLaunch(r.sportId, r.protocolId, r.subSportId);
++  const what = ctx ? `${ctx.contextName}, ${ctx.title}` : 'a live set';
++  const when = new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(draft.savedAt));
++  const held = heldReps(r.reps.map((x) => ({ step: x.state ? { state: x.state } : null })));
++  return (
++    <div className="modal-backdrop">
++      <div className="confirm sys-window" role="alertdialog" aria-modal="true" aria-labelledby="recovery-title" aria-describedby="recovery-body">
++        <h2 id="recovery-title">A set was interrupted</h2>
++        <div id="recovery-body" className="confirm-body">
++          <p>
++            {athleteName}’s set ({what}) stopped when the page was closed or reloaded on {when}. {r.totalReps} rep{r.totalReps === 1 ? '' : 's'} had been measured, {held} held
++            at baseline.
++          </p>
++          <p>You can keep it in your history. Because it never finished, it will not count toward records or comparisons.</p>
++        </div>
++        <div className="confirm-actions">
++          <button className="btn danger" onClick={onDiscard}>
++            Discard set
++          </button>
++          <button className="btn primary" ref={keepRef} onClick={onKeep}>
++            Keep interrupted set
++          </button>
++        </div>
++      </div>
++    </div>
++  );
++}
+diff --git a/src/components/SessionAnnouncer.tsx b/src/components/SessionAnnouncer.tsx
+new file mode 100644
+index 0000000..659321a
+--- /dev/null
++++ b/src/components/SessionAnnouncer.tsx
+@@ -0,0 +1,34 @@
++import { useEffect, useRef, useState } from 'react';
++import { announce, type Announcement } from '../session/announce';
++import type { Snapshot } from '../session/engine';
++
++/**
++ * The session's only live regions, visually hidden. Mount once. Visual panels should
++ * not set their own aria-live: a region that rewrites itself every rep is read out
++ * every rep. Polite for progress, an alert only for the breaking point.
++ */
++export function SessionAnnouncer({ snap }: { snap: Snapshot }) {
++  const prev = useRef<Snapshot | null>(null);
++  const [msg, setMsg] = useState<Announcement>({ polite: null, assertive: null });
++
++  useEffect(() => {
++    const a = announce(prev.current, snap);
++    const phaseChanged = prev.current !== null && prev.current.phase !== snap.phase;
++    prev.current = snap;
++    if (a.polite || a.assertive || phaseChanged) {
++      // A stale stop message is cleared once the phase moves on.
++      setMsg((m) => ({ polite: a.polite ?? m.polite, assertive: a.assertive ?? (phaseChanged ? null : m.assertive) }));
++    }
++  }, [snap]);
++
++  return (
++    <div className="visually-hidden">
++      <div role="status" aria-live="polite" aria-atomic="true">
++        {msg.polite}
++      </div>
++      <div role="alert" aria-atomic="true">
++        {msg.assertive}
++      </div>
++    </div>
++  );
++}
+diff --git a/src/components/SidePanel.tsx b/src/components/SidePanel.tsx
+index 5daf1e0..5b04aa2 100644
+--- a/src/components/SidePanel.tsx
++++ b/src/components/SidePanel.tsx
+@@ -359,7 +359,8 @@ function MonitorView(p: Props) {
+   const holding = stillHolding(s.monitorReps);
+   return (
+     <>
+-      <div key={state} className={`sys-window toned state-card ${STATE_CLASS[state]}`} role="status" aria-live="polite">
++      {/* No live region here: the held-rep count changes every rep and would be read out every rep. SessionAnnouncer speaks state changes only. */}
++      <div key={state} className={`sys-window toned state-card ${STATE_CLASS[state]}`}>
+         <div className="state-head">
+           <span className="eyebrow">Movement state{last ? `, rep ${last.index}` : ''}</span>
+           <StateScale state={state} />
+diff --git a/src/components/SportPage.tsx b/src/components/SportPage.tsx
+index 3a29a6f..234670b 100644
+--- a/src/components/SportPage.tsx
++++ b/src/components/SportPage.tsx
+@@ -23,7 +23,7 @@ export function SportPage({ sport, subSportId, onSubSport, onBack, onDemo, onLiv
+   const refs = protocolRefs(sport, sub?.id);
+   const contextName = sub?.name ?? sport.name;
+   return (
+-    <div className="landing">
++    <main className="landing" id="main" tabIndex={-1}>
+       <section className="section sport-page">
+         <button className="btn ghost sm" onClick={onBack}>
+           <span aria-hidden>‹</span> All sports
+@@ -115,6 +115,6 @@ export function SportPage({ sport, subSportId, onSubSport, onBack, onDemo, onLiv
+           </button>
+         </div>
+       </section>
+-    </div>
++    </main>
+   );
+ }
+diff --git a/src/data/draft.ts b/src/data/draft.ts
+new file mode 100644
+index 0000000..ac9dfd3
+--- /dev/null
++++ b/src/data/draft.ts
+@@ -0,0 +1,161 @@
++// Recovery drafts for live work interrupted by a refresh, crash, or closed tab.
++//
++// Browser unload handlers are not reliable, so a live set is checkpointed after
++// every rep. If the page disappears, the next visit offers the reps that really
++// were measured. Nothing is estimated: a draft is a SessionRecord built from the
++// engine's own output at the last checkpoint.
++//
++// Integrity rules:
++//  - Live sets only. Demo and sample data never get a draft.
++//  - An interrupted set is saved as an ordinary set in the athlete's history but is
++//    marked not eligible, so it can never set a record, raise a milestone's record
++//    count, or be used as a comparison. (It is real training, so it still shows in
++//    history and counts as a training day.)
++//  - Drafts are untrusted input: localStorage can be edited or corrupted, so every
++//    field is validated and unknown fields are dropped before anything is saved.
++
++import { readJson, writeJson, type KeyValueStore } from './kv';
++import { SCHEMA_VERSION, type SessionRecord } from './types';
++
++export const DRAFT_PREFIX = 'bp.v2.draft.';
++export const draftKey = (athleteId: string): string => DRAFT_PREFIX + athleteId;
++
++export const INTERRUPTED_REASON = 'Interrupted before the set ended';
++const MAX_REPS = 500;
++
++/** A monitored set that was in progress. */
++export interface SetDraft {
++  v: 1;
++  kind: 'set';
++  savedAt: string;
++  record: SessionRecord;
++}
++
++/** A calibration that was in progress. Nothing to restore (the baseline never locked); kept only so the athlete is told. */
++export interface CalibrationDraft {
++  v: 1;
++  kind: 'calibration';
++  savedAt: string;
++  athleteId: string;
++  protocolId: string;
++  /** Calibration reps captured before the interruption. */
++  reps: number;
++}
++
++export type Draft = SetDraft | CalibrationDraft;
++
++// ---------------------------------------------------------------- validation
++const isObj = (x: unknown): x is Record<string, unknown> => typeof x === 'object' && x !== null && !Array.isArray(x);
++const str = (x: unknown, max = 200): x is string => typeof x === 'string' && x.length > 0 && x.length <= max;
++const num = (x: unknown): x is number => typeof x === 'number' && Number.isFinite(x);
++const numOrNull = (x: unknown): boolean => x === null || num(x);
++const int = (x: unknown, min = 0): x is number => typeof x === 'number' && Number.isInteger(x) && x >= min;
++const iso = (x: unknown): x is string => str(x, 40) && !Number.isNaN(Date.parse(x));
++const STATES = ['STABLE', 'DRIFT', 'BREAKPOINT'];
++
++function validRep(r: unknown): boolean {
++  return (
++    isObj(r) &&
++    int(r.index, 1) &&
++    numOrNull(r.score) &&
++    (r.state === null || (typeof r.state === 'string' && STATES.includes(r.state))) &&
++    numOrNull(r.ewma) &&
++    num(r.quality) &&
++    r.quality >= 0 &&
++    r.quality <= 1 &&
++    typeof r.afterWarning === 'boolean'
++  );
++}
++
++function validRecord(rec: unknown): rec is SessionRecord {
++  if (!isObj(rec)) return false;
++  if (rec.schemaVersion !== SCHEMA_VERSION || rec.source !== 'live') return false;
++  if (![rec.id, rec.athleteId, rec.sportId, rec.protocolId, rec.exercise, rec.detectorConfigId].every((x) => str(x))) return false;
++  if (![rec.startedAt, rec.endedAt, rec.baselineSavedAt].every(iso)) return false;
++  if (!Array.isArray(rec.reps) || rec.reps.length < 1 || rec.reps.length > MAX_REPS || !rec.reps.every(validRep)) return false;
++  if (rec.totalReps !== rec.reps.length || !int(rec.scoredReps) || rec.scoredReps > rec.reps.length) return false;
++  if (!int(rec.heldReps) || rec.heldReps > rec.reps.length) return false;
++  if (!(rec.onsetRep === null || int(rec.onsetRep, 1)) || !(rec.breakpointRep === null || int(rec.breakpointRep, 1))) return false;
++  const cal = rec.calibration;
++  if (!isObj(cal) || typeof cal.ok !== 'boolean' || !num(cal.nReps) || !num(cal.sigma0) || !Array.isArray(cal.reasons)) return false;
++  const q = rec.quality;
++  if (!isObj(q) || typeof q.eligible !== 'boolean' || !Array.isArray(q.reasons) || !q.reasons.every((x) => typeof x === 'string')) return false;
++  return Array.isArray(rec.topChanges);
++}
++
++/** Validate untrusted JSON as a draft; null when anything is off. */
++export function parseDraft(raw: unknown): Draft | null {
++  if (!isObj(raw) || raw.v !== 1 || !iso(raw.savedAt)) return null;
++  if (raw.kind === 'set') return validRecord(raw.record) ? { v: 1, kind: 'set', savedAt: raw.savedAt, record: raw.record } : null;
++  if (raw.kind === 'calibration' && str(raw.athleteId) && str(raw.protocolId) && int(raw.reps)) {
++    return { v: 1, kind: 'calibration', savedAt: raw.savedAt, athleteId: raw.athleteId, protocolId: raw.protocolId, reps: raw.reps };
++  }
++  return null;
++}
++
++export const draftAthleteId = (d: Draft): string => (d.kind === 'set' ? d.record.athleteId : d.athleteId);
++
++// ---------------------------------------------------------------- storage
++/** One draft per athlete: the newest checkpoint replaces the last. */
++export function saveDraft(kv: KeyValueStore, d: Draft): boolean {
++  return writeJson(kv, draftKey(draftAthleteId(d)), d);
++}
++
++/** The athlete's draft, or null. A corrupt or tampered entry is removed so it cannot block recovery forever. */
++export function loadDraft(kv: KeyValueStore, athleteId: string): Draft | null {
++  const key = draftKey(athleteId);
++  const raw = readJson<unknown>(kv, key);
++  if (raw === null) {
++    if (kv.get(key) !== null) kv.remove(key); // present but not JSON
++    return null;
++  }
++  const d = parseDraft(raw);
++  if (!d || draftAthleteId(d) !== athleteId) {
++    kv.remove(key);
++    return null;
++  }
++  return d;
++}
++
++export function clearDraft(kv: KeyValueStore, athleteId: string): void {
++  kv.remove(draftKey(athleteId));
++}
++
++/** Every valid draft on this device (one per athlete), oldest first. */
++export function listDrafts(kv: KeyValueStore): Draft[] {
++  const out: Draft[] = [];
++  for (const key of kv.keys()) {
++    if (!key.startsWith(DRAFT_PREFIX)) continue;
++    const d = loadDraft(kv, key.slice(DRAFT_PREFIX.length));
++    if (d) out.push(d);
++  }
++  return out.sort((a, b) => a.savedAt.localeCompare(b.savedAt));
++}
++
++// ---------------------------------------------------------------- recovery
++const RECORD_KEYS: (keyof SessionRecord)[] = [
++  'schemaVersion', 'id', 'athleteId', 'source', 'sportId', 'subSportId', 'protocolId', 'exercise', 'detectorConfigId', 'startedAt', 'endedAt',
++  'baselineSavedAt', 'calibration', 'reps', 'totalReps', 'scoredReps', 'heldReps', 'onsetRep', 'breakpointRep', 'avgPre', 'avgPost', 'topChanges',
++  'patternId', 'recovery', 'quality',
++];
++
++/**
++ * The record to store when the athlete chooses to keep an interrupted set.
++ * Ends at the last checkpoint, carries no recovery check, and is never eligible for records.
++ */
++export function interruptedRecord(d: SetDraft): SessionRecord {
++  const src = d.record as unknown as Record<string, unknown>;
++  const clean: Record<string, unknown> = {};
++  for (const k of RECORD_KEYS) if (src[k] !== undefined) clean[k] = src[k];
++  const rec = clean as unknown as SessionRecord;
++  return {
++    ...rec,
++    endedAt: d.savedAt,
++    recovery: null,
++    quality: {
++      ...rec.quality,
++      eligible: false,
++      reasons: rec.quality.reasons.includes(INTERRUPTED_REASON) ? rec.quality.reasons : [...rec.quality.reasons, INTERRUPTED_REASON],
++    },
++  };
++}
+diff --git a/src/session/announce.ts b/src/session/announce.ts
+new file mode 100644
+index 0000000..dc79ade
+--- /dev/null
++++ b/src/session/announce.ts
+@@ -0,0 +1,54 @@
++// What a screen reader should hear as a session moves along.
++//
++// Quiet by default: nothing is announced per rep or per frame, because a live
++// region that rewrites itself every rep turns a calm workout into a stream of
++// interruptions. Only phase changes and the first drift are spoken politely.
++// The breaking point is the single assertive message, because it is the one
++// instruction that must interrupt: stop and rest.
++
++import { heldReps } from '../data/progress';
++import { RECOVERY_REPS, type Snapshot } from './engine';
++
++export interface Announcement {
++  polite: string | null;
++  /** Reserved for the breaking point. */
++  assertive: string | null;
++}
++
++const NONE: Announcement = { polite: null, assertive: null };
++const polite = (text: string): Announcement => ({ polite: text, assertive: null });
++
++export function announce(prev: Snapshot | null, next: Snapshot): Announcement {
++  if (!prev || prev === next) return NONE;
++
++  if (prev.alarmRep === null && next.alarmRep !== null) {
++    return { polite: null, assertive: `Stop. Breaking point at rep ${next.alarmRep}. End the set and rest.` };
++  }
++
++  if (prev.phase !== next.phase) {
++    switch (next.phase) {
++      case 'calibrating':
++        return polite(`Calibration started. Perform ${next.calibrationTarget} controlled reps at your normal tempo.`);
++      case 'baseline':
++        return polite('Baseline locked.');
++      case 'monitoring':
++        return polite('Set started.');
++      case 'summary': {
++        if (next.alarmRep !== null) return polite(`Set ended. The breaking point was at rep ${next.alarmRep}. Rest, then run the recovery check.`);
++        const held = heldReps(next.monitorReps);
++        return polite(`Set ended. ${next.monitorReps.length} reps, ${held} held at your baseline.`);
++      }
++      case 'recovery':
++        return polite(`Recovery check started. Perform ${RECOVERY_REPS} controlled reps.`);
++      case 'recoveryDone':
++        return polite(next.recovery ? `Recovery check complete. ${Math.round(next.recovery.percent * 100)} percent back toward your baseline.` : 'Recovery check complete.');
++      default:
++        return NONE;
++    }
++  }
++
++  if (next.phase === 'monitoring' && prev.state === 'STABLE' && next.state === 'DRIFT') {
++    return polite('Your movement is drifting from your baseline. Be ready to stop.');
++  }
++  return NONE;
++}
+diff --git a/src/session/navGuard.ts b/src/session/navGuard.ts
+new file mode 100644
+index 0000000..3174d52
+--- /dev/null
++++ b/src/session/navGuard.ts
+@@ -0,0 +1,160 @@
++// Keeps the browser's history in step with the app's three views, and protects
++// live work in progress from an accidental Back, refresh or close.
++//
++// What can and cannot be guaranteed:
++//  - Back / Forward: fully intercepted. A protected Back is undone, the athlete is
++//    asked, and the navigation is replayed only if they confirm.
++//  - Refresh / close: `beforeunload` asks the browser to show its own prompt. Browsers
++//    may ignore it (mobile browsers, no recent user interaction, crashes, tab discard),
++//    so it is only a speed bump. The real safety net is `persist`, called whenever the
++//    page is hidden or unloading, which writes a recoverable draft.
++//
++// The controller takes its window and handlers as arguments so it can be tested
++// without a browser.
++
++export type NavView = 'landing' | 'sport' | 'session';
++
++interface Entry {
++  view: NavView;
++  /** Position in the history stack, so a multi-step jump can be undone exactly. */
++  pos: number;
++}
++
++export interface HistoryLike {
++  readonly state: unknown;
++  pushState(data: unknown, unused: string, url?: string | null): void;
++  replaceState(data: unknown, unused: string, url?: string | null): void;
++  go(delta: number): void;
++}
++
++export interface GuardEnv {
++  win: {
++    readonly history: HistoryLike;
++    // eslint-disable-next-line @typescript-eslint/no-explicit-any
++    addEventListener(type: string, listener: (e: any) => void): void;
++    // eslint-disable-next-line @typescript-eslint/no-explicit-any
++    removeEventListener(type: string, listener: (e: any) => void): void;
++  };
++  doc: {
++    readonly visibilityState: string;
++    addEventListener(type: string, listener: () => void): void;
++    removeEventListener(type: string, listener: () => void): void;
++  };
++}
++
++export interface NavGuardHandlers {
++  /** The view the app is showing right now. */
++  getView(): NavView;
++  /** Move the app to a view (only called for Back/Forward the guard allows). */
++  setView(view: NavView): void;
++  /** True while leaving would throw away live work: calibrating, monitoring or a recovery check in a live set. */
++  isProtected(): boolean;
++  /** Ask the athlete. `proceed` must be called only if they confirm. */
++  requestLeave(proceed: () => void): void;
++  /** Write recoverable state now. Called when the page is hidden or unloading. */
++  persist(): void;
++}
++
++export interface NavGuard {
++  /** Tell the guard the app moved to `view` (call after every view change). */
++  sync(view: NavView): void;
++  dispose(): void;
++}
++
++const VIEWS: readonly string[] = ['landing', 'sport', 'session'];
++
++function parse(state: unknown): Entry | null {
++  const bp = (state as { bp?: { view?: unknown; pos?: unknown } } | null)?.bp;
++  if (!bp || typeof bp.view !== 'string' || !VIEWS.includes(bp.view)) return null;
++  if (typeof bp.pos !== 'number' || !Number.isInteger(bp.pos) || bp.pos < 0) return null;
++  return { view: bp.view as NavView, pos: bp.pos };
++}
++
++export function createNavGuard(env: GuardEnv, h: NavGuardHandlers): NavGuard {
++  const { win, doc } = env;
++  const hist = win.history;
++  let view = h.getView();
++  // After a reload the browser keeps the old entry's state: reuse its position, never its view
++  // (a reloaded page cannot resume a session).
++  let pos = parse(hist.state)?.pos ?? 0;
++  hist.replaceState({ bp: { view, pos } }, '');
++
++  /** The position we asked the browser to return to while the athlete decides. */
++  let undoTo: number | null = null;
++  /** Set once the athlete confirmed, so the replayed navigation is not blocked a second time. */
++  let allowLeave = false;
++
++  const onPopState = (e: { state: unknown }) => {
++    const st = parse(e.state);
++    if (!st) return; // an entry this app did not create: leave it to the browser
++    if (undoTo !== null && st.pos === undoTo) {
++      // Our own undo landed. Stay where we were.
++      undoTo = null;
++      pos = st.pos;
++      return;
++    }
++    const from = pos;
++    pos = st.pos;
++    if (st.view === 'session' && view !== 'session') {
++      // Forward onto a session that no longer exists: turn the dead entry into the current view.
++      hist.replaceState({ bp: { view, pos } }, '');
++      return;
++    }
++    if (st.view === view) return;
++    if (h.isProtected() && !allowLeave) {
++      const target = st.pos;
++      undoTo = from;
++      hist.go(from - target);
++      h.requestLeave(() => {
++        allowLeave = true;
++        hist.go(target - from);
++      });
++      return;
++    }
++    allowLeave = false;
++    h.setView(st.view);
++  };
++
++  const onBeforeUnload = (e: { preventDefault(): void; returnValue?: unknown }) => {
++    if (!h.isProtected()) return;
++    h.persist();
++    e.preventDefault();
++    e.returnValue = ''; // Chromium needs this to show its prompt
++  };
++  const onPageHide = () => h.persist();
++  const onVisibility = () => {
++    if (doc.visibilityState === 'hidden') h.persist();
++  };
++
++  win.addEventListener('popstate', onPopState);
++  win.addEventListener('beforeunload', onBeforeUnload);
++  win.addEventListener('pagehide', onPageHide);
++  doc.addEventListener('visibilitychange', onVisibility);
++
++  return {
++    sync(next) {
++      if (next === view) return;
++      const prev = view;
++      view = next;
++      const cur = parse(hist.state);
++      if (cur && cur.view === next) {
++        // Back or Forward already put the browser here.
++        pos = cur.pos;
++        return;
++      }
++      if (prev === 'session') {
++        // A finished session is not a place to come back to: replace its entry instead of stacking on it.
++        hist.replaceState({ bp: { view: next, pos } }, '');
++      } else {
++        pos += 1;
++        hist.pushState({ bp: { view: next, pos } }, '');
++      }
++    },
++    dispose() {
++      win.removeEventListener('popstate', onPopState);
++      win.removeEventListener('beforeunload', onBeforeUnload);
++      win.removeEventListener('pagehide', onPageHide);
++      doc.removeEventListener('visibilitychange', onVisibility);
++    },
++  };
++}
+diff --git a/src/session/useNavGuard.ts b/src/session/useNavGuard.ts
+new file mode 100644
+index 0000000..7077c08
+--- /dev/null
++++ b/src/session/useNavGuard.ts
+@@ -0,0 +1,42 @@
++import { useEffect, useRef } from 'react';
++import { createNavGuard, type NavGuard, type NavView } from './navGuard';
++
++interface Args {
++  view: NavView;
++  setView: (view: NavView) => void;
++  /** True while leaving would throw away live work. */
++  isProtected: boolean;
++  /** Ask the athlete (and end the set if they agree) before `proceed` runs. */
++  requestLeave: (proceed: () => void) => void;
++  /** Write a recovery draft now. */
++  persist: () => void;
++}
++
++/** Wires the browser Back/Forward/refresh/close protection (see navGuard.ts) to the app's view state. */
++export function useNavGuard(a: Args): void {
++  const latest = useRef(a);
++  latest.current = a;
++  const guard = useRef<NavGuard | null>(null);
++
++  useEffect(() => {
++    const g = createNavGuard(
++      { win: window, doc: document },
++      {
++        getView: () => latest.current.view,
++        setView: (v) => latest.current.setView(v),
++        isProtected: () => latest.current.isProtected,
++        requestLeave: (proceed) => latest.current.requestLeave(proceed),
++        persist: () => latest.current.persist(),
++      },
++    );
++    guard.current = g;
++    return () => {
++      g.dispose();
++      guard.current = null;
++    };
++  }, []);
++
++  useEffect(() => {
++    guard.current?.sync(a.view);
++  }, [a.view]);
++}
+diff --git a/src/session/useSetDraft.ts b/src/session/useSetDraft.ts
+new file mode 100644
+index 0000000..47f200f
+--- /dev/null
++++ b/src/session/useSetDraft.ts
+@@ -0,0 +1,92 @@
++// Checkpoints a live set (and an unfinished calibration) so an accidental refresh,
++// crash or closed tab does not lose the reps that were measured. See data/draft.ts
++// for the integrity rules. Demo and sample sessions never write drafts.
++
++import { useCallback, useEffect, useRef } from 'react';
++import { calibrationQuality } from '../data/quality';
++import { clearDraft, saveDraft } from '../data/draft';
++import type { KeyValueStore } from '../data/kv';
++import { newId } from '../data/repository';
++import { buildSessionRecord } from '../data/sessionRecord';
++import type { DetectorConfig } from '../detection/config';
++import type { LaunchContext } from '../protocols/launch';
++import type { Snapshot } from './engine';
++import { buildSummary } from './summary';
++
++interface Args {
++  snap: Snapshot;
++  mode: 'demo' | 'live';
++  kv: KeyValueStore;
++  /** False when browser storage is unavailable (nothing can be saved). */
++  persistent: boolean;
++  athleteId: string | null;
++  launch: LaunchContext;
++  config: DetectorConfig;
++  /** True while the session screen is showing. Leaving it on purpose clears this run's draft. */
++  active: boolean;
++  /** True while an earlier interrupted set is waiting for a decision: do not overwrite it. */
++  blocked: boolean;
++}
++
++export function useSetDraft(a: Args): { flush: () => void } {
++  const latest = useRef(a);
++  latest.current = a;
++  const startedAt = useRef<string | null>(null);
++  const setId = useRef<string | null>(null);
++  /** The athlete whose draft THIS page load wrote. Drafts from earlier loads are never touched here. */
++  const wrote = useRef<string | null>(null);
++
++  const flush = useCallback(() => {
++    const x = latest.current;
++    const s = x.snap;
++    if (x.mode !== 'live' || !x.persistent || !x.athleteId || x.blocked) return;
++    const now = new Date().toISOString();
++    if (s.phase === 'monitoring' && s.baseline && s.monitorReps.length > 0 && startedAt.current && setId.current) {
++      const summary = buildSummary(s.monitorReps, s.exercise, s.athlete, s.alarmRep, s.onsetRep);
++      const record = buildSessionRecord({
++        id: setId.current,
++        snap: { ...s, summary },
++        ctx: x.launch,
++        athleteId: x.athleteId,
++        source: 'live',
++        config: x.config,
++        startedAt: startedAt.current,
++        endedAt: now,
++        baselineSavedAt: s.baseline.createdAt,
++        calibration: calibrationQuality(s.baseline, x.config),
++      });
++      if (saveDraft(x.kv, { v: 1, kind: 'set', savedAt: now, record })) wrote.current = x.athleteId;
++    } else if (s.phase === 'calibrating' && s.calibrationReps.length > 0) {
++      if (saveDraft(x.kv, { v: 1, kind: 'calibration', savedAt: now, athleteId: x.athleteId, protocolId: x.launch.protocol.id, reps: s.calibrationReps.length })) {
++        wrote.current = x.athleteId;
++      }
++    }
++  }, []);
++
++  const drop = useCallback(() => {
++    if (!wrote.current) return;
++    clearDraft(latest.current.kv, wrote.current);
++    wrote.current = null;
++  }, []);
++
++  // A set begins when monitoring starts.
++  const phase = a.snap.phase;
++  useEffect(() => {
++    if (phase === 'monitoring') {
++      startedAt.current = new Date().toISOString();
++      setId.current = newId('set');
++    }
++  }, [phase]);
++
++  // Checkpoint after every rep and at every phase boundary.
++  useEffect(() => {
++    flush();
++  }, [flush, phase, a.snap.monitorReps.length, a.snap.calibrationReps.length, a.snap.alarmRep]);
++
++  // The set or calibration ended normally (the recorder has saved it) or the athlete left on purpose.
++  useEffect(() => {
++    if ((phase !== 'monitoring' && phase !== 'calibrating') || !a.active) drop();
++  }, [phase, a.active, drop]);
++
++  return { flush };
++}
+diff --git a/tests/a11y_css.test.ts b/tests/a11y_css.test.ts
+new file mode 100644
+index 0000000..937e16c
+--- /dev/null
++++ b/tests/a11y_css.test.ts
+@@ -0,0 +1,152 @@
++// Static accessibility guards that hold for any palette: the 11px text floor,
++// text contrast of the core tokens on the surfaces they are used on, and the
++// page-level settings the web-interface audit checks. They fail with file:line
++// so a regression names its cause.
++import { describe, expect, it } from 'vitest';
++import { readdirSync, readFileSync, statSync } from 'node:fs';
++import { join } from 'node:path';
++
++// Audit another checkout read-only with BP_ROOT=<path>; defaults to this one.
++const ROOT = process.env.BP_ROOT ?? '.';
++const at = (p: string) => join(ROOT, p);
++
++const walk = (dir: string, ext: string[]): string[] =>
++  readdirSync(dir).flatMap((f) => {
++    const p = join(dir, f);
++    return statSync(p).isDirectory() ? walk(p, ext) : ext.some((e) => p.endsWith(e)) ? [p] : [];
++  });
++
++const stripComments = (s: string) => s.replace(/\/\*[\s\S]*?\*\//g, (m) => m.replace(/[^\n]/g, ' '));
++
++// ---------------------------------------------------------------- text size floor
++const FLOOR_PX = 11;
++
++/** The smallest px value a font-size declaration can produce, or null when it is not a plain px / clamp(px, …). */
++function minPx(value: string): number | null {
++  const v = value.trim();
++  const plain = /^([\d.]+)px$/.exec(v);
++  if (plain) return Number(plain[1]);
++  const clamp = /^clamp\(\s*([\d.]+)px\s*,/.exec(v);
++  return clamp ? Number(clamp[1]) : null;
++}
++
++describe('text size floor', () => {
++  it(`no CSS declares text smaller than ${FLOOR_PX}px`, () => {
++    const bad: string[] = [];
++    for (const file of walk(at('src'), ['.css'])) {
++      stripComments(readFileSync(file, 'utf8'))
++        .split('\n')
++        .forEach((line, i) => {
++          for (const m of line.matchAll(/(?:^|[;{\s])font-size:\s*([^;}]+)/g)) {
++            const px = minPx(m[1]);
++            if (px !== null && px < FLOOR_PX) bad.push(`${file.replace(/\\/g, '/')}:${i + 1} font-size ${m[1].trim()}`);
++          }
++        });
++    }
++    expect(bad, `Informational text must be at least ${FLOOR_PX}px:\n${bad.join('\n')}`).toEqual([]);
++  });
++
++  it(`no SVG or inline text in TSX is smaller than ${FLOOR_PX}px`, () => {
++    const bad: string[] = [];
++    for (const file of walk(at('src'), ['.tsx'])) {
++      readFileSync(file, 'utf8')
++        .split('\n')
++        .forEach((line, i) => {
++          for (const m of line.matchAll(/fontSize[=:]\s*\{?\s*([\d.]+)/g)) if (Number(m[1]) < FLOOR_PX) bad.push(`${file.replace(/\\/g, '/')}:${i + 1} fontSize ${m[1]}`);
++        });
++    }
++    expect(bad, bad.join('\n')).toEqual([]);
++  });
++});
++
++// ---------------------------------------------------------------- token contrast
++function rootTokens(css: string): Map<string, string> {
++  const body = /:root\s*\{([\s\S]*?)\n\}/.exec(stripComments(css))?.[1] ?? '';
++  const out = new Map<string, string>();
++  for (const m of body.matchAll(/(--[\w-]+)\s*:\s*([^;]+);/g)) out.set(m[1], m[2].trim());
++  return out;
++}
++
++function resolveHex(tokens: Map<string, string>, name: string, depth = 0): string {
++  const raw = tokens.get(name);
++  if (raw === undefined) throw new Error(`token ${name} is not defined in :root`);
++  const ref = /^var\((--[\w-]+)\)$/.exec(raw);
++  if (ref) {
++    if (depth > 5) throw new Error(`token ${name} is circular`);
++    return resolveHex(tokens, ref[1], depth + 1);
++  }
++  const hex = /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.exec(raw);
++  if (!hex) throw new Error(`token ${name} is not a plain hex colour (${raw})`);
++  const h = hex[1].length === 3 ? [...hex[1]].map((c) => c + c).join('') : hex[1];
++  return h.toLowerCase();
++}
++
++const lin = (c: number) => (c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4);
++const lum = (hex: string) => {
++  const [r, g, b] = [0, 2, 4].map((i) => lin(parseInt(hex.slice(i, i + 2), 16) / 255));
++  return 0.2126 * r + 0.7152 * g + 0.0722 * b;
++};
++const contrast = (a: string, b: string) => {
++  const [hi, lo] = [lum(a), lum(b)].sort((x, y) => y - x);
++  return (hi + 0.05) / (lo + 0.05);
++};
++
++describe('token contrast (WCAG 2.1 AA)', () => {
++  const tokens = rootTokens(readFileSync(at('src/styles.css'), 'utf8'));
++  const c = (n: string) => resolveHex(tokens, `--${n}`);
++  const surfaces = ['void', 'abyss', 'panel', 'panel-2'];
++
++  it.each([['text'], ['text-2'], ['muted']])('%s reads at 4.5:1 on every surface text sits on', (fg) => {
++    for (const bg of surfaces) {
++      const ratio = contrast(c(fg), c(bg));
++      expect(ratio, `--${fg} on --${bg} is ${ratio.toFixed(2)}:1`).toBeGreaterThanOrEqual(4.5);
++    }
++  });
++
++  // The accent that is used as TEXT: the light cobalt in Breakaway (the base cobalt is a fill), the electric blue before it.
++  const accentText = tokens.has('--cobalt-hi') ? 'cobalt-hi' : 'sys';
++  it.each([['stable'], ['drift'], ['break'], [accentText], ['ice']])('state and accent colour --%s is legible as text on panels', (fg) => {
++    for (const bg of ['void', 'panel']) {
++      const ratio = contrast(c(fg), c(bg));
++      expect(ratio, `--${fg} on --${bg} is ${ratio.toFixed(2)}:1`).toBeGreaterThanOrEqual(4.5);
++    }
++  });
++
++  // Text that sits ON a filled colour must use the pairing the palette declares for it.
++  const fills = [['on-cobalt', 'cobalt'], ['on-lime', 'lime'], ['on-sys', 'sys']].filter(([fg, bg]) => tokens.has('--' + fg) && tokens.has('--' + bg));
++  it.each(fills)('--%s on --%s reaches 4.5:1', (fg, bg) => {
++    const ratio = contrast(c(fg), c(bg));
++    expect(ratio, `--${fg} on --${bg} is ${ratio.toFixed(2)}:1`).toBeGreaterThanOrEqual(4.5);
++  });
++
++  it('borders that mark a control are visible (3:1 against the surface they sit on)', () => {
++    // Informational: hairlines (--line) are decorative; control outlines (--line-2) are not required to reach 3:1
++    // because every control also has a filled background or a text label. This guards against the outline vanishing.
++    expect(contrast(c('line-2'), c('panel'))).toBeGreaterThan(1.3);
++  });
++});
++
++// ---------------------------------------------------------------- page-level settings
++describe('page-level settings', () => {
++  const html = readFileSync(at('index.html'), 'utf8');
++  const css = readFileSync(at('src/styles.css'), 'utf8');
++
++  it('does not disable zoom', () => {
++    expect(html).not.toMatch(/user-scalable\s*=\s*(no|0)/i);
++    expect(html).not.toMatch(/maximum-scale\s*=\s*1(\.0)?\b/i);
++  });
++
++  it('declares a dark colour scheme and a matching theme colour', () => {
++    expect(css).toMatch(/color-scheme:\s*dark/);
++    expect(html).toMatch(/<meta\s+name="theme-color"/);
++  });
++
++  it('has a skip link and a focus-visible ring', () => {
++    expect(css).toMatch(/\.skip-link/);
++    expect(css).toMatch(/:focus-visible/);
++  });
++
++  it('never uses transition: all', () => {
++    expect(stripComments(css)).not.toMatch(/transition:\s*all\b/);
++  });
++});
+diff --git a/tests/announce.test.ts b/tests/announce.test.ts
+new file mode 100644
+index 0000000..b1be13c
+--- /dev/null
++++ b/tests/announce.test.ts
+@@ -0,0 +1,77 @@
++// Screen-reader announcements: quiet per rep, polite for progress, assertive only for the stop instruction.
++import { describe, expect, it } from 'vitest';
++import { DEFAULT_DETECTOR_CONFIG } from '../src/detection/config';
++import { SessionEngine, type SessionPhase, type Snapshot } from '../src/session/engine';
++import { announce } from '../src/session/announce';
++
++const base = (): Snapshot => new SessionEngine('squat', DEFAULT_DETECTOR_CONFIG, 'Avery', 'live').getSnapshot();
++const rep = (index: number, state: 'STABLE' | 'DRIFT' | 'BREAKPOINT') =>
++  ({ index, context: 'monitoring', quality: 0.9, drift: { score: 0.5 }, step: { state } }) as unknown as Snapshot['monitorReps'][number];
++const snapAt = (phase: SessionPhase, over: Partial<Snapshot> = {}): Snapshot => ({ ...base(), phase, ...over });
++
++describe('announcements', () => {
++  it('say nothing without a previous snapshot or when nothing changed', () => {
++    const s = snapAt('monitoring');
++    expect(announce(null, s)).toEqual({ polite: null, assertive: null });
++    expect(announce(s, s)).toEqual({ polite: null, assertive: null });
++  });
++
++  it('stay silent for every rep while movement is stable', () => {
++    let prev = snapAt('monitoring', { monitorReps: [] });
++    for (let i = 1; i <= 12; i++) {
++      const next = { ...prev, monitorReps: [...prev.monitorReps, rep(i, 'STABLE')], version: prev.version + 1 };
++      expect(announce(prev, next)).toEqual({ polite: null, assertive: null });
++      prev = next;
++    }
++  });
++
++  it('say the first drift once, politely', () => {
++    const prev = snapAt('monitoring', { state: 'STABLE', monitorReps: [rep(1, 'STABLE')] });
++    const drift = snapAt('monitoring', { state: 'DRIFT', monitorReps: [rep(1, 'STABLE'), rep(2, 'DRIFT')] });
++    const a = announce(prev, drift);
++    expect(a.polite).toMatch(/drifting/i);
++    expect(a.assertive).toBeNull();
++    const again = snapAt('monitoring', { state: 'DRIFT', monitorReps: [...drift.monitorReps, rep(3, 'DRIFT')] });
++    expect(announce(drift, again)).toEqual({ polite: null, assertive: null });
++  });
++
++  it('make the breaking point the single assertive message, with the rep and what to do', () => {
++    const prev = snapAt('monitoring', { state: 'DRIFT', alarmRep: null });
++    const next = snapAt('monitoring', { state: 'BREAKPOINT', alarmRep: 11 });
++    const a = announce(prev, next);
++    expect(a.assertive).toBe('Stop. Breaking point at rep 11. End the set and rest.');
++    expect(a.polite).toBeNull();
++    // and not again on the next rep
++    const later = { ...next, monitorReps: [rep(12, 'BREAKPOINT')] };
++    expect(announce(next, later)).toEqual({ polite: null, assertive: null });
++  });
++
++  it('never goes assertive for anything but the breaking point', () => {
++    const phases: SessionPhase[] = ['idle', 'calibrating', 'baseline', 'monitoring', 'summary', 'recovery', 'recoveryDone'];
++    for (const from of phases) {
++      for (const to of phases) {
++        const a = announce(snapAt(from), snapAt(to));
++        expect(a.assertive, `${from} -> ${to}`).toBeNull();
++      }
++    }
++  });
++
++  it('describes phase changes in plain words', () => {
++    expect(announce(snapAt('idle'), snapAt('calibrating')).polite).toMatch(/Calibration started/);
++    expect(announce(snapAt('calibrating'), snapAt('baseline')).polite).toBe('Baseline locked.');
++    expect(announce(snapAt('baseline'), snapAt('monitoring')).polite).toBe('Set started.');
++    expect(announce(snapAt('summary'), snapAt('recovery')).polite).toMatch(/Recovery check started/);
++  });
++
++  it('summarises a finished set, with or without a breaking point', () => {
++    const clean = snapAt('summary', { monitorReps: [rep(1, 'STABLE'), rep(2, 'STABLE'), rep(3, 'DRIFT')] });
++    expect(announce(snapAt('monitoring'), clean).polite).toBe('Set ended. 3 reps, 2 held at your baseline.');
++    const broke = snapAt('summary', { alarmRep: 9 });
++    expect(announce(snapAt('monitoring', { alarmRep: 9 }), broke).polite).toMatch(/breaking point was at rep 9\. Rest, then run the recovery check/);
++  });
++
++  it('reports the recovery result as a whole percent', () => {
++    const done = snapAt('recoveryDone', { recovery: { percent: 0.8349 } as Snapshot['recovery'] });
++    expect(announce(snapAt('recovery'), done).polite).toBe('Recovery check complete. 83 percent back toward your baseline.');
++  });
++});
+diff --git a/tests/draft.test.ts b/tests/draft.test.ts
+new file mode 100644
+index 0000000..21f817e
+--- /dev/null
++++ b/tests/draft.test.ts
+@@ -0,0 +1,162 @@
++// Recovery drafts: validation of untrusted storage, and the guarantee that an
++// interrupted set can never become a record.
++import { describe, expect, it } from 'vitest';
++import { clearDraft, draftKey, interruptedRecord, INTERRUPTED_REASON, listDrafts, loadDraft, parseDraft, saveDraft, type SetDraft } from '../src/data/draft';
++import { MemoryStore } from '../src/data/kv';
++import { heldOutcome, personalRecords, recordSteps, trainingWeeks } from '../src/data/progress';
++import { AthleteRepository } from '../src/data/repository';
++import { createSampleRepository } from '../src/data/sample';
++import type { SessionRecord, SessionRep } from '../src/data/types';
++
++const reps = (states: ('STABLE' | 'DRIFT' | 'BREAKPOINT')[]): SessionRep[] =>
++  states.map((s, i) => ({ index: i + 1, score: 0.5, state: s, ewma: 0.5, quality: 0.9, afterWarning: false }));
++
++let n = 0;
++function rec(athleteId: string, held: number, over: Partial<SessionRecord> = {}): SessionRecord {
++  n++;
++  const r = reps([...Array(held).fill('STABLE'), 'DRIFT']);
++  return {
++    schemaVersion: 2,
++    id: `set_${n}`,
++    athleteId,
++    source: 'live',
++    sportId: 'strength',
++    protocolId: 'squat-bodyweight',
++    exercise: 'squat',
++    detectorConfigId: 'cfg-1',
++    startedAt: new Date(Date.UTC(2026, 8, 1 + n, 12)).toISOString(),
++    endedAt: new Date(Date.UTC(2026, 8, 1 + n, 12, 10)).toISOString(),
++    baselineSavedAt: '2026-09-01T10:00:00.000Z',
++    calibration: { nReps: 6, referenceSource: 'loo', mu0: 0.6, sigma0: 0.25, excludedFeatures: 0, totalFeatures: 4, ok: true, reasons: [] },
++    reps: r,
++    totalReps: r.length,
++    scoredReps: r.length,
++    heldReps: held,
++    onsetRep: held + 1,
++    breakpointRep: null,
++    avgPre: 0.5,
++    avgPost: null,
++    topChanges: [],
++    patternId: null,
++    recovery: null,
++    quality: { scoredFraction: 1, meanCapture: 0.9, calibrationOk: true, eligible: true, reasons: [] },
++    ...over,
++  };
++}
++
++const setDraft = (record: SessionRecord, savedAt = '2026-09-20T09:30:00.000Z'): SetDraft => ({ v: 1, kind: 'set', savedAt, record });
++
++describe('draft storage', () => {
++  it('round-trips a set draft and a calibration draft, one per athlete', () => {
++    const kv = new MemoryStore();
++    const d = setDraft(rec('ath_1', 5));
++    expect(saveDraft(kv, d)).toBe(true);
++    expect(loadDraft(kv, 'ath_1')).toEqual(d);
++    expect(saveDraft(kv, { v: 1, kind: 'calibration', savedAt: '2026-09-20T09:31:00.000Z', athleteId: 'ath_1', protocolId: 'squat-bodyweight', reps: 3 })).toBe(true);
++    expect(loadDraft(kv, 'ath_1')?.kind).toBe('calibration'); // newest checkpoint replaces the last
++    clearDraft(kv, 'ath_1');
++    expect(loadDraft(kv, 'ath_1')).toBeNull();
++  });
++
++  it('lists every athlete’s draft, oldest first', () => {
++    const kv = new MemoryStore();
++    saveDraft(kv, setDraft(rec('ath_b', 4), '2026-09-21T08:00:00.000Z'));
++    saveDraft(kv, setDraft(rec('ath_a', 4), '2026-09-20T08:00:00.000Z'));
++    kv.set('bp.v2.athletes', '[]'); // unrelated keys are ignored
++    expect(listDrafts(kv).map((d) => d.savedAt)).toEqual(['2026-09-20T08:00:00.000Z', '2026-09-21T08:00:00.000Z']);
++  });
++
++  it('removes a corrupt or mismatched entry instead of blocking recovery forever', () => {
++    const kv = new MemoryStore();
++    kv.set(draftKey('ath_1'), '{not json');
++    expect(loadDraft(kv, 'ath_1')).toBeNull();
++    expect(kv.get(draftKey('ath_1'))).toBeNull();
++
++    saveDraft(kv, setDraft(rec('ath_2', 4)));
++    kv.set(draftKey('ath_3'), kv.get(draftKey('ath_2')) as string); // stored under another athlete's key
++    expect(loadDraft(kv, 'ath_3')).toBeNull();
++    expect(kv.get(draftKey('ath_3'))).toBeNull();
++  });
++});
++
++describe('draft validation (storage is untrusted)', () => {
++  const ok = () => JSON.parse(JSON.stringify(setDraft(rec('ath_1', 5)))) as Record<string, unknown> & { record: Record<string, unknown> & { reps: Record<string, unknown>[] } };
++
++  it('accepts a well-formed draft', () => {
++    expect(parseDraft(ok())).not.toBeNull();
++  });
++
++  it.each([
++    ['demo source', (d: ReturnType<typeof ok>) => (d.record.source = 'demo')],
++    ['wrong schema version', (d: ReturnType<typeof ok>) => (d.record.schemaVersion = 1)],
++    ['unknown draft version', (d: ReturnType<typeof ok>) => (d.v = 2)],
++    ['unknown kind', (d: ReturnType<typeof ok>) => (d.kind = 'recovery')],
++    ['no reps', (d: ReturnType<typeof ok>) => ((d.record.reps = []), (d.record.totalReps = 0))],
++    ['too many reps', (d: ReturnType<typeof ok>) => ((d.record.reps = Array(501).fill(d.record.reps[0])), (d.record.totalReps = 501))],
++    ['bad movement state', (d: ReturnType<typeof ok>) => (d.record.reps[0].state = 'FAST')],
++    ['non-finite score', (d: ReturnType<typeof ok>) => (d.record.reps[0].score = 'NaN')],
++    ['capture quality above 1', (d: ReturnType<typeof ok>) => (d.record.reps[0].quality = 7)],
++    ['rep count mismatch', (d: ReturnType<typeof ok>) => (d.record.totalReps = 99)],
++    ['held more reps than were performed', (d: ReturnType<typeof ok>) => (d.record.heldReps = 99)],
++    ['empty athlete id', (d: ReturnType<typeof ok>) => (d.record.athleteId = '')],
++    ['bad timestamp', (d: ReturnType<typeof ok>) => (d.record.startedAt = 'yesterday-ish')],
++    ['missing quality block', (d: ReturnType<typeof ok>) => delete d.record.quality],
++    ['missing calibration block', (d: ReturnType<typeof ok>) => delete d.record.calibration],
++  ])('rejects %s', (_name, tamper) => {
++    const d = ok();
++    tamper(d);
++    expect(parseDraft(d)).toBeNull();
++  });
++
++  it('rejects non-objects', () => {
++    for (const x of [null, 1, 'x', [], undefined]) expect(parseDraft(x)).toBeNull();
++  });
++});
++
++describe('an interrupted set can never become a record', () => {
++  it('is not eligible, ends at the checkpoint, has no recovery, and drops unknown fields', () => {
++    const d = setDraft(rec('ath_1', 12), '2026-09-20T09:30:00.000Z');
++    (d.record as unknown as Record<string, unknown>).injected = 'x';
++    const out = interruptedRecord(d);
++    expect(out.quality.eligible).toBe(false);
++    expect(out.quality.reasons).toContain(INTERRUPTED_REASON);
++    expect(out.endedAt).toBe('2026-09-20T09:30:00.000Z');
++    expect(out.recovery).toBeNull();
++    expect((out as unknown as Record<string, unknown>).injected).toBeUndefined();
++    expect(out.heldReps).toBe(12); // the measurement itself is kept
++    expect(interruptedRecord(setDraft(out)).quality.reasons.filter((r) => r === INTERRUPTED_REASON)).toHaveLength(1);
++  });
++
++  it('does not touch records, comparisons or the staircase, but still counts as training', () => {
++    const repo = new AthleteRepository(new MemoryStore(), 'real');
++    const a = repo.createAthlete('Avery');
++    repo.saveSession(rec(a.id, 8));
++    const interrupted = interruptedRecord(setDraft(rec(a.id, 20)));
++    expect(repo.saveSession(interrupted)).toBe(true);
++
++    const history = repo.sessions(a.id);
++    expect(history).toHaveLength(2);
++    expect(personalRecords(history, 'squat-bodyweight').mostHeld?.value).toBe(8);
++    expect(recordSteps(history, 'squat-bodyweight').map((s) => s.held)).toEqual([8]);
++
++    const next = rec(a.id, 9, { startedAt: new Date(Date.UTC(2027, 0, 1)).toISOString() });
++    const outcome = heldOutcome([...history, next], next);
++    expect(outcome.previousBest).toBe(8);
++    expect(outcome.kind).toBe('new-record');
++
++    const days = trainingWeeks(history, 2, new Date(Date.UTC(2026, 8, 30)), 6).reduce((s, w) => s + w.days, 0);
++    expect(days).toBe(2); // both the finished and the interrupted set were training
++  });
++
++  it('the sample athlete refuses it: demo data and live drafts never mix', () => {
++    const sample = createSampleRepository();
++    const athlete = sample.activeAthlete();
++    expect(athlete).not.toBeNull();
++    expect(sample.saveSession(interruptedRecord(setDraft(rec(athlete!.id, 5))))).toBe(false);
++  });
++
++  it('is refused for an athlete that no longer exists', () => {
++    const repo = new AthleteRepository(new MemoryStore(), 'real');
++    expect(repo.saveSession(interruptedRecord(setDraft(rec('deleted_athlete', 5))))).toBe(false);
++  });
++});
+diff --git a/tests/navGuard.test.ts b/tests/navGuard.test.ts
+new file mode 100644
+index 0000000..dc6e033
+--- /dev/null
++++ b/tests/navGuard.test.ts
+@@ -0,0 +1,296 @@
++// The navigation guard against a fake browser. `go()` delivers popstate
++// asynchronously (queued until flush), like real browsers, so the undo/replay
++// logic is exercised under the awkward ordering it has to survive.
++import { describe, expect, it, vi } from 'vitest';
++import { createNavGuard, type GuardEnv, type HistoryLike, type NavGuardHandlers, type NavView } from '../src/session/navGuard';
++
++type Listener = (e: unknown) => void;
++
++class FakeBrowser {
++  stack: { state: unknown }[] = [{ state: null }];
++  idx = 0;
++  private winL = new Map<string, Set<Listener>>();
++  private docL = new Map<string, Set<Listener>>();
++  private queue: number[] = [];
++  visibility = 'visible';
++
++  history: HistoryLike = {
++    get state() {
++      return undefined; // replaced below (needs `this`)
++    },
++    pushState: (s) => {
++      this.stack.splice(this.idx + 1);
++      this.stack.push({ state: s });
++      this.idx += 1;
++    },
++    replaceState: (s) => {
++      this.stack[this.idx].state = s;
++    },
++    go: (d) => {
++      this.queue.push(d);
++    },
++  };
++
++  constructor() {
++    Object.defineProperty(this.history, 'state', { get: () => this.stack[this.idx].state });
++  }
++
++  env: GuardEnv = {
++    win: {
++      history: this.history,
++      addEventListener: (t, l) => this.add(this.winL, t, l),
++      removeEventListener: (t, l) => this.winL.get(t)?.delete(l),
++    },
++    doc: {
++      get visibilityState() {
++        return 'visible';
++      },
++      addEventListener: (t, l) => this.add(this.docL, t, l),
++      removeEventListener: (t, l) => this.docL.get(t)?.delete(l),
++    },
++  };
++
++  constructorDocPatch = (() => {
++    const self = this;
++    Object.defineProperty(this.env.doc, 'visibilityState', { get: () => self.visibility });
++  })();
++
++  private add(m: Map<string, Set<Listener>>, t: string, l: Listener) {
++    if (!m.has(t)) m.set(t, new Set());
++    m.get(t)!.add(l);
++  }
++  fireWin(type: string, e: unknown) {
++    this.winL.get(type)?.forEach((l) => l(e));
++  }
++  fireDoc(type: string) {
++    this.docL.get(type)?.forEach((l) => l(undefined));
++  }
++  listenerCount() {
++    return [...this.winL.values(), ...this.docL.values()].reduce((n, s) => n + s.size, 0);
++  }
++  /** Deliver queued history traversals in order, including ones queued by handlers. */
++  flush() {
++    while (this.queue.length) {
++      const d = this.queue.shift()!;
++      const next = Math.max(0, Math.min(this.stack.length - 1, this.idx + d));
++      if (next === this.idx) continue;
++      this.idx = next;
++      this.fireWin('popstate', { state: this.stack[this.idx].state });
++    }
++  }
++  back() {
++    this.history.go(-1);
++    this.flush();
++  }
++  forward() {
++    this.history.go(1);
++    this.flush();
++  }
++  topView() {
++    return (this.stack[this.idx].state as { bp: { view: NavView } } | null)?.bp.view;
++  }
++}
++
++/** A tiny app: owns `view`, tells the guard about changes the way App's effect does. */
++function setup(initial: NavView = 'landing') {
++  const b = new FakeBrowser();
++  const app = { view: initial, protectedNow: false };
++  const pending: { proceed: () => void }[] = [];
++  const persist = vi.fn();
++  let guard: ReturnType<typeof createNavGuard>;
++  const handlers: NavGuardHandlers = {
++    getView: () => app.view,
++    setView: (v) => {
++      app.view = v;
++      guard.sync(v); // React effect after the state change
++    },
++    isProtected: () => app.protectedNow,
++    requestLeave: (proceed) => pending.push({ proceed }),
++    persist,
++  };
++  guard = createNavGuard(b.env, handlers);
++  const go = (v: NavView) => {
++    app.view = v;
++    guard.sync(v);
++  };
++  return { b, app, guard, go, pending, persist };
++}
++
++describe('navigation guard: history', () => {
++  it('claims the first entry as the landing view', () => {
++    const { b } = setup();
++    expect(b.stack[0].state).toEqual({ bp: { view: 'landing', pos: 0 } });
++  });
++
++  it('after a reload reuses the entry position but never a stale session view', () => {
++    const b = new FakeBrowser();
++    b.stack = [{ state: null }, { state: { bp: { view: 'sport', pos: 1 } } }, { state: { bp: { view: 'session', pos: 2 } } }];
++    b.idx = 2;
++    createNavGuard(b.env, { getView: () => 'landing', setView: () => {}, isProtected: () => false, requestLeave: () => {}, persist: () => {} });
++    expect(b.stack[2].state).toEqual({ bp: { view: 'landing', pos: 2 } });
++  });
++
++  it('pushes one entry per forward navigation', () => {
++    const { b, go } = setup();
++    go('sport');
++    go('session');
++    expect(b.stack.length).toBe(3);
++    expect(b.idx).toBe(2);
++    expect(b.topView()).toBe('session');
++  });
++
++  it('Back from an unprotected session returns to the previous view without asking', () => {
++    const { b, app, go, pending } = setup();
++    go('sport');
++    go('session');
++    b.back();
++    expect(app.view).toBe('sport');
++    expect(pending).toHaveLength(0);
++    expect(b.stack.length).toBe(3); // history unchanged, no new push when the view follows the browser
++    expect(b.idx).toBe(1);
++  });
++
++  it('leaving the session through the app replaces its entry instead of stacking', () => {
++    const { b, go } = setup();
++    go('sport');
++    go('session');
++    go('landing');
++    expect(b.stack.length).toBe(3);
++    expect(b.topView()).toBe('landing');
++  });
++
++  it('Forward onto a session that no longer exists is turned into the current view', () => {
++    const { b, app, go } = setup();
++    go('sport');
++    go('session');
++    b.back(); // session -> sport
++    b.forward(); // onto the dead session entry
++    expect(app.view).toBe('sport');
++    expect(b.topView()).toBe('sport');
++  });
++
++  it('ignores history entries it did not create', () => {
++    const { b, app } = setup();
++    b.stack.push({ state: null });
++    b.history.go(1);
++    b.flush();
++    expect(app.view).toBe('landing');
++  });
++});
++
++describe('navigation guard: protected Back', () => {
++  function inLiveSet() {
++    const s = setup();
++    s.go('sport');
++    s.go('session');
++    s.app.protectedNow = true;
++    return s;
++  }
++
++  it('undoes the Back, asks, and stays in the session until confirmed', () => {
++    const s = inLiveSet();
++    s.b.back();
++    expect(s.pending).toHaveLength(1);
++    expect(s.app.view).toBe('session');
++    expect(s.b.idx).toBe(2); // returned to the session entry
++    expect(s.b.topView()).toBe('session');
++  });
++
++  it('cancelling leaves everything as it was', () => {
++    const s = inLiveSet();
++    s.b.back();
++    s.pending.length = 0; // dialog dismissed, proceed never called
++    s.b.flush();
++    expect(s.app.view).toBe('session');
++    expect(s.b.idx).toBe(2);
++  });
++
++  it('confirming replays the navigation exactly once', () => {
++    const s = inLiveSet();
++    s.b.back();
++    s.app.protectedNow = false; // App ends the set while confirming
++    s.pending[0].proceed();
++    s.b.flush();
++    expect(s.app.view).toBe('sport');
++    expect(s.b.idx).toBe(1);
++    expect(s.pending).toHaveLength(1); // no second prompt
++  });
++
++  it('confirming still works if React has not yet cleared the protection', () => {
++    const s = inLiveSet();
++    s.b.back();
++    s.pending[0].proceed(); // protectedNow is still true here
++    s.b.flush();
++    expect(s.app.view).toBe('sport');
++    expect(s.pending).toHaveLength(1);
++  });
++
++  it('a multi-step jump is undone to the exact entry and replayed to the exact target', () => {
++    const s = inLiveSet();
++    s.b.history.go(-2);
++    s.b.flush();
++    expect(s.app.view).toBe('session');
++    expect(s.b.idx).toBe(2);
++    s.app.protectedNow = false;
++    s.pending[0].proceed();
++    s.b.flush();
++    expect(s.app.view).toBe('landing');
++    expect(s.b.idx).toBe(0);
++  });
++
++  it('pressing Back twice while the dialog is open keeps one coherent state', () => {
++    const s = inLiveSet();
++    s.b.back();
++    s.b.back();
++    expect(s.app.view).toBe('session');
++    expect(s.b.idx).toBe(2);
++    expect(s.pending.length).toBeGreaterThanOrEqual(1);
++  });
++
++  it('is not protected after the set is over', () => {
++    const s = inLiveSet();
++    s.app.protectedNow = false;
++    s.b.back();
++    expect(s.pending).toHaveLength(0);
++    expect(s.app.view).toBe('sport');
++  });
++});
++
++describe('navigation guard: unload and hide', () => {
++  it('does not interfere with leaving when nothing is at risk', () => {
++    const s = setup();
++    const e = { preventDefault: vi.fn(), returnValue: undefined as unknown };
++    s.b.fireWin('beforeunload', e);
++    expect(e.preventDefault).not.toHaveBeenCalled();
++    expect(s.persist).not.toHaveBeenCalled();
++  });
++
++  it('asks the browser to confirm, and saves a draft, while a live set is in progress', () => {
++    const s = setup();
++    s.app.protectedNow = true;
++    const e = { preventDefault: vi.fn(), returnValue: undefined as unknown };
++    s.b.fireWin('beforeunload', e);
++    expect(e.preventDefault).toHaveBeenCalled();
++    expect(e.returnValue).toBe('');
++    expect(s.persist).toHaveBeenCalledTimes(1);
++  });
++
++  it('persists on pagehide and when the page becomes hidden, not when it becomes visible', () => {
++    const s = setup();
++    s.b.fireWin('pagehide', {});
++    expect(s.persist).toHaveBeenCalledTimes(1);
++    s.b.visibility = 'hidden';
++    s.b.fireDoc('visibilitychange');
++    expect(s.persist).toHaveBeenCalledTimes(2);
++    s.b.visibility = 'visible';
++    s.b.fireDoc('visibilitychange');
++    expect(s.persist).toHaveBeenCalledTimes(2);
++  });
++
++  it('dispose removes every listener', () => {
++    const s = setup();
++    expect(s.b.listenerCount()).toBe(4);
++    s.guard.dispose();
++    expect(s.b.listenerCount()).toBe(0);
++  });
++});

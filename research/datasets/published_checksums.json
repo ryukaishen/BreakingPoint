@@ -1,0 +1,24 @@
+{
+  "note": "MD5 checksums as published by each repository (figshare API /v2/articles/28890545/files; Zenodo API /api/records/13305826), retrieved 2026-10-09. research/adapters/prepare_data.py verifies the local downloads against these before extracting anything.",
+  "jump_fatigue": {
+    "doi": "10.6084/m9.figshare.28890545.v1",
+    "files": {
+      "Participants/participant_log.xlsx": { "bytes": 20739, "md5": "effc87f53ededb75f130b7c3a71bb6a6" },
+      "Participants/ACL_questionnaires.xlsx": { "bytes": 21231, "md5": "3386ea5b71e0216ffdf7e5ac23c13219" },
+      "Kinematic_data.zip": { "bytes": 6738510832, "md5": "55dcfd3d2a5d73d9bce6b387b48d5769" },
+      "Data_processing/labeling_CMJ.xlsx": { "bytes": 17846, "md5": "917ea6f0f4312348e274cbd3addb3492" },
+      "Data_processing/Supplementary Material/description_markers.docx": { "bytes": 14650, "md5": "bfe330ece5b9205b3f87b248943da383" },
+      "Data_processing/Matlab/figures.m": { "bytes": 4447, "md5": "6a2f8d508fbd9d6b32e7d02e839bcb5d" },
+      "Data_processing/Opensim/catelli_3dof_model.osim": { "bytes": 914072, "md5": "ee20950a14f793c8d9d0d606f947283f" }
+    }
+  },
+  "rehab24_6": {
+    "doi": "10.5281/zenodo.13305826",
+    "files": {
+      "3d_joints.zip": { "bytes": 551298977, "md5": "c75ae3fc13fcf16d7f4ca36b93849c74" },
+      "Segmentation.csv": { "bytes": 53290, "md5": "90b8fbd7445dd050bf27b17126c78fbe" },
+      "Segmentation.txt": { "bytes": 1729, "md5": "5f2a5b886c6f794f03e1a8f642738c86" },
+      "joints_names.txt": { "bytes": 395, "md5": "3f04a37cce43086b1ea1fa49f1e4514f" }
+    }
+  }
+}
