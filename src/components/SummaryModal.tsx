@@ -5,6 +5,7 @@ import { useLabels } from '../protocols/labels';
 import type { LaunchContext } from '../protocols/launch';
 import { sessionPattern } from '../protocols/patterns';
 import type { Snapshot } from '../session/engine';
+import { explainAlert, explainAlertText } from '../session/explain';
 import { exportCsv, exportJson } from '../session/export';
 import { arrow, fmt } from '../utils/format';
 import { useDialog } from '../utils/hooks';
@@ -22,6 +23,8 @@ interface Props {
 }
 
 type TileState = 'done' | 'alert' | 'pending' | 'plain';
+
+const SIGMA_TIP = 'Change from your usual form, in multiples of your normal rep-to-rep variation (σ).';
 
 function RecordTile({ state, label, value, sub, children }: { state: TileState; label: string; value: string; sub?: string; children?: ReactNode }) {
   return (
@@ -83,15 +86,15 @@ export function SummaryModal({ snap, launch, outcome, onClose, onRecovery, onNew
               value={snap.baseline ? `${snap.baseline.nReps} reps` : '—'}
               sub="fresh calibration reps"
             />
-            <RecordTile state={outcome?.kind === 'new-record' ? 'done' : 'plain'} label="Held at baseline" value={`${held} rep${held === 1 ? '' : 's'}`} sub={heldSub} />
+            <RecordTile state={outcome?.kind === 'new-record' ? 'done' : 'plain'} label="Reps at usual form" value={`${held} rep${held === 1 ? '' : 's'}`} sub={heldSub} />
             <RecordTile
               state={sm.breakpointRep !== null ? 'alert' : 'plain'}
               label="Breaking point"
               value={sm.breakpointRep !== null ? `Rep ${sm.breakpointRep}` : 'None'}
-              sub={sm.onsetRep && sm.breakpointRep ? `drift onset ≈ rep ${sm.onsetRep}` : 'no persistent drift this set'}
+              sub={sm.onsetRep && sm.breakpointRep ? `changes began around rep ${sm.onsetRep}` : 'no alert this set'}
             />
             {rec ? (
-              <RecordTile state="done" label="Recovery check" value={`${(rec.percent * 100).toFixed(0)}%`} sub="returned toward your baseline" />
+              <RecordTile state="done" label="Recovery check" value={`${(rec.percent * 100).toFixed(0)}%`} sub="of the change gone" />
             ) : sm.breakpointRep !== null ? (
               <RecordTile state="pending" label="Recovery check" value="Not run" sub="3 reps after a rest">
                 {snap.phase === 'summary' && (
@@ -101,7 +104,7 @@ export function SummaryModal({ snap, launch, outcome, onClose, onRecovery, onNew
                 )}
               </RecordTile>
             ) : (
-              <RecordTile state="plain" label="Recovery check" value="Not needed" sub="no breaking point this set" />
+              <RecordTile state="plain" label="Recovery check" value="Not needed" sub="no alert this set" />
             )}
           </div>
 
@@ -112,21 +115,25 @@ export function SummaryModal({ snap, launch, outcome, onClose, onRecovery, onNew
               <div className="s">{sm.scoredReps} scored</div>
             </div>
             <div className="kpi">
-              <div className="k">Avg drift before</div>
+              <div className="k">Average score before</div>
               <div className="v">{fmt(sm.avgPre)}</div>
-              <div className="s">σ RMS from baseline</div>
+              <div className="s">Form Change Score before the alert</div>
             </div>
             <div className="kpi">
-              <div className="k">Avg drift after</div>
+              <div className="k">Average score after</div>
               <div className={`v ${sm.avgPost !== null ? 'c-break' : ''}`}>{fmt(sm.avgPost)}</div>
-              <div className="s">{sm.postReps} reps after the breaking point</div>
+              <div className="s">
+                {sm.postReps} rep{sm.postReps === 1 ? '' : 's'} from the alert on
+              </div>
             </div>
             <div className="kpi">
               <div className="k">Largest change</div>
               <div className="v" style={{ fontSize: 20, lineHeight: 1.25 }}>
                 {top ? `${L.short(top.key)} ${arrow(top.meanZ)}` : '—'}
               </div>
-              <div className="s">{top ? `${top.meanZ >= 0 ? '+' : '−'}${Math.abs(top.meanZ).toFixed(1)}σ average (${top.meanZ > 0 ? top.upWord : top.downWord})` : ''}</div>
+              <div className="s" title={SIGMA_TIP}>
+                {top ? `${top.meanZ >= 0 ? '+' : '−'}${Math.abs(top.meanZ).toFixed(1)}σ on average (${top.meanZ > 0 ? top.upWord : top.downWord})` : ''}
+              </div>
             </div>
           </div>
 
@@ -140,7 +147,7 @@ export function SummaryModal({ snap, launch, outcome, onClose, onRecovery, onNew
           )}
           <div className="panel chart-card">
             <div className="chart-head">
-              <h2>Form drawdown</h2>
+              <h2>Form Changes Over Time</h2>
             </div>
             <FormDrawdown
               reps={snap.monitorReps}
@@ -155,10 +162,10 @@ export function SummaryModal({ snap, launch, outcome, onClose, onRecovery, onNew
           </div>
           {sm.topChanges.length > 0 && (
             <div className="panel">
-              <div className="panel-title">Primary changes</div>
+              <div className="panel-title">Biggest changes</div>
               <div className="row" style={{ flexWrap: 'wrap', gap: 8 }}>
                 {sm.topChanges.map((c) => (
-                  <span key={c.key} className="metric-chip" style={{ borderColor: Math.abs(c.meanZ) >= 2 ? 'var(--break)' : undefined }}>
+                  <span key={c.key} className="metric-chip" title={SIGMA_TIP} style={{ borderColor: Math.abs(c.meanZ) >= 2 ? 'var(--break)' : undefined }}>
                     {L.short(c.key)} {arrow(c.meanZ)}{' '}
                     <span className="mono">
                       {c.meanZ >= 0 ? '+' : '−'}
@@ -170,6 +177,9 @@ export function SummaryModal({ snap, launch, outcome, onClose, onRecovery, onNew
             </div>
           )}
           <div className="panel" style={{ borderLeft: `2px solid ${sm.breakpointRep ? 'var(--drift)' : 'var(--stable)'}` }}>
+            {sm.breakpointRep !== null && (
+              <p style={{ margin: '0 0 6px' }}>{explainAlertText(explainAlert(snap.exercise, snap.monitorReps, snap.onsetRep, sm.breakpointRep))}</p>
+            )}
             <b>Recommendation.</b> {sm.recommendation}
           </div>
           <div className="row" style={{ flexWrap: 'wrap' }}>
@@ -185,7 +195,7 @@ export function SummaryModal({ snap, launch, outcome, onClose, onRecovery, onNew
             </button>
           </div>
           <div className="disclaimer">
-            {sm.disclaimer} Movement-pattern labels describe changes in movement only. Exports contain derived numeric features only, never video.
+            {sm.disclaimer} Pattern labels describe how your movement changed, not why. Exports contain measurements only, never video.
           </div>
         </div>
       </div>

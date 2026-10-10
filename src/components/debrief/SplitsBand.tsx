@@ -143,7 +143,7 @@ export function SplitsBand({ model, headingLevel = 2, replay = true, recordTag =
           <i className="sb-sw s-stable" /> At baseline
         </li>
         <li>
-          <i className="sb-sw s-drift" /> Drift
+          <i className="sb-sw s-drift" /> Form changing
         </li>
         <li>
           <i className="sb-sw s-break">

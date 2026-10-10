@@ -1,6 +1,7 @@
-// FORM DRAWDOWN — the athlete's Movement Drift Score per rep, drawn like a
-// quantitative risk chart: personal normal band, warning / BreakingPoint levels,
-// smoothed EWMA line, CUSUM evidence strip and the detected change point.
+// FORM CHANGES OVER TIME (component name kept as FormDrawdown): the athlete's
+// Form Change Score (technical name: drift score) per rep, with the personal normal
+// band, warning and alert levels, the smoothed EWMA trend line, the CUSUM strip used
+// to estimate when the change began, and the alert rep.
 
 import { useMemo, useState } from 'react';
 import type { ExerciseType } from '../biomechanics/catalog';
@@ -70,7 +71,7 @@ export function FormDrawdown({
 
   return (
     <div className="chart-wrap" ref={ref}>
-      <svg width={W} height={H} role="img" aria-label="Form drawdown chart of movement drift score per rep" style={{ display: 'block' }}>
+      <svg width={W} height={H} role="img" aria-label="Form changes over time: Form Change Score for each rep" style={{ display: 'block' }}>
         <defs>
           <pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
             <line x1="0" y1="0" x2="0" y2="6" stroke={C.line2} strokeWidth="2" />
@@ -82,6 +83,11 @@ export function FormDrawdown({
         </defs>
 
         {/* grid + axis */}
+        {!compact && (
+          <text x={11} y={pad.t + plotH / 2} transform={`rotate(-90 11 ${pad.t + plotH / 2})`} textAnchor="middle" fontSize="10.5" fill={C.muted} fontFamily={FONT_DISPLAY}>
+            Form Change Score
+          </text>
+        )}
         {ticks.map((t) => (
           <g key={t}>
             <line x1={pad.l} x2={W - pad.r} y1={y(t)} y2={y(t)} stroke={C.line} />
@@ -152,7 +158,7 @@ export function FormDrawdown({
                   WARNING {thresholds.warningLevel.toFixed(2)}
                 </text>
                 <text x={W - pad.r - 4} y={y(thresholds.breakpointLevel) - 5} textAnchor="end" fontSize="10.5" fill={C.break} fontFamily={FONT_DISPLAY} letterSpacing="0.8" stroke={C.panel} strokeWidth="3" paintOrder="stroke">
-                  BREAKING POINT {thresholds.breakpointLevel.toFixed(2)} · EWMA
+                  ALERT LINE {thresholds.breakpointLevel.toFixed(2)}
                 </text>
               </>
             )}
@@ -174,7 +180,7 @@ export function FormDrawdown({
             <line x1={xc(onsetRep) - xStep / 2} x2={xc(onsetRep) - xStep / 2} y1={pad.t} y2={pad.t + plotH} stroke={C.violet} strokeDasharray="3 4" strokeWidth="1.4" />
             {!compact && (
               <text x={xc(onsetRep) - xStep / 2 + 4} y={pad.t + 10} fontSize="10.5" fill={C.violet} fontFamily={FONT_DISPLAY} letterSpacing="0.5">
-                drift onset · rep {onsetRep}
+                changes began, about rep {onsetRep}
               </text>
             )}
           </g>
@@ -198,11 +204,11 @@ export function FormDrawdown({
             )}
             {cusumPts.length > 1 && <polyline points={cusumPts.join(' ')} fill="none" stroke={C.violet} strokeWidth="1.5" />}
             {cusumTriggers && <line x1={pad.l} x2={W - pad.r} y1={yc(cusumH)} y2={yc(cusumH)} stroke={C.violet} strokeDasharray="3 3" opacity="0.7" />}
-            <text x={pad.l - 8} y={stripTop + stripH / 2 + 3} textAnchor="end" fontSize="11" fill={C.violet} fontFamily={FONT_DISPLAY}>
+            <text x={pad.l - 3} y={stripTop + stripH / 2 + 3} textAnchor="end" fontSize="10.5" fill={C.violet} fontFamily={FONT_DISPLAY}>
               CUSUM
             </text>
             <text x={W - pad.r - 6} y={stripTop + 10} textAnchor="end" fontSize="11" fill={C.violet} fontFamily={FONT_DISPLAY}>
-              {cusumTriggers ? `persistence evidence · trigger h = ${fmt(cusumH, 1)}` : 'persistence evidence · used to estimate drift onset'}
+              {cusumTriggers ? `build-up of change · alert at h = ${fmt(cusumH, 1)}` : 'build-up of change · used to estimate when changes began'}
             </text>
           </g>
         )}
@@ -240,16 +246,16 @@ export function FormDrawdown({
             <span>Rep {hr.index}</span>
             {hr.step && <span style={{ color: STATE_COLOR[hr.step.state] }}>{STATE_LABEL[hr.step.state]}</span>}
           </div>
-          <div className="r"><span>Drift score</span><span className="mono">{fmt(hr.drift?.score)}</span></div>
-          <div className="r"><span>EWMA level</span><span className="mono">{fmt(hr.step?.ewmaLevel)}</span></div>
-          <div className="r"><span>CUSUM</span><span className="mono">{fmt(hr.step?.cusum)}</span></div>
+          <div className="r"><span>Form Change Score</span><span className="mono">{fmt(hr.drift?.score)}</span></div>
+          <div className="r"><span>Trend (EWMA)</span><span className="mono">{fmt(hr.step?.ewmaLevel)}</span></div>
+          <div className="r"><span>Build-up (CUSUM)</span><span className="mono">{fmt(hr.step?.cusum)}</span></div>
           {hr.drift?.ranked.slice(0, 3).map((d) => (
             <div className="r" key={d.key}>
               <span>{L.short(d.key)}</span>
               <span className="mono">{fmtSigma(d.zClipped)} {arrow(d.zClipped ?? 0)}</span>
             </div>
           ))}
-          {hr.drift?.score === null && <div className="r"><span>Not scored — capture quality too low</span></div>}
+          {hr.drift?.score === null && <div className="r"><span>Not scored: the camera view was too poor</span></div>}
           <div className="r" style={{ marginTop: 4, color: C.muted }}><span>Click for full measurements</span></div>
         </div>
       )}

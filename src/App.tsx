@@ -27,6 +27,7 @@ import { useSessionRecorder } from './session/useSessionRecorder';
 import { C } from './ui/theme';
 import { arrow } from './utils/format';
 import { useEngine } from './utils/hooks';
+import { explainAlert } from './session/explain';
 
 type View = 'landing' | 'sport' | 'session';
 type Mode = 'demo' | 'live';
@@ -330,6 +331,7 @@ export default function App() {
   const savedBaseline = mode === 'live' && sessionAthlete ? data.real.baseline(sessionAthlete.id, launch.protocol.id) : null;
   const maxScore = Math.max(1, ...snap.monitorReps.map((r) => r.drift?.score ?? 0));
   const contrib = snap.breakpointContributors?.slice(0, 3) ?? [];
+  const explanation = snap.alarmRep !== null ? explainAlert(exercise, snap.monitorReps, snap.onsetRep, snap.alarmRep) : null;
   const pattern = snap.alarmRep !== null ? sessionPattern(exercise, snap.monitorReps, snap.onsetRep, snap.baseline?.reference.sigma0, launch.patternLabels) : null;
   const sportForPage = getSport(sportView.sportId);
 
@@ -464,16 +466,16 @@ export default function App() {
               <div className="panel chart-card">
                 <div className="chart-head">
                   <h2>
-                    Form drawdown
-                    <small>Drift per rep vs {athleteName}'s personal baseline</small>
+                    Form Changes Over Time
+                    <small>Form Change Score for each rep, compared with {athleteName}'s usual form</small>
                   </h2>
                   <div className="legend">
                     <span><i className="box" style={{ background: C.stable, opacity: 0.3 }} />your normal range</span>
-                    <span><i className="box" style={{ background: C.stable, opacity: 0.65 }} />per-rep drift</span>
-                    <span><i style={{ background: C.text, height: 3 }} />smoothed drift (EWMA)</span>
-                    <span><i style={{ background: C.drift }} />warning</span>
-                    <span><i style={{ background: C.break }} />breaking point</span>
-                    <span><i style={{ background: C.violet }} />CUSUM evidence</span>
+                    <span><i className="box" style={{ background: C.stable, opacity: 0.65 }} />score for each rep</span>
+                    <span><i style={{ background: C.text, height: 3 }} />trend (smoothed)</span>
+                    <span><i style={{ background: C.drift }} />warning line</span>
+                    <span><i style={{ background: C.break }} />alert line</span>
+                    <span><i style={{ background: C.violet }} />build-up of change (CUSUM)</span>
                   </div>
                 </div>
                 <FormDrawdown
@@ -492,7 +494,7 @@ export default function App() {
                   {snap.alarmRep !== null ? (
                     <>
                       <span>
-                        <b className="c-break">BreakingPoint occurred at rep {snap.alarmRep}.</b> Drift began ≈ rep {snap.onsetRep}.
+                        {explanation?.what} <b className="c-break">{explanation?.when}</b>
                         {pattern && (
                           <>
                             {' '}
@@ -501,12 +503,12 @@ export default function App() {
                         )}
                       </span>
                       <span>
-                        Primary changes: <b>{contrib.map((d) => `${labeler.short(d.key)} ${arrow(d.zClipped ?? 0)}`).join(', ')}</b>
+                        Biggest changes at the alert rep: <b>{contrib.map((d) => `${labeler.short(d.key)} ${arrow(d.zClipped ?? 0)}`).join(', ')}</b>
                       </span>
                     </>
                   ) : snap.monitorReps.length ? (
                     <span>
-                      No persistent drift yet. {snap.monitorReps.length} rep{snap.monitorReps.length > 1 ? 's' : ''} scored against your baseline.
+                      No alert yet. {snap.monitorReps.length} rep{snap.monitorReps.length > 1 ? 's' : ''} compared with your usual form.
                     </span>
                   ) : (
                     <span className="muted">The chart fills in as monitored reps are completed. Hover or click a bar for its measurements.</span>

@@ -90,7 +90,7 @@ describe('cells', () => {
   it('describes each state in words, including after the warning', () => {
     expect(cellLabel(undefined)).toBe('No rep');
     expect(cellLabel(toCell(reps(['STABLE'])[0]))).toBe('At baseline');
-    expect(cellLabel(toCell(reps(['BREAKPOINT', 'DRIFT'], { afterFrom: 1 })[1]))).toBe('Drift, after the warning');
+    expect(cellLabel(toCell(reps(['BREAKPOINT', 'DRIFT'], { afterFrom: 1 })[1]))).toBe('Form changing, after the warning');
     expect(cellLabel(toCell(reps([null])[0]))).toBe('Not scored');
   });
 });
@@ -163,7 +163,7 @@ describe('the rendered band', () => {
     const html = render(buildSplits([prev, today], today));
     const cells = (html.match(/class="sb-cell /g) ?? []).length;
     expect(cells).toBe(2 * Math.max(today.reps.length, prev.reps.length));
-    for (const word of ['At baseline', 'Drift', 'Breaking point', 'End of the held run']) expect(html).toContain(word);
+    for (const word of ['At baseline', 'Form changing', 'Breaking point', 'End of the held run']) expect(html).toContain(word);
   });
 
   it('carries state without colour: hatch pattern, cross glyph, outline, and a text-alternative table', () => {

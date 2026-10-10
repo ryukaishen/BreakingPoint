@@ -70,10 +70,10 @@ function RosterRow({ sport, onClick }: { sport: SportProfile; onClick: () => voi
 }
 
 const FLOW = [
-  ['Calibrate', 'A few fresh reps of your sport’s protocol. BreakingPoint learns your per-feature median and spread: your baseline, not an “ideal” athlete.'],
-  ['Monitor', 'On-device pose estimation scores every rep with a transparent Movement Drift Score: how far it sits from your own baseline.'],
-  ['Detect', 'Sequential EWMA / CUSUM detection ignores one-off bad reps, flags persistent drift, and names what changed.'],
-  ['Recover', 'After rest, a three-rep check measures how far your movement has returned toward your original baseline.'],
+  ['Calibrate', 'Do 5 to 8 controlled reps while you’re fresh. BreakingPoint learns your usual form from them, not from an “ideal” athlete.'],
+  ['Monitor', 'Keep training. The camera tracks every rep, and BreakingPoint compares it with your usual form: depth, tempo, trunk angle and more.'],
+  ['Detect', 'One odd rep has little effect. When the changes repeat, BreakingPoint triggers an alert and shows which measurements changed.'],
+  ['Recover', 'After a rest, three more reps show how close you are to your usual form again.'],
 ] as const;
 
 export function Landing({ config, athlete, onSport, onDemo, onLibrary, onLab }: Props) {
@@ -109,8 +109,8 @@ export function Landing({ config, athlete, onSport, onDemo, onLibrary, onLab }: 
             <span>Your movement.</span>
             <span className="base">Your baseline.</span>
           </h1>
-          <p className="lead">BreakingPoint learns how you move when fresh and detects when that movement begins to change.</p>
-          <p className="lead-2">Different athletes move differently. BreakingPoint compares you to you.</p>
+          <p className="lead">BreakingPoint learns how you move when you’re fresh, then tracks how your form changes throughout a workout.</p>
+          <p className="lead-2">Most fitness apps count your reps. BreakingPoint looks at how those reps change.</p>
           <div className="hero-actions">
             <button className="btn primary lg" onClick={() => onDemo(featured.id)}>
               <Play size={13} /> Run the {resolveDemo(featured.id)?.contextName.toLowerCase()} demo
@@ -147,12 +147,12 @@ export function Landing({ config, athlete, onSport, onDemo, onLibrary, onLab }: 
               <div className="hw-readout">{alarm !== null ? `Breaking point · rep ${alarm}` : 'Stable'}</div>
               <div className="hw-stats">
                 <div className="hw-stat">
-                  <div className="k">Held baseline</div>
+                  <div className="k">Reps at usual form</div>
                   <div className="v">{heldReps(preview.monitorReps)} reps</div>
                 </div>
                 <div className="hw-stat">
-                  <div className="k">Drift onset</div>
-                  <div className="v">{preview.onsetRep !== null ? `≈ rep ${preview.onsetRep}` : '—'}</div>
+                  <div className="k">Changes began</div>
+                  <div className="v">{preview.onsetRep !== null ? `about rep ${preview.onsetRep}` : '—'}</div>
                 </div>
                 <div className="hw-stat">
                   <div className="k">Pattern</div>
@@ -175,10 +175,10 @@ export function Landing({ config, athlete, onSport, onDemo, onLibrary, onLab }: 
               <div className="hw-caption">
                 {top.length > 0 ? (
                   <>
-                    Primary changes: <b>{top.map((d) => `${labels!.short(d.key)} ${arrow(d.zClipped ?? 0)}`).join(', ')}</b>
+                    Biggest changes at the alert rep: <b>{top.map((d) => `${labels!.short(d.key)} ${arrow(d.zClipped ?? 0)}`).join(', ')}</b>
                   </>
                 ) : (
-                  'Every rep is scored against the athlete’s own baseline.'
+                  'Every rep is compared with the athlete’s usual form.'
                 )}
               </div>
             </>
@@ -219,7 +219,7 @@ export function Landing({ config, athlete, onSport, onDemo, onLibrary, onLab }: 
               </span>
               <span className="status-badge soon">Roadmap</span>
             </div>
-            <p>Record a few clean reps of any repeatable movement. BreakingPoint learns the athlete’s movement distribution and monitors future reps for persistent drift.</p>
+            <p>Record a few clean reps of any repeatable movement. BreakingPoint learns your usual form for it and tracks how later reps change.</p>
           </div>
         </div>
         <ul className="roster-list">
@@ -242,7 +242,7 @@ export function Landing({ config, athlete, onSport, onDemo, onLibrary, onLab }: 
         </div>
         <button className="sys-window lab-readout" onClick={onLab}>
           <span className="lr-head">
-            <Flask size={14} /> BreakingPoint Lab: detector validation
+            <Flask size={14} /> Synthetic Validation | UF HiPerGator | October 2026
           </span>
           {validated ? (
             <span className="lr-stats">
@@ -252,22 +252,22 @@ export function Landing({ config, athlete, onSport, onDemo, onLibrary, onLab }: 
               </span>
               <span className="lr-stat">
                 <span className="v">{pct(v!.falsePositiveRate)}</span>
-                <span className="k">false alarms (held-out)</span>
+                <span className="k">false alerts on stable simulated sessions</span>
               </span>
               <span className="lr-stat">
                 <span className="v">{pct(v!.truePositiveRate)}</span>
-                <span className="k">drift detected</span>
+                <span className="k">simulated changes detected</span>
               </span>
               <span className="lr-stat">
                 <span className="v">{v!.medianDetectionDelay} reps</span>
-                <span className="k">median detection delay</span>
+                <span className="k">median reps from change to alert</span>
               </span>
             </span>
           ) : (
-            <span className="lr-stats">Run the Lab to calibrate the detector.</span>
+            <span className="lr-stats">Open the study for its results.</span>
           )}
           <span className="lr-foot">
-            One validated detector shared by every protocol. <b>Open the Lab report</b>
+            Simulated squat-like sessions, not real athletes. <b>See the study</b>
           </span>
         </button>
       </section>

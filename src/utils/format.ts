@@ -9,7 +9,7 @@ export const STATE_COLOR: Record<MovementState, string> = {
 
 export const STATE_LABEL: Record<MovementState, string> = {
   STABLE: 'STABLE',
-  DRIFT: 'DRIFT EMERGING',
+  DRIFT: 'FORM CHANGING',
   BREAKPOINT: 'BREAKING POINT',
 };
 

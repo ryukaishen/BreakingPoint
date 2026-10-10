@@ -28,7 +28,7 @@
         { "key": "concentricDuration", "label": "Propulsion duration", "short": "Propulsion", "unit": "s", "displayScale": 1, "decimals": 2, "group": "strategy", "weight": 0.5, "absFloor": 0.03, "relFloor": 0.05, "upWord": "slower push", "downWord": "faster push" },
         { "key": "trunkLean", "label": "Peak trunk lean", "short": "Trunk lean", "unit": "°", "displayScale": 1, "decimals": 1, "group": "strategy", "weight": 0.75, "absFloor": 2.0, "relFloor": 0.05, "upWord": "more forward lean", "downWord": "more upright" },
         { "key": "landingKneeFlex", "label": "Landing knee flexion", "short": "Landing flex", "unit": "°", "displayScale": 1, "decimals": 0, "group": "landing", "weight": 0.75, "absFloor": 3.0, "relFloor": 0.04, "upWord": "softer landing", "downWord": "stiffer landing" },
-        { "key": "asymmetry", "label": "L/R knee ROM asymmetry", "short": "L/R asymmetry", "unit": "°", "displayScale": 1, "decimals": 1, "group": "symmetry", "weight": 0.5, "absFloor": 2.0, "relFloor": 0.0, "upWord": "more asymmetric", "downWord": "more symmetric" }
+        { "key": "asymmetry", "label": "L/R landing knee bend difference", "short": "L/R landing", "unit": "°", "displayScale": 1, "decimals": 1, "group": "symmetry", "weight": 0.5, "absFloor": 2.0, "relFloor": 0.0, "upWord": "bigger L/R difference", "downWord": "smaller L/R difference" }
       ]
     },
     "lunge": {

@@ -125,7 +125,7 @@ export function buildSplits(history: readonly SessionRecord[], rec: SessionRecor
       best: ref ? String(ref.heldReps) : null,
       delta: diff === null ? null : diff === 0 ? 'same' : `${diff > 0 ? '+' : '−'}${Math.abs(diff)}`,
     },
-    { id: 'onset', label: 'Drift began', today: rep(rec.onsetRep), best: ref ? rep(ref.onsetRep) : null, delta: null },
+    { id: 'onset', label: 'Changes began', today: rep(rec.onsetRep), best: ref ? rep(ref.onsetRep) : null, delta: null },
     { id: 'break', label: 'Breaking point', today: rep(rec.breakpointRep), best: ref ? rep(ref.breakpointRep) : null, delta: null },
   ];
 
@@ -135,6 +135,6 @@ export function buildSplits(history: readonly SessionRecord[], rec: SessionRecor
 /** Plain-words state of one rep slot, for the text alternative. */
 export function cellLabel(c: SplitCell | undefined): string {
   if (!c) return 'No rep';
-  const base = { stable: 'At baseline', drift: 'Drift', break: 'Breaking point', unscored: 'Not scored' }[c.state];
+  const base = { stable: 'At baseline', drift: 'Form changing', break: 'Breaking point', unscored: 'Not scored' }[c.state];
   return c.afterWarning ? `${base}, after the warning` : base;
 }

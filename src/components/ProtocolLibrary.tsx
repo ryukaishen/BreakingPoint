@@ -61,7 +61,7 @@ export function ProtocolLibrary({ onClose, onOpenSport }: Props) {
                   return (
                     <div key={id} className="prim-row">
                       <span className={`prim-pill ${PRIM_STATUS[p.status]}`} title={p.description}>
-                        {id}
+                        {p.name}
                       </span>
                       <span className="prim-arrow">→</span>
                       <span className="prim-sports">
@@ -77,8 +77,8 @@ export function ProtocolLibrary({ onClose, onOpenSport }: Props) {
                 })}
             </div>
             <div className="muted" style={{ fontSize: 12.5, marginTop: 10 }}>
-              A new sport does not mean a new model: a sport selects a protocol on a reusable primitive, plus terminology and featured metrics. The personal
-              baseline and the sequential detector are shared.
+              A new sport reuses one of these movements with its own names and featured measurements. Learning your usual form and the alert rules are the
+              same for every sport.
             </div>
           </div>
 
@@ -113,14 +113,14 @@ export function ProtocolLibrary({ onClose, onOpenSport }: Props) {
             <ol className="custom-steps">
               <li>A coach records several clean repetitions of any repeatable movement.</li>
               <li>BreakingPoint segments the repetitions.</li>
-              <li>It learns the athlete's personal movement distribution and builds a baseline.</li>
-              <li>Future repetitions are monitored for persistent drift by the same validated detector.</li>
+              <li>It learns the athlete's usual form for that movement.</li>
+              <li>Later repetitions are compared with that usual form, with the same alert rules as every other protocol.</li>
             </ol>
             <p>Not implemented yet. Learning arbitrary movements is roadmap work.</p>
           </div>
           <div className="disclaimer">
-            Detector validation (BreakingPoint Lab) evaluates detector behaviour under controlled synthetic movement drift. Sport-specific clinical validation is future
-            work. BreakingPoint provides training information and is not a medical diagnosis.
+            The detector settings were chosen in a synthetic study of simulated squat-like sessions. They have not been tested on real athletes or for specific
+            sports. BreakingPoint provides training information and is not a medical diagnosis.
           </div>
         </div>
       </div>

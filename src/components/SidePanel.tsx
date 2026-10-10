@@ -7,6 +7,7 @@ import type { LaunchContext } from '../protocols/launch';
 import { sessionPattern } from '../protocols/patterns';
 import type { RepRecord, Snapshot } from '../session/engine';
 import { RECOVERY_REPS } from '../session/engine';
+import { describeAlertTiming, explainAlert, explainAlertText } from '../session/explain';
 import { arrow, fmt, fmtSigma, pct, STATE_CLASS, STATE_COLOR, STATE_LABEL } from '../utils/format';
 import { C } from '../ui/theme';
 import { Check, Close } from './Icons';
@@ -31,6 +32,10 @@ interface Props {
 }
 
 // ---------------------------------------------------------------- pieces
+const SCORE_TIP =
+  'How different a rep is from your usual form, across all measurements. Higher means more different, in either direction. It is not a percentage, and it does not measure fatigue or injury risk.';
+const SIGMA_TIP = 'Change from your usual form, in multiples of your normal rep-to-rep variation (σ). Arrows show the direction.';
+
 function zColor(z: number) {
   const a = Math.abs(z);
   return a >= 2 ? C.break : a >= 1 ? C.drift : C.muted;
@@ -55,7 +60,7 @@ export function Contributors({ devs, exercise, max = 4 }: { devs: FeatureDeviati
               <span className="mid" />
               <span className="f" style={{ background: zColor(z), left: z >= 0 ? '50%' : `${50 - w}%`, width: `${w}%` }} />
             </span>
-            <span className="z" style={{ color: zColor(z) }}>
+            <span className="z" style={{ color: zColor(z) }} title={SIGMA_TIP}>
               {fmtSigma(z)} {arrow(z)}
             </span>
           </div>
@@ -71,9 +76,9 @@ export function BaselineTable({ baseline, exercise }: { baseline: Baseline; exer
     <table className="baseline-table">
       <thead>
         <tr>
-          <th>Feature</th>
-          <th style={{ textAlign: 'right' }}>Your typical</th>
-          <th style={{ textAlign: 'right' }}>Normal ±</th>
+          <th>Measurement</th>
+          <th style={{ textAlign: 'right' }}>Your usual</th>
+          <th style={{ textAlign: 'right' }} title="Your normal rep-to-rep variation">Normal ±</th>
         </tr>
       </thead>
       <tbody>
@@ -88,7 +93,7 @@ export function BaselineTable({ baseline, exercise }: { baseline: Baseline; exer
                   <td className="num muted">±{formatFeatureValue(s, b.scale)}</td>
                 </>
               ) : (
-                <td colSpan={2} className="num excluded">excluded (low confidence)</td>
+                <td colSpan={2} className="num excluded">not used (camera view unclear)</td>
               )}
             </tr>
           );
@@ -151,7 +156,7 @@ function RepDetail({ rep, baseline, exercise, onClose }: { rep: RepRecord; basel
       </div>
       <div className="rep-stats">
         <span>
-          Drift <b className="mono">{fmt(rep.drift?.score)}</b>
+          Form Change Score <b className="mono">{fmt(rep.drift?.score)}</b>
         </span>
         <span>
           Duration <b className="mono">{(rep.tEnd - rep.tStart).toFixed(2)}s</b>
@@ -161,10 +166,12 @@ function RepDetail({ rep, baseline, exercise, onClose }: { rep: RepRecord; basel
         </span>
       </div>
       <div className="feat hdr">
-        <span>Feature</span>
+        <span>Measurement</span>
         <span className="num">This rep</span>
-        <span className="num">Baseline</span>
-        <span className="num">z</span>
+        <span className="num">Usual</span>
+        <span className="num" title={SIGMA_TIP}>
+          Change
+        </span>
       </div>
       {featureSpecs(exercise).map((s) => {
         const d = rep.drift?.deviations.find((x) => x.key === s.key);
@@ -175,7 +182,7 @@ function RepDetail({ rep, baseline, exercise, onClose }: { rep: RepRecord; basel
             <span className="num">{formatWithUnit(s, rep.features.values[s.key])}</span>
             <span className="num muted">{b ? formatFeatureValue(s, b.center) : '—'}</span>
             <span className="num" style={{ color: d?.used ? zColor(d.zClipped ?? 0) : C.dim }}>
-              {d?.used ? fmtSigma(d.zClipped) : d?.reason === 'low-quality' ? 'low conf.' : '—'}
+              {d?.used ? fmtSigma(d.zClipped) : d?.reason === 'low-quality' ? 'unclear' : '—'}
             </span>
           </div>
         );
@@ -196,13 +203,13 @@ function StateScale({ state }: { state: Snapshot['state'] }) {
   );
 }
 
-/** Reps held at baseline before drift began, plus the live personal best when there is one. */
+/** Reps held at the usual form before it started to change, plus the live personal best when there is one. */
 function HeldLine({ held, holding, best }: { held: number; holding: boolean; best: number | null }) {
   const beat = best !== null && held > best;
   return (
     <div className="held">
       <span className="v">{held}</span>
-      <span className="l">{holding ? `rep${held === 1 ? '' : 's'} held at your baseline so far` : `rep${held === 1 ? '' : 's'} held at your baseline before drift`}</span>
+      <span className="l">{holding ? `rep${held === 1 ? '' : 's'} at your usual form so far` : `rep${held === 1 ? '' : 's'} at your usual form before it started to change`}</span>
       {best !== null && <span className={`pb ${beat ? 'new' : ''}`}>{beat ? `New personal best (was ${best})` : `Personal best ${best}`}</span>}
     </div>
   );
@@ -213,7 +220,7 @@ function SetupView(p: Props) {
   const l = p.snap.live;
   const items = [
     { ok: l.present, text: 'Athlete detected in frame' },
-    { ok: l.quality >= 0.65, text: 'Whole body visible — head to feet, nothing cropped' },
+    { ok: l.quality >= 0.65, text: 'Whole body visible, head to feet, nothing cropped' },
     { ok: l.present && l.calibrated, text: 'Standing still briefly so BreakingPoint can find your standing posture' },
   ];
   return (
@@ -241,11 +248,11 @@ function SetupView(p: Props) {
       </div>
       <div className="panel">
         <div className="panel-title">
-          <span>Learn your baseline</span>
+          <span>Learn your usual form</span>
           <span className="meta">Calibrate</span>
         </div>
         <p className="muted" style={{ marginTop: 0, fontSize: 13 }}>
-          Perform 5–8 controlled {p.launch.primitive.name.toLowerCase()} reps at your normal tempo while fresh. BreakingPoint learns how <b>you</b> move — not an
+          Do 5–8 controlled {p.launch.primitive.name.toLowerCase()} reps at your normal pace while you're fresh. BreakingPoint learns how <b>you</b> move, not an
           "ideal" form.
         </p>
         <div className="col">
@@ -274,12 +281,12 @@ function CalibratingView(p: Props) {
       </div>
       <SyncMeter value={s.calibrationReps.length} total={s.calibrationTarget} label="Fresh reps calibrated" />
       <p className="muted" style={{ fontSize: 13, margin: '12px 0 0' }}>
-        Perform controlled reps at your normal tempo. Each rep becomes one sample of <b>your</b> movement distribution.
+        Do controlled reps at your normal pace. Each one teaches BreakingPoint more about <b>your</b> usual form.
       </p>
       <div className="rep-chips" style={{ marginTop: 12 }}>
         {s.calibrationReps.map((r) => (
           <span className="rep-chip" key={r.index}>
-            #{r.index}: {s.exercise === 'cmj' ? `jump ${((r.features.values.jumpHeight ?? 0) * 100).toFixed(0)}%` : `depth ${((r.features.values.depth ?? 0) * 100).toFixed(0)}%`}, {(r.tEnd - r.tStart).toFixed(1)}s
+            #{r.index}: {s.exercise === 'cmj' ? `jump ${((r.features.values.jumpHeight ?? 0) * 100).toFixed(0)}% of leg length` : `depth ${((r.features.values.depth ?? 0) * 100).toFixed(0)}% of leg length`}, {(r.tEnd - r.tStart).toFixed(1)}s
           </span>
         ))}
         {!s.calibrationReps.length && <span className="muted" style={{ fontSize: 13 }}>Waiting for the first rep…</span>}
@@ -305,8 +312,11 @@ function BaselineView(p: Props) {
           </span>
           <div>
             <div className="ms-title">Baseline locked</div>
-            <div className="ms-sub">
-              {s.baseline.nReps} fresh reps. In-control drift {fmt(s.baseline.reference.mu0)} ± {fmt(s.baseline.reference.sigma0)} (leave-one-out).
+            <div
+              className="ms-sub"
+              title={`Technical: your fresh reps scored ${fmt(s.baseline.reference.mu0)} ± ${fmt(s.baseline.reference.sigma0)} against each other (leave-one-out). Later reps are judged against this spread.`}
+            >
+              {s.baseline.nReps} fresh reps recorded. Every rep from now on is compared with this usual form.
             </div>
           </div>
         </div>
@@ -319,8 +329,8 @@ function BaselineView(p: Props) {
       </div>
       <div className="panel">
         <div className="panel-title">
-          <span>Your baseline</span>
-          <span className="meta">not an “ideal” form</span>
+          <span>Your usual form</span>
+          <span className="meta">from your fresh reps</span>
         </div>
         <BaselineTable baseline={s.baseline} exercise={s.exercise} />
       </div>
@@ -336,25 +346,27 @@ function MonitorView(p: Props) {
   const state = s.state;
   const sub =
     state === 'BREAKPOINT'
-      ? `Persistent drift since rep ${s.onsetRep}. Detected at rep ${s.alarmRep}.`
+      ? describeAlertTiming(s.onsetRep, s.alarmRep ?? s.monitorReps.length)
       : state === 'DRIFT'
-        ? 'Your mechanics are starting to shift away from your baseline.'
+        ? 'Your form is starting to change.'
         : s.monitorReps.length
-          ? 'Movement matches your personal baseline.'
-          : `Perform your set — every rep is compared with ${s.athlete}'s baseline.`;
+          ? 'Your reps match your usual form.'
+          : `Do your set. Each rep is compared with ${s.athlete}'s usual form.`;
   const frozen = s.breakpointContributors;
   const devs = frozen ?? lastScored?.drift?.ranked ?? [];
   const mode = s.config.mode;
   const pattern = state !== 'STABLE' ? sessionPattern(s.exercise, s.monitorReps, s.onsetRep ?? s.firstWarnRep, s.baseline?.reference.sigma0, p.launch.patternLabels) : null;
   const triggerText =
     mode === 'ewma'
-      ? `Triggers when smoothed drift (EWMA) crosses ${fmt(th?.breakpointLevel)}` +
-        (s.config.minimumPersistentReps > 0 ? ` after ≥${s.config.minimumPersistentReps} elevated reps` : '. One odd rep moves it at most halfway.')
+      ? `The alert triggers when the trend line crosses ${fmt(th?.breakpointLevel)}` +
+        (s.config.minimumPersistentReps > 0
+          ? ` after ${s.config.minimumPersistentReps} or more high reps.`
+          : '. Each rep moves the trend line only part of the way, so one unusual rep rarely triggers it on its own.')
       : mode === 'cusum'
-        ? `Triggers when CUSUM evidence exceeds h = ${s.config.cusumH}`
+        ? `The alert triggers when the build-up of change (CUSUM) passes h = ${s.config.cusumH}.`
         : mode === 'combined'
-          ? 'Triggers when EWMA and CUSUM both confirm persistent drift'
-          : `Triggers after ${Math.max(1, s.config.minimumPersistentReps)} consecutive reps above the line`;
+          ? 'The alert triggers when the trend line (EWMA) and the build-up of change (CUSUM) both show a lasting change.'
+          : `The alert triggers after ${Math.max(1, s.config.minimumPersistentReps)} reps in a row above the line.`;
   const held = heldReps(s.monitorReps);
   const holding = stillHolding(s.monitorReps);
   return (
@@ -384,18 +396,19 @@ function MonitorView(p: Props) {
       <div className="panel">
         <div className="metrics-row">
           <div>
-            <div className="panel-title" style={{ marginBottom: 6 }}>Movement drift score</div>
+            <div className="panel-title" style={{ marginBottom: 6 }} title={SCORE_TIP}>
+              Form Change Score
+            </div>
             <div className="metric-big">
               <span className="v" style={{ color: lastScored?.step ? STATE_COLOR[lastScored.step.state] : C.text }}>{fmt(lastScored?.drift?.score)}</span>
-              <span className="u">σ RMS</span>
             </div>
             <div className="metric-cap">
-              vs your baseline. Your normal is ≤ <span className="mono">{fmt(th?.normalUpper)}</span>
+              How different this rep is from your usual form. Your normal range is up to <span className="mono">{fmt(th?.normalUpper)}</span>.
             </div>
           </div>
           <div>
             <Gauge
-              label="Smoothed drift (EWMA)"
+              label="Trend (smoothed score)"
               value={lastScored?.step?.ewmaLevel ?? th?.mu0 ?? 0}
               max={(th?.breakpointLevel ?? 2) * 1.35}
               ticks={th ? [th.warningLevel, th.breakpointLevel] : []}
@@ -403,7 +416,7 @@ function MonitorView(p: Props) {
               valueText={fmt(lastScored?.step?.ewmaLevel)}
             />
             <Gauge
-              label={mode === 'cusum' || mode === 'combined' ? 'Persistence evidence (CUSUM)' : 'CUSUM (onset tracking)'}
+              label={mode === 'cusum' || mode === 'combined' ? 'Build-up of change (CUSUM)' : 'Build-up of change (CUSUM, for timing)'}
               value={lastScored?.step?.cusum ?? 0}
               max={s.config.cusumH * 1.4}
               ticks={[s.config.cusumH]}
@@ -417,8 +430,8 @@ function MonitorView(p: Props) {
 
       <div className="panel">
         <div className="panel-title">
-          <span>{frozen ? `Why rep ${s.alarmRep} was flagged` : 'What changed'}</span>
-          {frozen ? <span className="frozen-tag code">Frozen at breaking point</span> : lastScored && <span className="dim">rep {lastScored.index}</span>}
+          <span>{frozen ? `What changed at rep ${s.alarmRep}` : 'What changed'}</span>
+          {frozen ? <span className="frozen-tag code">Kept from the alert rep</span> : lastScored && <span className="dim">rep {lastScored.index}</span>}
         </div>
         <Contributors devs={devs} exercise={s.exercise} />
       </div>
@@ -477,7 +490,9 @@ function SummaryView(p: Props) {
           </div>
         )}
         <div className="state-sub">
-          {s.alarmRep !== null ? 'Take a recovery period, then run a 3-rep recovery check against your original baseline.' : 'Movement stayed within your personal baseline.'}
+          {s.alarmRep !== null
+            ? `${explainAlertText(explainAlert(s.exercise, s.monitorReps, s.onsetRep, s.alarmRep))} Rest, then run a ${RECOVERY_REPS}-rep recovery check against your usual form.`
+            : 'Your form stayed close to your usual form.'}
         </div>
         <HeldLine held={heldReps(s.monitorReps)} holding={false} best={p.bestHeld} />
       </div>
@@ -497,8 +512,8 @@ function SummaryView(p: Props) {
       {s.breakpointContributors && (
         <div className="panel">
           <div className="panel-title">
-            <span>Why rep {s.alarmRep} was flagged</span>
-            <span className="frozen-tag code">Frozen</span>
+            <span>What changed at rep {s.alarmRep}</span>
+            <span className="frozen-tag code">At the alert</span>
           </div>
           <Contributors devs={s.breakpointContributors} exercise={s.exercise} />
         </div>
@@ -519,40 +534,42 @@ function RecoveryView(p: Props) {
         </div>
         {!r ? (
           <>
-            <SyncMeter value={s.recoveryReps.length} total={RECOVERY_REPS} tone="violet" label="Recovery reps vs your original baseline" />
+            <SyncMeter value={s.recoveryReps.length} total={RECOVERY_REPS} tone="violet" label="Recovery reps vs your usual form" />
             <p className="muted" style={{ fontSize: 13, margin: '12px 0 0' }}>
               After a rest, perform {RECOVERY_REPS} controlled reps.
             </p>
           </>
         ) : (
           <div>
-            <div style={{ fontSize: 14, color: C.text2 }}>{r.status === 'persistent' ? 'Persistent drift remains' : 'Movement has returned'}</div>
+            <div style={{ fontSize: 14, color: C.text2 }}>
+              {r.status === 'recovered' ? 'Back to your usual form' : r.status === 'partial' ? 'Partly back to your usual form' : 'Still different from your usual form'}
+            </div>
             <div className="metric-big" style={{ marginTop: 4 }}>
               <span className="v" style={{ fontSize: 60, color: r.status === 'recovered' ? C.stable : r.status === 'partial' ? C.drift : C.break }}>
                 {(r.percent * 100).toFixed(0)}%
               </span>
-              <span className="u">toward baseline</span>
+              <span className="u">of the change gone</span>
             </div>
             <div className="muted" style={{ fontSize: 13, marginTop: 8 }}>
-              Mean drift {fmt(r.meanRecovery)} now vs {fmt(r.meanPost)} after the breaking point (your normal ≤ {fmt(s.thresholds?.normalUpper)}).
+              Average Form Change Score {fmt(r.meanRecovery)} now, {fmt(r.meanPost)} after the alert. Your normal range is up to {fmt(s.thresholds?.normalUpper)}.
             </div>
             <div style={{ fontSize: 13.5, marginTop: 10 }}>
               {r.status === 'recovered'
-                ? 'Mechanics are back within your normal range.'
+                ? 'Your form is back within your normal range.'
                 : r.status === 'partial'
-                  ? 'Partially recovered. Consider more rest or a lighter session before reassessing.'
-                  : 'Persistent drift remains. Consider ending intense work for today.'}
+                  ? 'Partly recovered. Consider more rest or a lighter session before you test again.'
+                  : 'Your form is still different from your usual form. Consider keeping the rest of today light.'}
             </div>
           </div>
         )}
       </div>
       {s.recoveryReps.length > 0 && (
         <div className="panel">
-          <div className="panel-title">Recovery reps vs baseline</div>
+          <div className="panel-title">Recovery reps vs your usual form</div>
           {s.recoveryReps.map((rep) => (
             <div key={rep.index} className="row" style={{ justifyContent: 'space-between', fontSize: 13, padding: '4px 0' }}>
               <span>Rep {rep.index}</span>
-              <span className="mono">drift {fmt(rep.drift?.score)}</span>
+              <span className="mono">score {fmt(rep.drift?.score)}</span>
             </div>
           ))}
         </div>

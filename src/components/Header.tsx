@@ -110,10 +110,10 @@ export function Header(p: Props) {
         <button className="btn ghost sm hide-sm" onClick={p.onLibrary} title="Movement protocol library">
           Protocols
         </button>
-        <button className="btn ghost sm hide-sm" onClick={p.onLab} title="BreakingPoint Lab validation">
+        <button className="btn ghost sm hide-sm" onClick={p.onLab} title="Synthetic validation study (UF HiPerGator)">
           <Flask size={15} /> Lab
         </button>
-        <button className="btn ghost sm" onClick={p.onResearch} title="Method, science and limitations">
+        <button className="btn ghost sm" onClick={p.onResearch} title="How it works, evidence and limits">
           <Book size={15} /> Research
         </button>
         {p.view === 'session' && (

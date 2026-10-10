@@ -24,7 +24,7 @@ export function RepTimeline({ reps, alarmRep, selected, onSelect, maxScore }: Pr
             const s = r.drift?.score ?? null;
             const col = r.step ? STATE_COLOR[r.step.state] : C.sys;
             const h = s === null ? 4 : Math.max(3, Math.min(20, (s / Math.max(maxScore, 1e-6)) * 20));
-            const label = `Rep ${r.index}${s !== null ? `, drift ${s.toFixed(2)}` : ', not scored'}${r.step ? `, ${STATE_LABEL[r.step.state].toLowerCase()}` : ''}${alarmRep === r.index ? ', breaking point' : ''}`;
+            const label = `Rep ${r.index}${s !== null ? `, Form Change Score ${s.toFixed(2)}` : ', not scored'}${r.step ? `, ${STATE_LABEL[r.step.state].toLowerCase()}` : ''}${alarmRep === r.index ? ', alert triggered' : ''}`;
             return (
               <li key={r.index}>
                 <button

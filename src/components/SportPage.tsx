@@ -101,15 +101,15 @@ export function SportPage({ sport, subSportId, onSubSport, onBack, onDemo, onLiv
                     </span>
                   )}
                 </div>
-                {p.status === 'BETA' && ctx && <div className="proto-foot">Beta: shared {prim.name.toLowerCase()} primitive. Real-camera reliability is still being validated.</div>}
+                {p.status === 'BETA' && ctx && <div className="proto-foot">Beta: built on the shared {prim.name.toLowerCase()} movement. How well it works with real cameras has not been tested yet.</div>}
               </li>
             );
           })}
         </ol>
 
         <div className="shared-note">
-          <b>One detector for every protocol.</b> The sport changes which repeatable movement is monitored and how it is described. The personal baseline and the
-          Lab-calibrated sequential detector stay the same.{' '}
+          <b>Same method for every sport.</b> The sport changes which movement is tracked and what the measurements are called. Learning your usual form and
+          the alert rules stay the same.{' '}
           <button className="link-btn" onClick={onLibrary}>
             Explore all protocols
           </button>

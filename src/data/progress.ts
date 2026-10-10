@@ -224,7 +224,7 @@ export function milestones(history: readonly SessionRecord[], profile: Pick<Athl
     {
       id: 'back-to-baseline',
       title: 'Back to baseline',
-      criterion: 'A recovery check rated "recovered": back inside your warning line with at least 75% of the extra drift gone.',
+      criterion: 'A recovery check rated "recovered": back inside your warning line with at least 75% of the change gone.',
       earned: !!recovered,
       earnedAt: recovered?.recovery?.completedAt ?? null,
       detail: bestRec ? `Best so far ${Math.round(bestRec.value * 100)}%` : 'Run a recovery check after a rest',
