@@ -136,7 +136,7 @@ export default function App() {
     else if (demo === '1') startSession('demo', launchForExercise(q.get('exercise')));
     else if (q.get('live') === '1') startSession('live', launchForExercise(q.get('exercise')));
     const panel = q.get('panel');
-    if (panel === 'lab' || panel === 'method' || panel === 'science' || panel === 'privacy') setResearch(panel);
+    if (panel === 'lab' || panel === 'method' || panel === 'realworld' || panel === 'science' || panel === 'privacy') setResearch(panel);
     if (panel === 'library') setLibrary(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [configReady]);

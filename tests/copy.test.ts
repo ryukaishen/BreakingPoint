@@ -10,7 +10,7 @@ import { PATTERN_EXPLAIN, PATTERN_LABELS } from '../src/protocols/patterns';
 import { DISCLAIMER } from '../src/session/summary';
 import { STATE_LABEL } from '../src/utils/format';
 
-/** Files whose visible text an athlete sees in the live app. */
+/** Files whose visible text an athlete sees in the live app (the research panel is checked separately). */
 const LIVE_COPY_FILES = [
   'src/App.tsx',
   'src/components/SidePanel.tsx',
@@ -67,6 +67,25 @@ describe('athlete-facing wording', () => {
       expect(m ? `"${m[0]}" (${why})` : null, path).toBeNull();
     }
   });
+
+  // The research panel may use statistical terms, but it must not over-claim either.
+  it.each(['src/components/ResearchModal.tsx', 'src/research/hipergatorStudy.ts', 'src/research/realWorldStudies.ts'])(
+    '%s makes no absolute or unsupported claims',
+    (path) => {
+      const text = visibleSource(path);
+      for (const re of [
+        /(cannot|can never|can't|will never|never) trigger/i,
+        /one (bad|odd|weird) rep (cannot|can't|never)/i,
+        /fatigue (screen|detect)|detects? fatigue/i,
+        /validated detector|clinically validated|\bregime\b|movement signature/i,
+      ]) {
+        const m = text.match(re);
+        expect(m ? m[0] : null, path).toBeNull();
+      }
+      // The synthetic study is always called synthetic or simulated where its numbers appear.
+      if (path.endsWith('ResearchModal.tsx')) expect(text).toMatch(/simulated athlete sessions, not on real people/);
+    },
+  );
 
   it('state labels are plain words', () => {
     expect(STATE_LABEL).toEqual({ STABLE: 'STABLE', DRIFT: 'FORM CHANGING', BREAKPOINT: 'BREAKING POINT' });
