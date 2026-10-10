@@ -99,6 +99,39 @@ export function appScale(values: readonly number[], spec: FeatureSpec): number |
   return b ? b.scale : null;
 }
 
+/**
+ * Change from the first group to the second in one measurement (Δ = mean of the second - mean of the first),
+ * standardized two ways:
+ *   dz    (analysis v2, reported): Δ over the mean of the app's spread in the two groups. Swapping the groups
+ *         flips its sign exactly, so it is centred on 0 when the labels do not matter.
+ *   dz_v1 (analysis v1, superseded): Δ over the first group's spread only; not centred on 0 under random labels.
+ */
+export function standardizedChange(spec: FeatureSpec, first: readonly RepFeatures[], second: readonly RepFeatures[]) {
+  const vals = (fs: readonly RepFeatures[]) => fs.map((x) => x.values[spec.key]).filter((v): v is number => typeof v === 'number' && Number.isFinite(v));
+  const fv = vals(first);
+  const sv = vals(second);
+  const delta = fv.length && sv.length ? meanOf(sv) - meanOf(fv) : null;
+  const s1 = appScale(fv, spec);
+  const s2 = appScale(sv, spec);
+  return {
+    first: fv, second: sv, delta, scale_first: s1, scale_second: s2,
+    dz: delta !== null && s1 && s2 ? delta / ((s1 + s2) / 2) : null,
+    dz_v1: delta !== null && s1 ? delta / s1 : null,
+  };
+}
+
+/** (mean of the second group - mean of the first) over the app's spread of both groups pooled (label-free), as used
+ * for REHAB24-6 standardized differences in analysis v2; v1 divided by the first group's spread. */
+export function pooledStandardizedDifference(spec: FeatureSpec, first: readonly RepFeatures[], second: readonly RepFeatures[]) {
+  const vals = (fs: readonly RepFeatures[]) => fs.map((x) => x.values[spec.key]).filter((v): v is number => typeof v === 'number' && Number.isFinite(v));
+  const fv = vals(first);
+  const sv = vals(second);
+  const diff = fv.length && sv.length ? meanOf(sv) - meanOf(fv) : null;
+  const pooled = appScale([...fv, ...sv], spec);
+  const s1 = appScale(fv, spec);
+  return { v2: diff !== null && pooled ? diff / pooled : null, v1: diff !== null && s1 ? diff / s1 : null };
+}
+
 /** Seeded generator (mulberry32) and an in-place Fisher-Yates shuffle, for label shuffling. */
 export function rng(seed: number): () => number {
   let a = seed >>> 0;
@@ -135,6 +168,61 @@ export function shuffleWithin<T>(groups: readonly (readonly T[])[], seed: number
     k += g.length;
   }
   return out;
+}
+
+/** Scores from a personal leave-one-correct-rep-out design: fold k holds correct rep k out, builds the
+ * baseline from the other correct reps, and scores the held-out rep and every incorrect rep against it. */
+export interface LooFolds {
+  heldout: (number | null)[];
+  incorrectByFold: (number | null)[][];
+}
+
+export function personalLooFolds(correct: readonly RepFeatures[], incorrect: readonly RepFeatures[], specs: readonly FeatureSpec[], cfg: Cfg): LooFolds {
+  const heldout: (number | null)[] = [];
+  const incorrectByFold: (number | null)[][] = [];
+  correct.forEach((c, k) => {
+    const s = scoreAgainst(correct.filter((_, j) => j !== k), [c, ...incorrect], specs, cfg);
+    heldout.push(s[0]);
+    incorrectByFold.push(s.slice(1));
+  });
+  return { heldout, incorrectByFold };
+}
+
+/** P(pos > neg) + 0.5 P(pos = neg) over all pairs; null when either side is empty. */
+export function aucPairs(pos: readonly (number | null)[], neg: readonly (number | null)[]): number | null {
+  const p = pos.filter((x): x is number => x !== null);
+  const n = neg.filter((x): x is number => x !== null);
+  if (!p.length || !n.length) return null;
+  let s = 0;
+  for (const a of p) for (const b of n) s += a > b ? 1 : a === b ? 0.5 : 0;
+  return s / (p.length * n.length);
+}
+
+/** Analysis v1 construction (superseded): each incorrect rep's scores averaged over folds, against the held-out scores. */
+export function aucFoldAveraged(f: LooFolds): number | null {
+  const nInc = f.incorrectByFold[0]?.length ?? 0;
+  const incMean = Array.from({ length: nInc }, (_, i) => {
+    const v = f.incorrectByFold.map((fold) => fold[i]).filter((x): x is number => x !== null);
+    return v.length ? v.reduce((a, b) => a + b, 0) / v.length : null;
+  });
+  return aucPairs(incMean, f.heldout);
+}
+
+/** Analysis v2 construction: within each fold, the held-out correct rep is compared only with the incorrect reps
+ * scored against the same baseline; the comparisons are pooled over folds. With labels assigned at random, the
+ * held-out rep and each incorrect rep are exchangeable given the fold's baseline, so the null expectation is 0.5. */
+export function aucFoldPaired(f: LooFolds): number | null {
+  let s = 0;
+  let n = 0;
+  f.heldout.forEach((h, k) => {
+    if (h === null) return;
+    for (const v of f.incorrectByFold[k]) {
+      if (v === null) continue;
+      s += v > h ? 1 : v === h ? 0.5 : 0;
+      n += 1;
+    }
+  });
+  return n ? s / n : null;
 }
 
 /** Link found reps to annotated reps: greedy one-to-one by the share of the found rep inside the annotation

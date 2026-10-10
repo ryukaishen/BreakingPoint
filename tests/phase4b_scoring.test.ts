@@ -10,7 +10,8 @@ import { driftScore } from '../src/detection/driftScore';
 import { DemoController } from '../src/demo/demoController';
 import { SessionEngine } from '../src/session/engine';
 import {
-  JUMP_SCORES, combinations, linkReps, personalSplits, rankOf, scoreAgainst, shuffleWithin, specsFor,
+  JUMP_SCORES, aucFoldAveraged, aucFoldPaired, combinations, linkReps, personalLooFolds, personalSplits, pooledStandardizedDifference,
+  rankOf, scoreAgainst, shuffleWithin, specsFor, standardizedChange,
 } from '../research/phase4b/scoring';
 
 const cfg = existsSync('public/breakingpoint_detector_config.json')
@@ -78,6 +79,50 @@ describe('label shuffling', () => {
     expect(shuffleWithin(groups, 3, 'sub01')).toEqual(s1);
     const seen = new Set(Array.from({ length: 30 }, (_, k) => shuffleWithin(groups, k, 'sub01')[0].join()));
     expect(seen.size).toBeGreaterThan(3);
+  });
+});
+
+function squatReps(): RepFeatures[] {
+  const engine = new SessionEngine('squat', cfg, 'Adam', 'demo');
+  new DemoController(engine, 'squat').runToEnd(false);
+  const s = engine.getSnapshot();
+  return [...s.calibrationReps, ...s.monitorReps].map((r) => r.features);
+}
+
+describe('analysis v2 constructions are centred when labels do not matter (exact, over every labelling)', () => {
+  const reps = squatReps().slice(0, 7);
+  const specs = specsFor('squat');
+  const labellings = combinations(7, 5); // 5 "correct", 2 "incorrect"
+  const split = (c: number[]) => ({ correct: c.map((i) => reps[i]), incorrect: [0, 1, 2, 3, 4, 5, 6].filter((i) => !c.includes(i)).map((i) => reps[i]) });
+
+  it('the fold-paired personal AUC averages exactly 0.5; the v1 fold-averaged construction need not', () => {
+    const paired: number[] = [];
+    const averaged: number[] = [];
+    for (const c of labellings) {
+      const { correct, incorrect } = split(c);
+      const f = personalLooFolds(correct, incorrect, specs, cfg);
+      paired.push(aucFoldPaired(f) as number);
+      averaged.push(aucFoldAveraged(f) as number);
+    }
+    const mean = (xs: number[]) => xs.reduce((a, b) => a + b, 0) / xs.length;
+    expect(mean(paired)).toBeCloseTo(0.5, 12);
+    expect(Number.isFinite(mean(averaged))).toBe(true);
+  });
+
+  it('the pooled standardized difference averages exactly 0', () => {
+    for (const spec of specs) {
+      const v = labellings.map((c) => pooledStandardizedDifference(spec, split(c).correct, split(c).incorrect).v2).filter((x): x is number => x !== null);
+      if (v.length === labellings.length) expect(v.reduce((a, b) => a + b, 0) / v.length).toBeCloseTo(0, 12);
+    }
+  });
+
+  it('the v2 standardized change flips sign exactly when the groups swap', () => {
+    const jumps = cmjReps().slice(0, 6);
+    for (const spec of specsFor('cmj')) {
+      const a = standardizedChange(spec, jumps.slice(0, 3), jumps.slice(3));
+      const b = standardizedChange(spec, jumps.slice(3), jumps.slice(0, 3));
+      if (a.dz !== null) expect(b.dz as number).toBeCloseTo(-(a.dz as number), 12);
+    }
   });
 });
 
