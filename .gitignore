@@ -20,6 +20,9 @@ venv/
 results/runs/*
 !results/runs/README.md
 
+# External datasets and everything derived from them stay local (see data/README.md)
+data/external/*
+data/processed/*
 results/shards/
 results/logs/
 results/robustness_cache/
