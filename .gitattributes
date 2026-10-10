@@ -9,3 +9,6 @@ results/archive/**                         -text
 results/figures/**                         binary
 public/lab/figures/**                      binary
 results/provenance.json                    -text
+
+# Phase 4B real-label run (research/results/phase4b/MANIFEST.sha256 and EXECUTION.json), same rule.
+research/results/phase4b/**                -text

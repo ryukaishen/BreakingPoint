@@ -1,0 +1,1530 @@
+{
+ "meta": {
+  "labels": "actual",
+  "seed": null,
+  "inject": null,
+  "analysis": "v2",
+  "freeze": {
+   "protocol_freeze_commit": "0fa32fe655381d97057042678792f8fe48c9ec89",
+   "analysis_freeze_sha256": "d7442a63212a0be865d689193abf111b76443feb3f46b68eceeb609603d3a4f5"
+  }
+ },
+ "evaluation": "exploratory offline motion-capture evaluation",
+ "rehab24_6": {
+  "squat_primary": {
+   "key": "ex6_squat/oblique35",
+   "exercise": "squat",
+   "persons": 9,
+   "reps_correct": 130,
+   "reps_incorrect": 61,
+   "R-1": {
+    "personal_auc": {
+     "n": 9,
+     "mean": 0.9204042870709537,
+     "median": 0.9523809523809523,
+     "q25": 0.9047619047619048,
+     "q75": 1.0,
+     "min": 0.6666666666666666,
+     "max": 1.0,
+     "share_above_zero": 1.0,
+     "mean_interval": [
+      0.8333549887857256,
+      1.007453585356182
+     ],
+     "mean_interval_label": "95% CI",
+     "median_interval": [
+      0.8153846153846154,
+      1.0
+     ],
+     "median_interval_label": "96.1% exact interval",
+     "median_interval_exact_level": 0.9609375
+    },
+    "population_auc": {
+     "n": 9,
+     "mean": 0.6257113329662349,
+     "median": 0.8627450980392157,
+     "q25": 0.19,
+     "q75": 0.9777777777777777,
+     "min": 0.08,
+     "max": 1.0,
+     "share_above_zero": 1.0,
+     "mean_interval": [
+      0.30860036159312665,
+      0.9428223043393432
+     ],
+     "mean_interval_label": "95% CI",
+     "median_interval": [
+      0.09230769230769231,
+      1.0
+     ],
+     "median_interval_label": "96.1% exact interval",
+     "median_interval_exact_level": 0.9609375
+    },
+    "personal_minus_population": {
+     "n": 9,
+     "mean": 0.29469295410471885,
+     "median": 0.0,
+     "q25": -0.033333333333333326,
+     "q75": 0.7230769230769231,
+     "min": -0.1960784313725491,
+     "max": 0.92,
+     "share_above_zero": 0.4444444444444444
+    },
+    "personal_auc_v1_fold_averaged_superseded": {
+     "n": 9,
+     "mean": 0.8990192886271318,
+     "median": 0.9126984126984127,
+     "q25": 0.8571428571428571,
+     "q75": 1.0,
+     "min": 0.6470588235294118,
+     "max": 1.0,
+     "share_above_zero": 1.0
+    },
+    "per_person": {
+     "1": {
+      "n_correct": 21,
+      "n_incorrect": 6,
+      "personal_auc": 0.9523809523809523,
+      "population_auc": 0.47619047619047616
+     },
+     "2": {
+      "n_correct": 21,
+      "n_incorrect": 1,
+      "personal_auc": 0.9047619047619048,
+      "population_auc": 0.9523809523809523
+     },
+     "3": {
+      "n_correct": 10,
+      "n_incorrect": 10,
+      "personal_auc": 1.0,
+      "population_auc": 0.08
+     },
+     "4": {
+      "n_correct": 17,
+      "n_incorrect": 3,
+      "personal_auc": 0.6666666666666666,
+      "population_auc": 0.8627450980392157
+     },
+     "5": {
+      "n_correct": 10,
+      "n_incorrect": 10,
+      "personal_auc": 1.0,
+      "population_auc": 1.0
+     },
+     "6": {
+      "n_correct": 10,
+      "n_incorrect": 11,
+      "personal_auc": 1.0,
+      "population_auc": 1.0
+     },
+     "7": {
+      "n_correct": 10,
+      "n_incorrect": 10,
+      "personal_auc": 1.0,
+      "population_auc": 0.19
+     },
+     "8": {
+      "n_correct": 13,
+      "n_incorrect": 5,
+      "personal_auc": 0.8153846153846154,
+      "population_auc": 0.09230769230769231
+     },
+     "9": {
+      "n_correct": 18,
+      "n_incorrect": 5,
+      "personal_auc": 0.9444444444444444,
+      "population_auc": 0.9777777777777777
+     }
+    }
+   },
+   "R-2": {
+    "kneeRomL": {
+     "status": "passed",
+     "interpreted": true,
+     "stddiff": {
+      "n": 9,
+      "mean": 1.1470191020126084,
+      "median": 1.2295540178463575,
+      "q25": 0.9547645358058603,
+      "q75": 1.3015321715960828,
+      "min": 0.44499473768865194,
+      "max": 1.6903854269602727,
+      "share_above_zero": 1.0,
+      "mean_interval": [
+       0.8523858986628295,
+       1.4416523053623873
+      ],
+      "mean_interval_label": "95% CI",
+      "median_interval": [
+       0.8892565889798602,
+       1.6079484205935883
+      ],
+      "median_interval_label": "96.1% exact interval",
+      "median_interval_exact_level": 0.9609375
+     }
+    },
+    "kneeRomR": {
+     "status": "not checked",
+     "interpreted": false,
+     "stddiff": {
+      "n": 9,
+      "mean": 1.1152673911649176,
+      "median": 0.9443969333645431,
+      "q25": 0.7218482673137759,
+      "q75": 1.2594043829862378,
+      "min": 0.585151254855591,
+      "max": 2.2735858406289653,
+      "share_above_zero": 1.0,
+      "mean_interval": [
+       0.6861254412645199,
+       1.5444093410653152
+      ],
+      "mean_interval_label": "95% CI",
+      "median_interval": [
+       0.6493349042185216,
+       1.6455680952997476
+      ],
+      "median_interval_label": "96.1% exact interval",
+      "median_interval_exact_level": 0.9609375
+     }
+    },
+    "hipRom": {
+     "status": "passed",
+     "interpreted": true,
+     "stddiff": {
+      "n": 9,
+      "mean": 1.1794999129129162,
+      "median": 1.2278497312657344,
+      "q25": 0.9386379285033256,
+      "q75": 1.314435044990341,
+      "min": 0.8038661326184056,
+      "max": 1.655889820347368,
+      "share_above_zero": 1.0,
+      "mean_interval": [
+       0.9707945948962686,
+       1.3882052309295638
+      ],
+      "mean_interval_label": "95% CI",
+      "median_interval": [
+       0.9368307699151882,
+       1.3914214176072779
+      ],
+      "median_interval_label": "96.1% exact interval",
+      "median_interval_exact_level": 0.9609375
+     }
+    },
+    "depth": {
+     "status": "passed",
+     "interpreted": true,
+     "stddiff": {
+      "n": 9,
+      "mean": 1.1077656448614739,
+      "median": 1.1266827024834056,
+      "q25": 0.7806263793842447,
+      "q75": 1.449725953296662,
+      "min": -0.09883670741868288,
+      "max": 2.2342855979479714,
+      "share_above_zero": 0.8888888888888888,
+      "mean_interval": [
+       0.5918620328802305,
+       1.6236692568427173
+      ],
+      "mean_interval_label": "95% CI",
+      "median_interval": [
+       0.5524523358329633,
+       1.6916334887736557
+      ],
+      "median_interval_label": "96.1% exact interval",
+      "median_interval_exact_level": 0.9609375
+     }
+    },
+    "trunkLean": {
+     "status": "passed",
+     "interpreted": true,
+     "stddiff": {
+      "n": 9,
+      "mean": 0.880716517486,
+      "median": 1.1995288753660012,
+      "q25": 0.3190429635260474,
+      "q75": 1.578597548016663,
+      "min": -1.02796429750557,
+      "max": 1.6736584576759033,
+      "share_above_zero": 0.8888888888888888,
+      "mean_interval": [
+       0.19063671275604432,
+       1.5707963222159558
+      ],
+      "mean_interval_label": "95% CI",
+      "median_interval": [
+       0.252013863682806,
+       1.595395435781943
+      ],
+      "median_interval_label": "96.1% exact interval",
+      "median_interval_exact_level": 0.9609375
+     }
+    },
+    "repDuration": {
+     "status": "failed",
+     "interpreted": false,
+     "stddiff": {
+      "n": 9,
+      "mean": -0.6272391115427776,
+      "median": -0.9624794504020544,
+      "q25": -1.450407718051444,
+      "q75": 0.10850856169879501,
+      "min": -1.518791339470809,
+      "max": 0.8870825110773899,
+      "share_above_zero": 0.3333333333333333,
+      "mean_interval": [
+       -1.3106494093838488,
+       0.05617118629829354
+      ],
+      "mean_interval_label": "95% CI",
+      "median_interval": [
+       -1.4570340116414227,
+       0.4058372935847455
+      ],
+      "median_interval_label": "96.1% exact interval",
+      "median_interval_exact_level": 0.9609375
+     }
+    },
+    "eccentricDuration": {
+     "status": "not checked",
+     "interpreted": false,
+     "stddiff": {
+      "n": 9,
+      "mean": -0.587853710879503,
+      "median": -0.9168873104344093,
+      "q25": -1.2809390573185384,
+      "q75": 0.33972354979873715,
+      "min": -1.4592107480792864,
+      "max": 0.6989392864734916,
+      "share_above_zero": 0.3333333333333333,
+      "mean_interval": [
+       -1.2285882336320109,
+       0.05288081187300475
+      ],
+      "mean_interval_label": "95% CI",
+      "median_interval": [
+       -1.2897145187078176,
+       0.3879965329256843
+      ],
+      "median_interval_label": "96.1% exact interval",
+      "median_interval_exact_level": 0.9609375
+     }
+    },
+    "concentricDuration": {
+     "status": "not checked",
+     "interpreted": false,
+     "stddiff": {
+      "n": 9,
+      "mean": -0.4741437722298514,
+      "median": -0.23521628374422554,
+      "q25": -1.2335362801282561,
+      "q75": -0.0864272656140563,
+      "min": -1.4955741754704617,
+      "max": 0.8200797602366917,
+      "share_above_zero": 0.2222222222222222,
+      "mean_interval": [
+       -1.0834223183597855,
+       0.13513477390008277
+      ],
+      "mean_interval_label": "95% CI",
+      "median_interval": [
+       -1.495364623099284,
+       0.12715595004114677
+      ],
+      "median_interval_label": "96.1% exact interval",
+      "median_interval_exact_level": 0.9609375
+     }
+    },
+    "peakVelocity": {
+     "status": "not checked",
+     "interpreted": false,
+     "stddiff": {
+      "n": 9,
+      "mean": 1.3580004073186933,
+      "median": 1.425792190209174,
+      "q25": 1.3705853884900663,
+      "q75": 1.4738222194738697,
+      "min": 0.8496611920225401,
+      "max": 1.5568891817676083,
+      "share_above_zero": 1.0,
+      "mean_interval": [
+       1.1840649293121024,
+       1.5319358853252842
+      ],
+      "mean_interval_label": "95% CI",
+      "median_interval": [
+       1.1430677491291574,
+       1.553895349685642
+      ],
+      "median_interval_label": "96.1% exact interval",
+      "median_interval_exact_level": 0.9609375
+     }
+    },
+    "asymmetry": {
+     "status": "failed",
+     "interpreted": false,
+     "stddiff": {
+      "n": 9,
+      "mean": -0.2722229342350694,
+      "median": -0.35534004279162607,
+      "q25": -1.0674393640178264,
+      "q75": 0.43094518829348244,
+      "min": -1.4463239841272317,
+      "max": 0.9649649737595825,
+      "share_above_zero": 0.4444444444444444,
+      "mean_interval": [
+       -1.0084151366260539,
+       0.4639692681559151
+      ],
+      "mean_interval_label": "95% CI",
+      "median_interval": [
+       -1.3867335007850896,
+       0.9360722442106159
+      ],
+      "median_interval_label": "96.1% exact interval",
+      "median_interval_exact_level": 0.9609375
+     }
+    }
+   },
+   "note": "57% of the shipped squat score's weight (3.25 of 5.75) sits on measurements that failed the Phase 4A.5 agreement criteria (rep duration, left-right difference) or were not checked (far-side knee range of motion, eccentric and concentric duration, peak velocity). A separation result is not validation of every measurement."
+  },
+  "squat_without_person_2": {
+   "key": "ex6_squat/oblique35",
+   "exercise": "squat",
+   "persons": 8,
+   "reps_correct": 109,
+   "reps_incorrect": 60,
+   "R-1": {
+    "personal_auc": {
+     "n": 8,
+     "mean": 0.9223595848595848,
+     "median": 0.9761904761904762,
+     "q25": 0.9121794871794872,
+     "q75": 1.0,
+     "min": 0.6666666666666666,
+     "max": 1.0,
+     "share_above_zero": 1.0,
+     "mean_interval": [
+      0.8212816907838488,
+      1.0234374789353207
+     ],
+     "mean_interval_label": "95% CI",
+     "median_interval": [
+      0.6666666666666666,
+      1.0
+     ],
+     "median_interval_label": "99.2% exact interval",
+     "median_interval_exact_level": 0.9921875
+    },
+    "population_auc": {
+     "n": 8,
+     "mean": 0.6233025389643037,
+     "median": 0.7091503267973857,
+     "q25": 0.22980769230769232,
+     "q75": 0.9916666666666667,
+     "min": 0.16,
+     "max": 1.0,
+     "share_above_zero": 1.0,
+     "mean_interval": [
+      0.3011262924826559,
+      0.9454787854459514
+     ],
+     "mean_interval_label": "95% CI",
+     "median_interval": [
+      0.16,
+      1.0
+     ],
+     "median_interval_label": "99.2% exact interval",
+     "median_interval_exact_level": 0.9921875
+    },
+    "personal_minus_population": {
+     "n": 8,
+     "mean": 0.29905704589528115,
+     "median": 0.19841269841269837,
+     "q25": -0.011111111111111127,
+     "q75": 0.6721153846153846,
+     "min": -0.1960784313725491,
+     "max": 0.84,
+     "share_above_zero": 0.5
+    },
+    "personal_auc_v1_fold_averaged_superseded": {
+     "n": 8,
+     "mean": 0.904253842562666,
+     "median": 0.9413492063492064,
+     "q25": 0.8705128205128205,
+     "q75": 1.0,
+     "min": 0.6470588235294118,
+     "max": 1.0,
+     "share_above_zero": 1.0
+    },
+    "per_person": {
+     "1": {
+      "n_correct": 21,
+      "n_incorrect": 6,
+      "personal_auc": 0.9523809523809523,
+      "population_auc": 0.5555555555555556
+     },
+     "3": {
+      "n_correct": 10,
+      "n_incorrect": 10,
+      "personal_auc": 1.0,
+      "population_auc": 0.16
+     },
+     "4": {
+      "n_correct": 17,
+      "n_incorrect": 3,
+      "personal_auc": 0.6666666666666666,
+      "population_auc": 0.8627450980392157
+     },
+     "5": {
+      "n_correct": 10,
+      "n_incorrect": 10,
+      "personal_auc": 1.0,
+      "population_auc": 1.0
+     },
+     "6": {
+      "n_correct": 10,
+      "n_incorrect": 11,
+      "personal_auc": 1.0,
+      "population_auc": 1.0
+     },
+     "7": {
+      "n_correct": 10,
+      "n_incorrect": 10,
+      "personal_auc": 1.0,
+      "population_auc": 0.25
+     },
+     "8": {
+      "n_correct": 13,
+      "n_incorrect": 5,
+      "personal_auc": 0.8153846153846154,
+      "population_auc": 0.16923076923076924
+     },
+     "9": {
+      "n_correct": 18,
+      "n_incorrect": 5,
+      "personal_auc": 0.9444444444444444,
+      "population_auc": 0.9888888888888889
+     }
+    }
+   },
+   "R-2": {
+    "kneeRomL": {
+     "status": "passed",
+     "interpreted": true,
+     "stddiff": {
+      "n": 8,
+      "mean": 1.0894029371899863,
+      "median": 1.0981792737300782,
+      "q25": 0.9383875490993603,
+      "q75": 1.253831659670774,
+      "min": 0.44499473768865194,
+      "max": 1.6903854269602727,
+      "share_above_zero": 1.0,
+      "mean_interval": [
+       0.7836366542973379,
+       1.3951692200826347
+      ],
+      "mean_interval_label": "95% CI",
+      "median_interval": [
+       0.44499473768865194,
+       1.6903854269602727
+      ],
+      "median_interval_label": "99.2% exact interval",
+      "median_interval_exact_level": 0.9921875
+     }
+    },
+    "kneeRomR": {
+     "status": "not checked",
+     "interpreted": false,
+     "stddiff": {
+      "n": 8,
+      "mean": 0.9704775849819118,
+      "median": 0.833941278075845,
+      "q25": 0.7037199265399623,
+      "q75": 1.2408245100188575,
+      "min": 0.585151254855591,
+      "max": 1.6455680952997476,
+      "share_above_zero": 1.0,
+      "mean_interval": [
+       0.657011335590735,
+       1.2839438343730887
+      ],
+      "mean_interval_label": "95% CI",
+      "median_interval": [
+       0.585151254855591,
+       1.6455680952997476
+      ],
+      "median_interval_label": "99.2% exact interval",
+      "median_interval_exact_level": 0.9921875
+     }
+    },
+    "hipRom": {
+     "status": "passed",
+     "interpreted": true,
+     "stddiff": {
+      "n": 8,
+      "mean": 1.1626330214032383,
+      "median": 1.1304942983744692,
+      "q25": 0.9381861388562913,
+      "q75": 1.332927483515871,
+      "min": 0.8038661326184056,
+      "max": 1.655889820347368,
+      "share_above_zero": 1.0,
+      "mean_interval": [
+       0.9242189521985391,
+       1.4010470906079375
+      ],
+      "mean_interval_label": "95% CI",
+      "median_interval": [
+       0.8038661326184056,
+       1.655889820347368
+      ],
+      "median_interval_label": "99.2% exact interval",
+      "median_interval_exact_level": 0.9921875
+     }
+    },
+    "depth": {
+     "status": "passed",
+     "interpreted": true,
+     "stddiff": {
+      "n": 8,
+      "mean": 0.9669506507256616,
+      "median": 1.0966142916431028,
+      "q25": 0.7235828684964244,
+      "q75": 1.2375128678118488,
+      "min": -0.09883670741868288,
+      "max": 1.6916334887736557,
+      "share_above_zero": 0.875,
+      "mean_interval": [
+       0.5008277375925458,
+       1.4330735638587773
+      ],
+      "mean_interval_label": "95% CI",
+      "median_interval": [
+       -0.09883670741868288,
+       1.6916334887736557
+      ],
+      "median_interval_label": "99.2% exact interval",
+      "median_interval_exact_level": 0.9921875
+     }
+    },
+    "trunkLean": {
+     "status": "passed",
+     "interpreted": true,
+     "stddiff": {
+      "n": 8,
+      "mean": 0.9509257117309942,
+      "median": 1.3421663050158308,
+      "q25": 0.7015325230441114,
+      "q75": 1.582797019957983,
+      "min": -1.02796429750557,
+      "max": 1.6736584576759033,
+      "share_above_zero": 0.875,
+      "mean_interval": [
+       0.170952983690156,
+       1.7308984397718323
+      ],
+      "mean_interval_label": "95% CI",
+      "median_interval": [
+       -1.02796429750557,
+       1.6736584576759033
+      ],
+      "median_interval_label": "99.2% exact interval",
+      "median_interval_exact_level": 0.9921875
+     }
+    },
+    "repDuration": {
+     "status": "failed",
+     "interpreted": false,
+     "stddiff": {
+      "n": 8,
+      "mean": -0.585334069185368,
+      "median": -0.8289339253400994,
+      "q25": -1.4520642914489388,
+      "q75": 0.18284074467028263,
+      "min": -1.518791339470809,
+      "max": 0.8870825110773899,
+      "share_above_zero": 0.375,
+      "mean_interval": [
+       -1.371963661601582,
+       0.20129552323084587
+      ],
+      "mean_interval_label": "95% CI",
+      "median_interval": [
+       -1.518791339470809,
+       0.8870825110773899
+      ],
+      "median_interval_label": "99.2% exact interval",
+      "median_interval_exact_level": 0.9921875
+     }
+    },
+    "eccentricDuration": {
+     "status": "not checked",
+     "interpreted": false,
+     "stddiff": {
+      "n": 8,
+      "mean": -0.5268453942584106,
+      "median": -0.8057790995797773,
+      "q25": -1.283132922665858,
+      "q75": 0.3517917955804739,
+      "min": -1.4592107480792864,
+      "max": 0.6989392864734916,
+      "share_above_zero": 0.375,
+      "mean_interval": [
+       -1.2536586882077911,
+       0.19996789969096995
+      ],
+      "mean_interval_label": "95% CI",
+      "median_interval": [
+       -1.4592107480792864,
+       0.6989392864734916
+      ],
+      "median_interval_label": "99.2% exact interval",
+      "median_interval_exact_level": 0.9921875
+     }
+    },
+    "concentricDuration": {
+     "status": "not checked",
+     "interpreted": false,
+     "stddiff": {
+      "n": 8,
+      "mean": -0.5040097082905547,
+      "median": -0.3342055161451087,
+      "q25": -1.298993365871013,
+      "q75": -0.03303146170025553,
+      "min": -1.4955741754704617,
+      "max": 0.8200797602366917,
+      "share_above_zero": 0.25,
+      "mean_interval": [
+       -1.2078882648268245,
+       0.19986884824571527
+      ],
+      "mean_interval_label": "95% CI",
+      "median_interval": [
+       -1.4955741754704617,
+       0.8200797602366917
+      ],
+      "median_interval_label": "99.2% exact interval",
+      "median_interval_exact_level": 0.9921875
+     }
+    },
+    "peakVelocity": {
+     "status": "not checked",
+     "interpreted": false,
+     "stddiff": {
+      "n": 8,
+      "mean": 1.3508903555961775,
+      "median": 1.4296008821002677,
+      "q25": 1.313705978649839,
+      "q75": 1.4938405020268128,
+      "min": 0.8496611920225401,
+      "max": 1.5568891817676083,
+      "share_above_zero": 1.0,
+      "mean_interval": [
+       1.1495530052345035,
+       1.5522277059578515
+      ],
+      "mean_interval_label": "95% CI",
+      "median_interval": [
+       0.8496611920225401,
+       1.5568891817676083
+      ],
+      "median_interval_label": "99.2% exact interval",
+      "median_interval_exact_level": 0.9921875
+     }
+    },
+    "asymmetry": {
+     "status": "failed",
+     "interpreted": false,
+     "stddiff": {
+      "n": 8,
+      "mean": -0.1329091134163169,
+      "median": -0.03691690850247922,
+      "q25": -0.8726034523376061,
+      "q75": 0.5572269522727658,
+      "min": -1.4463239841272317,
+      "max": 0.9649649737595825,
+      "share_above_zero": 0.5,
+      "mean_interval": [
+       -0.9030918741809761,
+       0.6372736473483422
+      ],
+      "mean_interval_label": "95% CI",
+      "median_interval": [
+       -1.4463239841272317,
+       0.9649649737595825
+      ],
+      "median_interval_label": "99.2% exact interval",
+      "median_interval_exact_level": 0.9921875
+     }
+    }
+   },
+   "note": "57% of the shipped squat score's weight (3.25 of 5.75) sits on measurements that failed the Phase 4A.5 agreement criteria (rep duration, left-right difference) or were not checked (far-side knee range of motion, eccentric and concentric duration, peak velocity). A separation result is not validation of every measurement."
+  },
+  "squat_side": {
+   "key": "ex6_squat/side",
+   "exercise": "squat",
+   "persons": 9,
+   "reps_correct": 130,
+   "reps_incorrect": 61,
+   "R-1": {
+    "personal_auc": {
+     "n": 9,
+     "mean": 0.9034299759789955,
+     "median": 0.9523809523809523,
+     "q25": 0.9222222222222223,
+     "q75": 1.0,
+     "min": 0.6274509803921569,
+     "max": 1.0,
+     "share_above_zero": 1.0,
+     "mean_interval": [
+      0.7940858993109267,
+      1.0127740526470643
+     ],
+     "mean_interval_label": "95% CI",
+     "median_interval": [
+      0.6923076923076923,
+      1.0
+     ],
+     "median_interval_label": "96.1% exact interval",
+     "median_interval_exact_level": 0.9609375
+    },
+    "population_auc": {
+     "n": 9,
+     "mean": 0.6455545979075391,
+     "median": 0.7843137254901961,
+     "q25": 0.4126984126984127,
+     "q75": 0.9523809523809523,
+     "min": 0.0,
+     "max": 1.0,
+     "share_above_zero": 0.8888888888888888,
+     "mean_interval": [
+      0.3454021608395821,
+      0.9457070349754961
+     ],
+     "mean_interval_label": "95% CI",
+     "median_interval": [
+      0.09,
+      0.98
+     ],
+     "median_interval_label": "96.1% exact interval",
+     "median_interval_exact_level": 0.9609375
+    },
+    "personal_minus_population": {
+     "n": 9,
+     "mean": 0.2578753780714565,
+     "median": 0.020000000000000018,
+     "q25": 0.0,
+     "q75": 0.5238095238095238,
+     "min": -0.1568627450980392,
+     "max": 1.0,
+     "share_above_zero": 0.5555555555555556
+    },
+    "personal_auc_v1_fold_averaged_superseded": {
+     "n": 9,
+     "mean": 0.8965109690599886,
+     "median": 0.9523809523809523,
+     "q25": 0.8222222222222222,
+     "q75": 1.0,
+     "min": 0.6274509803921569,
+     "max": 1.0,
+     "share_above_zero": 1.0
+    },
+    "per_person": {
+     "1": {
+      "n_correct": 21,
+      "n_incorrect": 6,
+      "personal_auc": 0.9365079365079365,
+      "population_auc": 0.4126984126984127
+     },
+     "2": {
+      "n_correct": 21,
+      "n_incorrect": 1,
+      "personal_auc": 0.9523809523809523,
+      "population_auc": 0.9523809523809523
+     },
+     "3": {
+      "n_correct": 10,
+      "n_incorrect": 10,
+      "personal_auc": 1.0,
+      "population_auc": 0.09
+     },
+     "4": {
+      "n_correct": 17,
+      "n_incorrect": 3,
+      "personal_auc": 0.6274509803921569,
+      "population_auc": 0.7843137254901961
+     },
+     "5": {
+      "n_correct": 10,
+      "n_incorrect": 10,
+      "personal_auc": 1.0,
+      "population_auc": 0.98
+     },
+     "6": {
+      "n_correct": 10,
+      "n_incorrect": 11,
+      "personal_auc": 1.0,
+      "population_auc": 1.0
+     },
+     "7": {
+      "n_correct": 10,
+      "n_incorrect": 10,
+      "personal_auc": 1.0,
+      "population_auc": 0.0
+     },
+     "8": {
+      "n_correct": 13,
+      "n_incorrect": 5,
+      "personal_auc": 0.6923076923076923,
+      "population_auc": 0.6461538461538462
+     },
+     "9": {
+      "n_correct": 18,
+      "n_incorrect": 5,
+      "personal_auc": 0.9222222222222223,
+      "population_auc": 0.9444444444444444
+     }
+    }
+   },
+   "R-2": {
+    "kneeRomL": {
+     "status": "passed",
+     "interpreted": true,
+     "stddiff": {
+      "n": 9,
+      "mean": 1.0070543726488477,
+      "median": 0.8608142488036061,
+      "q25": 0.5131996761295211,
+      "q75": 1.4173072383376406,
+      "min": -0.10614377237746965,
+      "max": 2.711927414415461,
+      "share_above_zero": 0.8888888888888888,
+      "mean_interval": [
+       0.36215407684799816,
+       1.6519546684496973
+      ],
+      "mean_interval_label": "95% CI",
+      "median_interval": [
+       0.152399856530496,
+       1.526410426945245
+      ],
+      "median_interval_label": "96.1% exact interval",
+      "median_interval_exact_level": 0.9609375
+     }
+    },
+    "kneeRomR": {
+     "status": "not checked",
+     "interpreted": false,
+     "stddiff": {
+      "n": 9,
+      "mean": 1.1007684222484848,
+      "median": 0.9676612774092972,
+      "q25": 0.5980325215160489,
+      "q75": 1.2618934057243414,
+      "min": 0.26537091217158626,
+      "max": 2.75743180593858,
+      "share_above_zero": 1.0,
+      "mean_interval": [
+       0.539421498832304,
+       1.6621153456646658
+      ],
+      "mean_interval_label": "95% CI",
+      "median_interval": [
+       0.5300237403304309,
+       1.5243697996147898
+      ],
+      "median_interval_label": "96.1% exact interval",
+      "median_interval_exact_level": 0.9609375
+     }
+    },
+    "hipRom": {
+     "status": "passed",
+     "interpreted": true,
+     "stddiff": {
+      "n": 9,
+      "mean": 1.0184630715001892,
+      "median": 1.2040339479489983,
+      "q25": 0.6587119016143442,
+      "q75": 1.3126854466274682,
+      "min": -0.1545322695095588,
+      "max": 1.703722025536308,
+      "share_above_zero": 0.8888888888888888,
+      "mean_interval": [
+       0.5912767912957915,
+       1.445649351704587
+      ],
+      "mean_interval_label": "95% CI",
+      "median_interval": [
+       0.6514327049520963,
+       1.4220251683186877
+      ],
+      "median_interval_label": "96.1% exact interval",
+      "median_interval_exact_level": 0.9609375
+     }
+    },
+    "depth": {
+     "status": "passed",
+     "interpreted": true,
+     "stddiff": {
+      "n": 9,
+      "mean": 1.090041072484384,
+      "median": 1.0884803278437687,
+      "q25": 0.7412414163201291,
+      "q75": 1.4744465734901286,
+      "min": -0.19963855371097558,
+      "max": 2.2895990374913957,
+      "share_above_zero": 0.8888888888888888,
+      "mean_interval": [
+       0.5465874484112335,
+       1.6334946965575345
+      ],
+      "mean_interval_label": "95% CI",
+      "median_interval": [
+       0.5628291249719252,
+       1.6803500987296414
+      ],
+      "median_interval_label": "96.1% exact interval",
+      "median_interval_exact_level": 0.9609375
+     }
+    },
+    "trunkLean": {
+     "status": "passed",
+     "interpreted": true,
+     "stddiff": {
+      "n": 9,
+      "mean": 0.8520955515067021,
+      "median": 1.2025095634004173,
+      "q25": 0.2990704081162845,
+      "q75": 1.5630975096433088,
+      "min": -1.1276044375381875,
+      "max": 1.6718732269312837,
+      "share_above_zero": 0.8888888888888888,
+      "mean_interval": [
+       0.1301236720860156,
+       1.5740674309273888
+      ],
+      "mean_interval_label": "95% CI",
+      "median_interval": [
+       0.15288144463480727,
+       1.639410968057323
+      ],
+      "median_interval_label": "96.1% exact interval",
+      "median_interval_exact_level": 0.9609375
+     }
+    },
+    "repDuration": {
+     "status": "failed",
+     "interpreted": false,
+     "stddiff": {
+      "n": 9,
+      "mean": -0.6272617569553594,
+      "median": -0.9835813316777567,
+      "q25": -1.4450239371809355,
+      "q75": 0.09834659080114082,
+      "min": -1.5077987021164532,
+      "max": 0.8858061945089768,
+      "share_above_zero": 0.3333333333333333,
+      "mean_interval": [
+       -1.3089301066546635,
+       0.05440659274394466
+      ],
+      "mean_interval_label": "95% CI",
+      "median_interval": [
+       -1.4537531484562298,
+       0.4164171204696337
+      ],
+      "median_interval_label": "96.1% exact interval",
+      "median_interval_exact_level": 0.9609375
+     }
+    },
+    "eccentricDuration": {
+     "status": "not checked",
+     "interpreted": false,
+     "stddiff": {
+      "n": 9,
+      "mean": -0.5785407188543572,
+      "median": -0.8306007300580293,
+      "q25": -1.281721386392213,
+      "q75": 0.33496750075527204,
+      "min": -1.4731949486286489,
+      "max": 0.7064538884707613,
+      "share_above_zero": 0.3333333333333333,
+      "mean_interval": [
+       -1.2176534764364995,
+       0.06057203872778516
+      ],
+      "mean_interval_label": "95% CI",
+      "median_interval": [
+       -1.2913306076907778,
+       0.3873213254969429
+      ],
+      "median_interval_label": "96.1% exact interval",
+      "median_interval_exact_level": 0.9609375
+     }
+    },
+    "concentricDuration": {
+     "status": "not checked",
+     "interpreted": false,
+     "stddiff": {
+      "n": 9,
+      "mean": -0.4638632031061194,
+      "median": -0.2629217208250303,
+      "q25": -1.2020883290096822,
+      "q75": -0.10364771046452674,
+      "min": -1.4806381826327184,
+      "max": 0.8176810174827617,
+      "share_above_zero": 0.2222222222222222,
+      "mean_interval": [
+       -1.0651255735252958,
+       0.1373991673130569
+      ],
+      "mean_interval_label": "95% CI",
+      "median_interval": [
+       -1.4727736453179496,
+       0.15690380579466517
+      ],
+      "median_interval_label": "96.1% exact interval",
+      "median_interval_exact_level": 0.9609375
+     }
+    },
+    "peakVelocity": {
+     "status": "not checked",
+     "interpreted": false,
+     "stddiff": {
+      "n": 9,
+      "mean": 1.2725943421878194,
+      "median": 1.3499806323102204,
+      "q25": 1.0852675952373285,
+      "q75": 1.4570054670806325,
+      "min": 0.7418211976724143,
+      "max": 1.5301371521957174,
+      "share_above_zero": 1.0,
+      "mean_interval": [
+       1.0732452454891768,
+       1.471943438886462
+      ],
+      "mean_interval_label": "95% CI",
+      "median_interval": [
+       1.076842440797206,
+       1.5188474457209005
+      ],
+      "median_interval_label": "96.1% exact interval",
+      "median_interval_exact_level": 0.9609375
+     }
+    },
+    "asymmetry": {
+     "status": "failed",
+     "interpreted": false,
+     "stddiff": {
+      "n": 9,
+      "mean": 0.13937640359514405,
+      "median": 0.01833689869764399,
+      "q25": -0.3273179762240952,
+      "q75": 0.5477632863516064,
+      "min": -0.4389466860582675,
+      "max": 1.1698204800521468,
+      "share_above_zero": 0.6666666666666666,
+      "mean_interval": [
+       -0.2697220861310833,
+       0.5484748933213713
+      ],
+      "mean_interval_label": "95% CI",
+      "median_interval": [
+       -0.34865473781581513,
+       0.591313359838691
+      ],
+      "median_interval_label": "96.1% exact interval",
+      "median_interval_exact_level": 0.9609375
+     }
+    }
+   },
+   "note": "57% of the shipped squat score's weight (3.25 of 5.75) sits on measurements that failed the Phase 4A.5 agreement criteria (rep duration, left-right difference) or were not checked (far-side knee range of motion, eccentric and concentric duration, peak velocity). A separation result is not validation of every measurement."
+  },
+  "split_squat_side": {
+   "key": "ex5_lunge/side",
+   "exercise": "lunge",
+   "persons": 5,
+   "reps_correct": 53,
+   "reps_incorrect": 53,
+   "R-1": {
+    "personal_auc": {
+     "n": 5,
+     "mean": 0.9137016317016318,
+     "median": 0.9294871794871795,
+     "q25": 0.83,
+     "q75": 0.9790209790209791,
+     "min": 0.83,
+     "max": 1.0,
+     "share_above_zero": 1.0,
+     "mean_interval": [
+      0.8136433586930583,
+      1.0137599047102053
+     ],
+     "mean_interval_label": "95% CI",
+     "median_interval": [
+      0.83,
+      1.0
+     ],
+     "median_interval_label": "93.8% exact interval",
+     "median_interval_exact_level": 0.9375
+    },
+    "population_auc": {
+     "n": 5,
+     "mean": 0.5468058608058608,
+     "median": 0.59,
+     "q25": 0.3142857142857143,
+     "q75": 0.74,
+     "min": 0.24358974358974358,
+     "max": 0.8461538461538461,
+     "share_above_zero": 1.0,
+     "mean_interval": [
+      0.22135452456406707,
+      0.8722571970476545
+     ],
+     "mean_interval_label": "95% CI",
+     "median_interval": [
+      0.24358974358974358,
+      0.8461538461538461
+     ],
+     "median_interval_label": "93.8% exact interval",
+     "median_interval_exact_level": 0.9375
+    },
+    "personal_minus_population": {
+     "n": 5,
+     "mean": 0.36689577089577086,
+     "median": 0.24,
+     "q25": 0.13286713286713292,
+     "q75": 0.6857142857142857,
+     "min": 0.08999999999999997,
+     "max": 0.6858974358974359,
+     "share_above_zero": 1.0
+    },
+    "personal_auc_v1_fold_averaged_superseded": {
+     "n": 5,
+     "mean": 0.8992913752913754,
+     "median": 0.8974358974358975,
+     "q25": 0.82,
+     "q75": 0.9790209790209791,
+     "min": 0.8,
+     "max": 1.0,
+     "share_above_zero": 1.0
+    },
+    "per_person": {
+     "2": {
+      "n_correct": 10,
+      "n_incorrect": 10,
+      "personal_auc": 0.83,
+      "population_auc": 0.59
+     },
+     "4": {
+      "n_correct": 7,
+      "n_incorrect": 10,
+      "personal_auc": 1.0,
+      "population_auc": 0.3142857142857143
+     },
+     "5": {
+      "n_correct": 13,
+      "n_incorrect": 11,
+      "personal_auc": 0.9790209790209791,
+      "population_auc": 0.8461538461538461
+     },
+     "6": {
+      "n_correct": 10,
+      "n_incorrect": 10,
+      "personal_auc": 0.83,
+      "population_auc": 0.74
+     },
+     "8": {
+      "n_correct": 13,
+      "n_incorrect": 12,
+      "personal_auc": 0.9294871794871795,
+      "population_auc": 0.24358974358974358
+     }
+    }
+   },
+   "R-2": {
+    "kneeRomL": {
+     "status": "failed or not checked",
+     "interpreted": false,
+     "stddiff": {
+      "n": 5,
+      "mean": 0.6262575378798994,
+      "median": 0.9562071846529654,
+      "q25": 0.6397164501011199,
+      "q75": 1.1326648893714053,
+      "min": -0.7965528413700816,
+      "max": 1.1992520066440875,
+      "share_above_zero": 0.8,
+      "mean_interval": [
+       -0.3973075509215882,
+       1.649822626681387
+      ],
+      "mean_interval_label": "95% CI",
+      "median_interval": [
+       -0.7965528413700816,
+       1.1992520066440875
+      ],
+      "median_interval_label": "93.8% exact interval",
+      "median_interval_exact_level": 0.9375
+     }
+    },
+    "kneeRomR": {
+     "status": "failed or not checked",
+     "interpreted": false,
+     "stddiff": {
+      "n": 5,
+      "mean": 0.7816517188930373,
+      "median": 1.1594823130107978,
+      "q25": -0.008448264540996927,
+      "q75": 1.4590877663814852,
+      "min": -0.16469931416388697,
+      "max": 1.4628360937777876,
+      "share_above_zero": 0.6,
+      "mean_interval": [
+       -0.21661948942665432,
+       1.7799229272127288
+      ],
+      "mean_interval_label": "95% CI",
+      "median_interval": [
+       -0.16469931416388697,
+       1.4628360937777876
+      ],
+      "median_interval_label": "93.8% exact interval",
+      "median_interval_exact_level": 0.9375
+     }
+    },
+    "hipRom": {
+     "status": "failed or not checked",
+     "interpreted": false,
+     "stddiff": {
+      "n": 5,
+      "mean": -0.9410949455544715,
+      "median": -1.0309739066650871,
+      "q25": -1.116819030754505,
+      "q75": -0.4650594684118124,
+      "min": -1.7102243133201744,
+      "max": -0.3823980086207787,
+      "share_above_zero": 0.0,
+      "mean_interval": [
+       -1.6124176724725117,
+       -0.2697722186364312
+      ],
+      "mean_interval_label": "95% CI",
+      "median_interval": [
+       -1.7102243133201744,
+       -0.3823980086207787
+      ],
+      "median_interval_label": "93.8% exact interval",
+      "median_interval_exact_level": 0.9375
+     }
+    },
+    "depth": {
+     "status": "failed or not checked",
+     "interpreted": false,
+     "stddiff": {
+      "n": 5,
+      "mean": 1.009486219469282,
+      "median": 1.161163625090416,
+      "q25": 0.5537070367178885,
+      "q75": 1.1684353655015716,
+      "min": 0.3324863322927972,
+      "max": 1.8316387377437362,
+      "share_above_zero": 1.0,
+      "mean_interval": [
+       0.2774652284772329,
+       1.741507210461331
+      ],
+      "mean_interval_label": "95% CI",
+      "median_interval": [
+       0.3324863322927972,
+       1.8316387377437362
+      ],
+      "median_interval_label": "93.8% exact interval",
+      "median_interval_exact_level": 0.9375
+     }
+    },
+    "stepLength": {
+     "status": "failed or not checked",
+     "interpreted": false,
+     "stddiff": {
+      "n": 5,
+      "mean": -0.9874855428204642,
+      "median": -1.2046542422780422,
+      "q25": -1.5173937498250991,
+      "q75": -0.5363240455442029,
+      "min": -1.5629257943317696,
+      "max": -0.11612988212320761,
+      "share_above_zero": 0.0,
+      "mean_interval": [
+       -1.7781398507598143,
+       -0.1968312348811141
+      ],
+      "mean_interval_label": "95% CI",
+      "median_interval": [
+       -1.5629257943317696,
+       -0.11612988212320761
+      ],
+      "median_interval_label": "93.8% exact interval",
+      "median_interval_exact_level": 0.9375
+     }
+    },
+    "trunkLean": {
+     "status": "passed",
+     "interpreted": false,
+     "stddiff": {
+      "n": 5,
+      "mean": 0.29076224879884005,
+      "median": 0.7145040106363632,
+      "q25": 0.03451194415378327,
+      "q75": 0.8311048405771393,
+      "min": -1.3318353015363165,
+      "max": 1.205525750163231,
+      "share_above_zero": 0.8,
+      "mean_interval": [
+       -0.9519577220197927,
+       1.5334822196174729
+      ],
+      "mean_interval_label": "95% CI",
+      "median_interval": [
+       -1.3318353015363165,
+       1.205525750163231
+      ],
+      "median_interval_label": "approximate interval (calibrated coverage 93%)",
+      "median_interval_exact_level": 0.9375
+     }
+    },
+    "repDuration": {
+     "status": "failed or not checked",
+     "interpreted": false,
+     "stddiff": {
+      "n": 5,
+      "mean": -0.07250078793569706,
+      "median": -0.15924334843781887,
+      "q25": -0.7854720503152485,
+      "q75": 0.6476581162421856,
+      "min": -1.5152389589068689,
+      "max": 1.4497923017392653,
+      "share_above_zero": 0.4,
+      "mean_interval": [
+       -1.519632188315335,
+       1.3746306124439407
+      ],
+      "mean_interval_label": "95% CI",
+      "median_interval": [
+       -1.5152389589068689,
+       1.4497923017392653
+      ],
+      "median_interval_label": "approximate interval (calibrated coverage 93%)",
+      "median_interval_exact_level": 0.9375
+     }
+    },
+    "eccentricDuration": {
+     "status": "failed or not checked",
+     "interpreted": false,
+     "stddiff": {
+      "n": 5,
+      "mean": -0.023656067170136463,
+      "median": -0.5686259346648547,
+      "q25": -0.8109428248980687,
+      "q75": 1.156929847113317,
+      "min": -1.3783779768561544,
+      "max": 1.4827365534550785,
+      "share_above_zero": 0.4,
+      "mean_interval": [
+       -1.5961005845443932,
+       1.5487884502041203
+      ],
+      "mean_interval_label": "95% CI",
+      "median_interval": [
+       -1.3783779768561544,
+       1.4827365534550785
+      ],
+      "median_interval_label": "approximate interval (calibrated coverage 93%)",
+      "median_interval_exact_level": 0.9375
+     }
+    },
+    "concentricDuration": {
+     "status": "failed or not checked",
+     "interpreted": false,
+     "stddiff": {
+      "n": 5,
+      "mean": -0.04437816223432698,
+      "median": 0.23533265483181826,
+      "q25": -0.8646477460345589,
+      "q75": 0.24201263907004128,
+      "min": -0.8894388686853469,
+      "max": 1.0548505096464114,
+      "share_above_zero": 0.6,
+      "mean_interval": [
+       -1.0749464326265912,
+       0.9861901081579373
+      ],
+      "mean_interval_label": "95% CI",
+      "median_interval": [
+       -0.8894388686853469,
+       1.0548505096464114
+      ],
+      "median_interval_label": "93.8% exact interval",
+      "median_interval_exact_level": 0.9375
+     }
+    },
+    "recoveryVelocity": {
+     "status": "failed or not checked",
+     "interpreted": false,
+     "stddiff": {
+      "n": 5,
+      "mean": 1.0783836103985422,
+      "median": 1.3080324998810828,
+      "q25": 0.6342595469322106,
+      "q75": 1.4574502618967962,
+      "min": 0.5060798047120804,
+      "max": 1.4860959385705415,
+      "share_above_zero": 1.0,
+      "mean_interval": [
+       0.4935357096627859,
+       1.6632315111342986
+      ],
+      "mean_interval_label": "95% CI",
+      "median_interval": [
+       0.5060798047120804,
+       1.4860959385705415
+      ],
+      "median_interval_label": "93.8% exact interval",
+      "median_interval_exact_level": 0.9375
+     }
+    },
+    "asymmetry": {
+     "status": "failed or not checked",
+     "interpreted": false,
+     "stddiff": {
+      "n": 5,
+      "mean": -0.11573225722166905,
+      "median": -0.10728496579615054,
+      "q25": -0.2303218321837339,
+      "q75": -0.01161375111837442,
+      "min": -1.1073903341827926,
+      "max": 0.8779495971727063,
+      "share_above_zero": 0.2,
+      "mean_interval": [
+       -0.9925862299148643,
+       0.7611217154715263
+      ],
+      "mean_interval_label": "95% CI",
+      "median_interval": [
+       -1.1073903341827926,
+       0.8779495971727063
+      ],
+      "median_interval_label": "approximate interval (calibrated coverage 93%)",
+      "median_interval_exact_level": 0.9375
+     }
+    }
+   },
+   "note": "Split squats: descriptive only. The app finds far fewer correct split squats than incorrect ones (recall 0.72 vs 0.93), and only peak trunk lean passed the Phase 4A.5 criteria."
+  }
+ }
+}
