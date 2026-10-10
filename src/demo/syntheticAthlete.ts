@@ -72,6 +72,11 @@ export class SyntheticAthlete {
     this.noise = noise;
   }
 
+  /** Drop queued reps (the rep in progress still finishes). */
+  clearQueue() {
+    this.queue.length = 0;
+  }
+
   enqueue(...specs: RepSpec[]) {
     this.queue.push(...specs);
   }

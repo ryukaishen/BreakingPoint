@@ -13,6 +13,12 @@ export type DemoStage = 'ready' | 'calibration' | 'baselinePause' | 'monitoring'
 
 export class DemoController {
   stage: DemoStage = 'ready';
+  /**
+   * When set, the synthetic athlete stops this many reps after the breaking point,
+   * as a real athlete should. Null keeps the full scripted set (used by the
+   * regression tests that lock the demo story).
+   */
+  stopAfterWarning: number | null = null;
   readonly athlete: SyntheticAthlete;
   readonly pipeline: PosePipeline;
   private plan: DemoPlan;
@@ -98,6 +104,10 @@ export class DemoController {
         if (!this.enqueued && t - this.stageT > 0.8) {
           this.athlete.enqueue(...this.plan.monitoring);
           this.enqueued = true;
+        }
+        // Dropping the queue lets the rep already under way finish, so at most `stopAfterWarning` reps follow the warning.
+        if (this.stopAfterWarning !== null && snap.alarmRep !== null && snap.monitorReps.length >= snap.alarmRep + Math.max(0, this.stopAfterWarning - 1)) {
+          this.athlete.clearQueue();
         }
         if (this.enqueued && idleFor() > 0.6) {
           this.engine.endSet();

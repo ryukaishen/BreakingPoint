@@ -26,6 +26,8 @@ export class DemoRunner implements Runner {
 
   constructor(engine: SessionEngine, exercise: ExerciseType) {
     this.demo = new DemoController(engine, exercise, this.aspect);
+    // In the app the synthetic athlete follows the product's instruction and stops after the warning.
+    this.demo.stopAfterWarning = 1;
   }
 
   get pipeline(): PosePipeline {

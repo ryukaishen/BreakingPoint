@@ -17,6 +17,8 @@ interface Props {
   flash: boolean;
   demoSpeed: number;
   demoPaused: boolean;
+  /** Show detector overlays (joint angles, depth gauge, rep phase) for coaches. Optional until the athlete view is wired in. */
+  evidence?: boolean;
   onDemoSpeed: (s: number) => void;
   onDemoPause: () => void;
   onDemoSkip: () => void;
@@ -156,7 +158,7 @@ export function CameraStage(p: Props) {
                 }}
               />
             )}
-            <div className="fill" style={{ height: `${(depthNow / gaugeMax) * 100}%` }} />
+            <div className="fill" style={{ transform: `scaleY(${depthNow / gaugeMax})` }} />
           </div>
           {baseDepth && <div className="lbl" style={{ color: C.stable }}>Your<br />range</div>}
         </div>
