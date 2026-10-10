@@ -15,4 +15,4 @@ python -m pip install -r hpc/requirements.txt
 mkdir -p hpc/logs results
 python -c "import numpy, matplotlib; print('numpy', numpy.__version__, '| matplotlib', matplotlib.__version__)"
 echo "Environment ready at ${VENV_DIR}"
-echo "Smoke test:  python hpc/run_experiment.py --sessions 500 --seed 1 --grid quick --out results_smoke --no-install"
+echo "Smoke test:  python hpc/run_experiment.py --sessions 500 --seed 1 --grid quick --run-name smoke"

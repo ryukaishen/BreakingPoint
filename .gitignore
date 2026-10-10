@@ -15,6 +15,11 @@ venv/
 .pytest_cache/
 
 # Lab outputs: shards and logs are regenerated; keep the curated results
+# New Lab runs write to results/runs/<run-name>/ (see hpc/output_guard.py); copy a run out
+# deliberately if it should become part of the record.
+results/runs/*
+!results/runs/README.md
+
 results/shards/
 results/logs/
 results/robustness_cache/
