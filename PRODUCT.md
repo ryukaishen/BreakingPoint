@@ -18,7 +18,7 @@ The UF Designathon 2026 is over. BreakingPoint is now being developed into a pol
 
 ## Product Purpose
 
-BreakingPoint learns how an athlete moves when fresh (a personal baseline from a few calibration reps), scores every rep against that baseline with a Movement Drift Score, and uses sequential change detection (EWMA/CUSUM) to flag the rep where fatigue causes persistent movement drift: the breaking point. It then explains what changed and offers a 3-rep recovery check. Success means athletes become stronger, more consistent versions of themselves by raising their sustainable performance over time.
+BreakingPoint learns how an athlete moves when fresh (a personal baseline from a few calibration reps), scores every rep against that baseline with a Form Change Score, and uses sequential change detection (EWMA/CUSUM) to flag the rep where the athlete's form has changed and keeps changing: the breaking point. It does not measure fatigue. It then explains what changed and offers a 3-rep recovery check. Success means athletes become stronger, more consistent versions of themselves by raising their sustainable performance over time.
 
 ## Positioning
 

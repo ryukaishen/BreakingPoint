@@ -1,5 +1,7 @@
 # BreakingPoint design system: "System window"
 
+> **Superseded.** This describes the earlier "System window" design. The current design is Breakaway: the approved concepts are in [`design-concepts.html`](design-concepts.html) (Direction B, held to Direction A's restraint), and the tokens live in `src/styles.css` and `src/ui/theme.ts`. This file will be rewritten once the remaining screens are built.
+
 BreakingPoint is a quiet instrument that watches how you move and speaks up when that movement changes. The interface borrows the *structure* of a game's system interface (crisp windows, status readouts, a visible run of stages, milestones that unlock) and none of its costume. There's no character art, no fantasy vocabulary and no decorative glow.
 
 **One rule decides most choices:** the athlete's movement state is the loudest thing on screen. The interface itself stays in blue-black and steel, and the only saturated colors are the state of your movement (mint, amber, crimson), the system's own voice (electric blue) and progression milestones (violet).

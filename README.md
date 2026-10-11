@@ -1,364 +1,222 @@
-<div align="center">
-
-<img src="public/favicon.svg" width="72" alt="BreakingPoint logo" />
-
 # BreakingPoint
 
-### Detect the rep where fatigue starts changing how you move and POINTS where you BREAK!
+BreakingPoint is a browser app that learns how an athlete moves when fresh and flags when their form keeps changing during a set. You do 5 to 8 controlled reps, and every rep after that is scored against them. Pose tracking runs on the device, so no video is uploaded.
 
-**Your movement. Your baseline.** Personalized movement monitoring for athletes.
+I designed BreakingPoint and directed its implementation and evaluation. That included the movement pipeline, the athlete-specific scoring and change detection, a simulation study to choose the detector settings, and an evaluation on recorded human movement. I also decided which conclusions the results can support.
 
-**BreakingPoint uses ordinary camera video to learn an athlete's personal movement baseline and applies
-sequential change-point detection to identify the moment fatigue begins causing persistent biomechanical drift —
-across sports, through reusable movement protocols.**
+- Stack: React and TypeScript, MediaPipe Pose Landmarker running in the browser (WebAssembly and WebGL), a Python simulation lab with numpy, and Slurm jobs on UF HiPerGator.
+- Methods: rep segmentation and per-rep features from pose landmarks, a baseline calibrated to each athlete, a standardized multivariate form-change score, an EWMA that decides when to alert, and a CUSUM that estimates when the change began.
+- Experiments: a 100,000-session simulation on UF HiPerGator to choose the detector settings, and an exploratory evaluation on two public motion-capture datasets with protocols frozen before the outcomes were looked at.
+- Results: on held-out simulated sessions, 2.2% false alerts and 89.6% of changes detected. On motion capture, personal baselines separated deliberate squat technique errors (mean AUC 0.92) much better than population norms (0.63). Changes after a jump fatigue protocol were small, and none of the six prespecified tests was significant.
+- Not validated yet: real webcam footage processed through MediaPipe. BreakingPoint does not measure fatigue, predict injury or give medical advice.
+- Try it: https://breaking-point-zeta.vercel.app. The demos run without a camera.
 
-`computer vision` · `biomechanics` · `sequential anomaly detection` · `personalized baselines` · `sport → protocol → primitive` · `HPC-validated detector`
+<img src="docs/screenshots/release/athlete-view-alert.png" alt="Squat demo at the alert: the athlete view says Stop, the alert triggered at rep 10" width="900" />
 
-<!-- Demo GIF placeholder: record the demo with `?demo=soccer&speed=2` and save as docs/demo.gif -->
-<img src="docs/screenshots/soccer_breakingpoint.png" alt="BreakingPoint soccer explosive-fatigue screen at the detected breaking point" width="900" />
+## How a session works
 
-> *BreakingPoint doesn't ask whether you move like the ideal athlete. It asks whether you still move like yourself.*
+The app has four stages, and these are the names it uses:
 
-</div>
+1. Calibrate. 5 to 8 controlled reps at your normal tempo become your usual form.
+2. Monitor. Each later rep gets a Form Change Score for how different it is from your usual form. The score has no direction, so a deeper squat and a shallower one both raise it.
+3. Detect. When the smoothed score crosses the alert line, the athlete view says Stop and lists the measurements that changed most.
+4. Recover. After a rest, three more reps show how much of the change has gone.
 
----
+The squat and the countermovement jump are ready. The forward lunge is in beta: it works end to end on synthetic data, but its segmentation hasn't been checked on real footage. Sports are configuration on top of these movements. Soccer, basketball and volleyball use the jump, and pickleball, tennis and fencing use the lunge. A sport only changes which measurements are featured and how they're labelled; the detector and its weights stay the same.
 
-## The problem
+The session screen has two parts. The athlete view is sized to be read from about 3 m. It shows the state, one instruction, the rep count, and a record line for reps held at your usual form. The detector evidence below it (chart, score, trend, ranked changes, baseline table) is for coaches; it opens by default in demos and stays closed in live sessions. Live sessions can run hands-free, with a countdown before calibration and before the set, and spoken cues are optional.
 
-Fatigue doesn't make an athlete forget how to squat. Their mechanics **drift**: a little less depth,
-a little more trunk lean, a slower drive, a growing left/right difference. Each rep still "counts", so
-the change is easy to miss until form has already broken down.
-
-Most form apps compare you against universal rules ("knee angle should be X"). But athletes move
-differently from one another, and an athlete can be perfectly consistent with *their own* technique
-while differing from any "ideal". Lab tools (motion capture, force plates) can see within-athlete
-change, but they are expensive and inaccessible.
-
-## The idea
-
-> We don't ask *"Does this look like the perfect squat?"*
-> We ask **"Does this still look like YOUR squat?"**
-
-BreakingPoint treats an athlete's movement like a monitored system in quantitative finance:
-
-1. **Learn the regime** — a personalized baseline from 5–8 fresh reps.
-2. **Score every rep** — a transparent Movement Drift Score (RMS of standardized deviations from *your* baseline).
-3. **Detect the regime change** — EWMA / CUSUM sequential detection ignores a single bad rep and fires when drift **persists**.
-4. **Explain it** — the features that moved most, in σ units: *trunk lean +2.4σ ↑, velocity −2.1σ ↓ …*
-5. **Close the loop** — after rest, a 3-rep recovery check reports how far movement has returned toward baseline.
-
-It runs entirely in the browser on any laptop or phone camera. **Video never leaves the device.**
-
-## A movement-monitoring platform, not a squat app
-
-Athletes choose a **sport**, BreakingPoint recommends a repeatable **movement protocol**, and the protocol runs on a
-reusable **movement primitive**. A new sport does not mean a new model: sports only choose which movement is monitored,
-which metrics are featured, and what the UI calls things. The personal baseline, drift score and sequential detector
-are shared, with the same validated parameters for every protocol.
+## Implementation
 
 ```
-             BREAKINGPOINT
-                   |
-            SPORT PROFILE            soccer · basketball · volleyball · pickleball · tennis · badminton · strength · fencing …
-                   |
-          MOVEMENT PROTOCOL          Explosive Fatigue Screen · Jump Consistency · Forward Lunge Endurance · Bodyweight Squat …
-                   |
-             POSE SIGNAL             on-device MediaPipe landmarks (+ One Euro smoothing)
-                   |
-            FEATURE VECTOR           primitive-specific segmentation + features   ← the only primitive-specific step
-                   |
-          PERSONAL BASELINE          median · robust scale · leave-one-out in-control reference
-                   |
-           DRIFT DETECTION           Movement Drift Score → EWMA / CUSUM / persistence
-                   |
-             BREAKINGPOINT           + descriptive movement pattern (e.g. EXPLOSIVE FATIGUE, RECOVERY SLOWING)
-                   ^
-                   |
-     HiPerGator-calibrated detector parameters
-   (BreakingPoint Lab · 100,000 simulated sessions · Slurm array)
+camera -> MediaPipe Pose (WASM/WebGL, on device) -> One Euro smoothing -> rep segmentation
+       -> per-rep measurements -> personal baseline -> Form Change Score -> EWMA alert + CUSUM onset
 ```
 
-| movement primitive | status | sports using it today |
-|---|---|---|
-| `JUMP_AND_LAND` (countermovement jump) | **implemented** | Soccer · Basketball · Volleyball · Gymnastics · Field sports |
-| `SQUAT` | **implemented** (reference) | Strength |
-| `FORWARD_LUNGE` | **beta** | Pickleball · Tennis · Badminton · Fencing · Strength (lunge) |
-| `LATERAL_MOVEMENT`, `SINGLE_LEG_HOP`, `GAIT_CYCLE`, `HIP_HINGE`, `STRIKE_STEP`, `KICK` | roadmap | change-of-direction, single-leg hop/landing, running gait, deadlift, kendo fumikomi, kickboxing |
+### Pose tracking
 
-What is **implemented**: Bodyweight Squat and Repeated Countermovement Jump (READY), Forward Lunge (BETA: works end to end
-on deterministic data and in tests; real-camera reliability is still being validated). Everything else in the protocol
-library is **roadmap** and cannot be launched; the UI and tests enforce that. **Create your own protocol** (teach
-BreakingPoint any repeatable movement) is a roadmap card, not a feature.
+MediaPipe's Pose Landmarker (full model) runs in video mode with the GPU delegate and falls back to the CPU. It returns 33 landmarks per frame. Each landmark coordinate goes through a One Euro filter (minimum cutoff 1.2 Hz, beta 0.05), which removes jitter when a joint is still without adding much lag during fast movement. The filter resets after a tracking gap longer than 0.5 s.
 
-Movement-pattern labels (`EXPLOSIVE FATIGUE`, `RECOVERY SLOWING`, `RANGE-OF-MOTION DRIFT`, `ASYMMETRY EMERGING`,
-`LANDING CONSISTENCY DRIFT`, `TECHNIQUE DRIFT`, `MOVEMENT VARIABILITY INCREASING`) come from the dominant feature
-deviations. Sports may rename them (basketball says *jump consistency drift*), but they never change which pattern
-the data shows. They describe movement change, not injury.
+From the smoothed landmarks the app computes knee flexion, hip flexion, trunk lean from vertical, hip height and leg length, per side and only when the landmarks involved have visibility of at least 0.5. These are 2D angles in the image plane, not lab-grade joint angles. Since every comparison is with the same athlete from the same camera setup, a systematic projection bias mostly cancels.
 
-## Two components
+### Rep segmentation
 
-| **BreakingPoint Edge** — the product | **BreakingPoint Lab** — the validation |
+The squat segmenter works on hip drop divided by the athlete's own leg length, `d(t) = (hipY - standingHipY) / legLength`, so it doesn't depend on camera distance. A rep starts when `d` stays above 0.10 for two frames. Its start and end are the crossings of 0.06, and it counts only if the depth reaches 0.15 and the rep lasts between 0.6 s and 8 s. Losing tracking for more than 0.7 s aborts the rep.
+
+The countermovement jump uses a separate state machine (standing, dip, propulsion, flight, landing). Take-off and touchdown come from the ankle rising above its standing height (0.035 and 0.015 leg lengths), with flight times outside 0.12 to 1.0 s rejected. The lunge reuses the squat's hip-drop machine with its own thresholds.
+
+### Per-rep measurements
+
+- Squat: left and right knee range of motion, hip range of motion, depth, peak trunk lean, rep, eccentric and concentric duration, peak knee-extension velocity, and the left-right knee difference.
+- Countermovement jump: jump height (hip rise over leg length), RSI-mod (jump height over time to take-off), flight time, countermovement depth, dip and propulsion durations, peak trunk lean, landing knee flexion, and the left-right landing difference.
+
+Each measurement carries a quality value from the visibility of the landmarks it depends on, and it needs at least 60% usable frames within the rep.
+
+### Athlete calibration
+
+The baseline comes from the calibration reps. For each measurement it stores a centre and a robust scale:
+
+```
+centre_i = median(x_i)        scale_i = max(SD_i, 1.4826 * MAD_i, absFloor_i, relFloor_i * |median_i|)
+```
+
+The median keeps one odd calibration rep from moving the baseline. With only 5 to 8 reps, both SD and MAD are noisy, so taking the larger one is the conservative choice. The floors are set near the smallest change a single camera can resolve (for example 2.5 degrees for knee range of motion and 2% of leg length for depth). Without them, a very consistent athlete would get tiny scales and be flagged for camera noise.
+
+### Form Change Score
+
+Each rep is scored as a weighted root mean square of its clipped z-scores (`driftScore` in the code):
+
+```
+z_i   = clip((x_i - centre_i) / scale_i, -6, 6)
+score = sqrt( sum(w_i * z_i^2) / sum(w_i) )        w_i = group weight * quality
+```
+
+This is a standardized Euclidean (diagonal Mahalanobis) distance. A full Mahalanobis distance isn't usable here because with 5 to 8 calibration reps and about 10 measurements the covariance matrix is singular. Group weights stop correlated measurements from counting several times: both knees, hip range of motion and depth share one depth group at 0.5 each, the tempo measurements get 0.5 each, trunk lean has 1.0, and the left-right difference 0.75. Measurements that are missing or below 0.5 quality are dropped and the weights renormalized. If less than half of the weight is usable, the rep isn't scored and the detector keeps its previous state.
+
+A leave-one-out pass over the calibration reps measures how far this athlete's own fresh reps fall from a baseline built without them. That gives an in-control level and spread (mu0, sigma0). Every later score is standardized as `s_t = (score_t - mu0) / sigma0` and clipped at 2.5 before it reaches the detectors.
+
+### EWMA and CUSUM
+
+The two detectors have different jobs.
+
+The EWMA decides when to alert: `Z_t = 0.4 * s_t + 0.6 * Z_(t-1)`, with a warning at 1.0 and an alert at 2.0, in units of the athlete's own spread. There is no extra run-length rule, and the alert latches for the rest of the set. From a resting trend, one extreme rep can move Z by at most 0.4 x 2.5 = 1.0, half the alert level. If Z is already above about 1.67, though, a single rep can push it over. In the simulation, isolated bad reps caused false alerts in 3.9% of sessions.
+
+The CUSUM, `C_t = max(0, C_(t-1) + s_t - k)`, estimates when the change began. The onset estimate is the first rep of the CUSUM's current run above zero, so the app reports both when it became confident and roughly where the change started. CUSUM-only and combined EWMA plus CUSUM detectors were candidates in the sweep below, and the selection rule picked the EWMA.
+
+After a rest, the recovery check scores three reps against the original baseline and reports what share of the excess score has gone (recovered at 75% or more and below the warning line, partial at 40% or more).
+
+The detector settings load from [`public/breakingpoint_detector_config.json`](public/breakingpoint_detector_config.json), the file the Lab exports. A parity test replays sessions generated by the Python Lab through the TypeScript code and requires the baselines, scores, trends and alert reps to match to within 1e-9, so the app runs the same detector that was evaluated. [TECHNICAL_NOTES.md](TECHNICAL_NOTES.md) has the remaining details and the reasoning behind them.
+
+## Evidence
+
+There are three kinds of evidence, and they answer different questions. Their numbers shouldn't be combined.
+
+### 1. Detector selection on UF HiPerGator (synthetic, October 2026)
+
+The Lab simulates individual athletes with known change points in eight scenarios: no change, an isolated bad rep, gradual change, sudden change, camera noise, landmark dropout, high natural variability, and change followed by recovery. The sweep crossed EWMA and CUSUM parameters, warning and alert thresholds, run-length rules, outlier clipping, feature weighting and missing-feature handling across four detector families. That gave 5,056 detector settings, each scored with 5 score variants, so 25,280 configurations in total. It ran on 100,000 simulated sessions as a 20-task Slurm array (job 44695919, 8 CPUs per task) plus a merge job (44695920). Of those sessions, 50,000 were used to choose the settings and 50,000 were held out to report them.
+
+I used a fixed selection rule: at most 5% false alerts in every no-change scenario, then the configurations within 2 percentage points of the best miss rate, then the shortest median delay.
+
+| Held-out result (selected EWMA detector) | Value |
 |---|---|
-| React + TypeScript app with on-device MediaPipe Pose. Real-time rep segmentation, feature extraction, personal baseline, drift score, sequential detection, explanations, session report, recovery check, deterministic Demo Mode. | Python Monte-Carlo backtest of the **same** detector on simulated individualized athletes with known change points. Sweeps 25,280 configurations, selects the operating point with a transparent rule, and exports the config the app loads. Scales from a laptop to **UF HiPerGator** Slurm arrays. |
+| False alerts, all no-change sessions | 2.2% (95% CI 2.1 to 2.4%) |
+| False alerts: no change / isolated bad rep / camera noise / dropout / high variability | 1.9 / 3.9 / 1.3 / 2.5 / 1.6% |
+| Changes detected | 89.6% (95% CI 89.2 to 90.0%) |
+| Detected: gradual / sudden / change then recovery | 87.1 / 90.5 / 91.2% |
+| Median delay after the true change | 4 reps |
+| Median error of the onset estimate | 1 rep |
 
-A cross-language **parity test** replays Lab-generated sessions through the app's TypeScript code and
-requires identical baselines, drift scores, EWMA/CUSUM values, and alarm reps (to 1e-9), so the Lab
-validates exactly the detector the athlete runs.
-
-## Screenshots
-
-| What do you play? | Sport → recommended protocols |
-|---|---|
-| <img src="docs/screenshots/landing.png" width="440" /> | <img src="docs/screenshots/sport_page.png" width="440" /> |
-| **Pickleball · Forward Lunge (beta) → RECOVERY SLOWING** | **Strength · Bodyweight Squat (reference protocol)** |
-| <img src="docs/screenshots/pickleball_breakingpoint.png" width="440" /> | <img src="docs/screenshots/dashboard_breakingpoint.png" width="440" /> |
-| **Movement protocol library** | **Racquet sports share one lunge protocol** |
-| <img src="docs/screenshots/protocol_library.png" width="440" /> | <img src="docs/screenshots/sport_racquet.png" width="440" /> |
-| **Lab validation panel (in-app)** | **Method panel** |
-| <img src="docs/screenshots/lab_validation.png" width="440" /> | <img src="docs/screenshots/method.png" width="440" /> |
-
-Validation figures (generated by the Lab) live in [`results/figures/`](results/figures/), e.g.
-[detection trade-off](results/figures/detection_tradeoff.png),
-[scenario examples](results/figures/scenario_examples.png),
-[personal vs population baseline](results/figures/personal_vs_population.png),
-[noise robustness](results/figures/noise_robustness.png),
-[parameter heatmaps](results/figures/parameter_heatmap.png).
-
-## Architecture
-
-```mermaid
-flowchart LR
-  subgraph CTX["Sport context layer · configuration only"]
-    SP[Sport profile<br/>soccer · basketball · pickleball …] --> PR[Movement protocol<br/>READY / BETA only]
-    PR --> PRIM[Movement primitive<br/>SQUAT · JUMP_AND_LAND · FORWARD_LUNGE]
-  end
-  PRIM -. selects segmenter + features .-> SEG
-  SP -. terminology · featured metrics · pattern names .-> UI
-  subgraph EDGE["BreakingPoint Edge · browser, on-device"]
-    CAM[Camera frames] --> MP[MediaPipe Pose Landmarker<br/>WASM / WebGL]
-    DEMO[Demo dataset<br/>synthetic 33-landmark athlete] --> SM
-    MP --> SM[One Euro smoothing]
-    SM --> KIN[Frame kinematics<br/>knee/hip flexion, trunk lean,<br/>hip drop, visibility]
-    KIN --> SEG[Rep segmentation<br/>state machine]
-    SEG --> FEAT[Per-rep features<br/>+ quality]
-    FEAT --> BASE[Personal baseline<br/>median, robust scale,<br/>LOO in-control reference]
-    FEAT --> DRIFT[Movement Drift Score<br/>weighted RMS z]
-    BASE --> DRIFT
-    DRIFT --> DET[Sequential detector<br/>EWMA / CUSUM / persistence]
-    DET --> UI[State · Form Drawdown ·<br/>What changed · Summary · Recovery]
-  end
-  subgraph LAB["BreakingPoint Lab · UF HiPerGator / laptop"]
-    SIM[Synthetic athlete generator<br/>8 scenario classes] --> VEC[Vectorized baseline + drift<br/>numpy]
-    VEC --> SWEEP[25,280 detector configs<br/>Slurm array shards]
-    SWEEP --> MERGE[Merge counts · selection rule ·<br/>held-out metrics · robustness · figures]
-  end
-  MERGE -- breakingpoint_detector_config.json --> DET
-  CAT[(shared/feature_catalog.json)] -.-> FEAT
-  CAT -.-> VEC
-```
-
-## The algorithm (short version — details in [TECHNICAL_NOTES.md](TECHNICAL_NOTES.md))
-
-**Per-rep features (squat):** left/right knee flexion ROM, hip flexion ROM, depth (hip drop ÷ own leg
-length), peak trunk lean, rep / eccentric / concentric duration, peak knee-extension velocity,
-L/R asymmetry. Each carries a landmark-confidence quality score. (CMJ: jump height, RSI-mod, flight
-time, countermovement depth, dip and propulsion durations, trunk lean, landing knee flexion, asymmetry.
-Forward lunge (beta): L/R knee ROM, lead-hip ROM, lunge depth, step length, trunk lean, rep / descent /
-recovery duration, peak recovery velocity, L/R difference.)
-
-**Personal baseline** from calibration reps, per feature:
-
-```
-center_i = median          scale_i = max(SD_i, 1.4826·MAD_i, absFloor_i, relFloor_i·|median_i|)
-```
-
-**Movement Drift Score** for every rep:
-
-```
-z_i   = clip((x_i − center_i) / scale_i, ±6)
-drift = sqrt( Σ w_i z_i² / Σ w_i )        w_i = group weight × landmark confidence
-```
-
-Low-confidence features are dropped; a rep with too little usable signal is **not scored** rather
-than reported with false precision.
-
-**Athlete-specific in-control reference:** leave-one-out over the calibration reps gives μ₀, σ₀ —
-how far *this* athlete's fresh reps naturally fall from their own baseline. Each rep is standardized,
-`s_t = (drift_t − μ₀)/σ₀`, and winsorized.
-
-**Sequential detection:**
-
-```
-EWMA   Z_t = α s_t + (1−α) Z_{t−1}
-CUSUM  C_t = max(0, C_{t−1} + s_t − k)
-```
-
-The shipped configuration (selected on UF HiPerGator, see below) is **EWMA, α = 0.4**: drift is flagged as
-*emerging* when the smoothed drift exceeds **1.0 σ** and BreakingPoint fires when it exceeds **2.0 σ**, with
-per-rep input winsorized at **2.5 σ** (no extra run-length rule). A single extreme rep moves the smoothed drift
-by at most 1 σ, half the alarm level, so one bad rep cannot trigger it. The drift **onset** is estimated
-with the classic CUSUM change-point estimator (first rep of the current CUSUM excursion).
-
-## Validation (BreakingPoint Lab)
-
-The detector has a sensitivity problem: too aggressive and one bad rep raises a false alarm; too
-conservative and real drift is caught late. We treated it like **strategy backtesting**:
-
-- **8 scenario classes** with known ground truth: A no change · B isolated bad rep(s) · C gradual fatigue
-  drift · D sudden change · E camera noise · F landmark dropout · G high natural variability · H drift then recovery.
-- **Sweep:** EWMA α, CUSUM k and h, warning and BreakingPoint thresholds, persistence, outlier clipping,
-  feature weighting, missing-feature handling; detector families EWMA-only / CUSUM-only / EWMA+CUSUM /
-  naive consecutive-threshold → **5,056 detector settings × 5 drift-score variants = 25,280 configurations**.
-- **Transparent selection rule** on a *selection split*; all reported numbers come from a *held-out split*:
-  FPR ≤ 5 % in **every** no-change scenario → keep configs within 2 pp of the best miss rate → lowest median delay.
-
-**UF HiPerGator run (completed): 100,000 simulated sessions** (50,000 selection / 50,000 held-out), as a
-20-task Slurm array (job 44695919, 8 CPUs per task, 30–59 s each) plus a merge/finalize job (44695920, 37 s).
-See [hpc/README_HIPERGATOR.md](hpc/README_HIPERGATOR.md). The exported configuration is the one the app loads.
-
-| held-out metric (selected detector) | value |
-|---|---|
-| False-positive rate, all no-change sessions | **2.2 %** (95 % CI 2.1–2.4 %) |
-| …no change / isolated bad rep / camera noise / dropout / high variability | 1.9 % / 3.9 % / 1.3 % / 2.5 % / 1.6 % |
-| Drift sessions detected | **89.6 %** (95 % CI 89.2–90.0 %) |
-| …gradual / sudden / drift-then-recovery | 87.1 % / 90.5 % / 91.2 % |
-| Median detection delay | **4 reps** after the true change |
-| Median change-point (onset) error | 1 rep |
-
-| detector comparison (held-out split) | false-positive rate | miss rate | median delay |
+| Detector family (held-out split) | False alerts | Missed | Median delay |
 |---|---|---|---|
-| **BreakingPoint (selected: EWMA)** | **2.2 %** | **10.0 %** | 4 reps |
-| Best CUSUM-only | 3.0 % | 9.5 % | 4 reps |
-| Best EWMA + CUSUM | 2.0 % | 12.3 % | 3 reps |
-| Naive "flag any rep > 2σ" | 51.9 % | 1.5 % | 1 rep |
+| Selected EWMA | 2.2% | 10.0% | 4 reps |
+| Best CUSUM only | 3.0% | 9.5% | 4 reps |
+| Best EWMA + CUSUM | 2.0% | 12.3% | 3 reps |
+| Flag any rep above 2 | 51.9% | 1.5% | 1 rep |
 
-| same detector, different reference (evaluation set, 20,000 fresh sessions) | false-positive rate | drift detected |
-|---|---|---|
-| **Personal baseline (BreakingPoint)** | **2.2 %** (1.7 % for high-variability athletes) | **89.8 %** |
-| Population norms ("universal rules") | 17.8 % (30.5 % for high-variability athletes) | 40.0 % |
+The main design choice behind the app is the personal baseline, so I tested it directly. With the same detector but population norms in place of the personal baseline, false alerts rose from 2.2% to 17.8% (30.5% for highly variable athletes) and detection fell from 89.8% to 40.0%. That comparison used a separate 20,000-session set, which is why its detection rate isn't the 89.6% above.
 
-An earlier 50,000-session local run of the same pipeline gave consistent results (2.2 % FPR, 88.9 % detection).
+All of this is simulated squat-like measurement data with a known ground truth. It shows how the detector behaves under controlled conditions, and nothing about real people, real cameras, jumps, lunges, specific sports, fatigue or injury. The report, Slurm job records and exported config are in [`results/`](results/), and [`results/PROVENANCE.md`](results/PROVENANCE.md) corrects two labels in the original report.
 
-Full report: [results/VALIDATION_REPORT.md](results/VALIDATION_REPORT.md). Synthetic sessions test the
-detector's statistical behaviour under controlled conditions — they are not clinical data.
+### 2. Measurement evaluation on recorded human movement (motion capture, October 2026)
 
-## Features
+To test the measurement and scoring code on real movement, I used two public motion-capture datasets. The marker data goes through a virtual camera and then into the app's own feature and scoring code. Markers are cleaner than webcam landmarks, so this is a best case for the measurements and doesn't test MediaPipe. A first pass checked segmentation and measurement agreement against the lab references. Strict squat segmentation reached F1 0.76. For jumps, flight time, propulsion duration and the left-right difference did not agree well enough; for squats, rep duration and the left-right difference did not. Before looking at the outcome labels, I froze the protocols, inclusion lists and analysis code by hash, and the analysis ran once. The datasets had been inspected during the earlier measurement checks, so it isn't a blinded study.
 
-- **Sports-first entry**: "What do you play?" → recommended protocols with status, camera placement and measured metrics
-- **Sport → protocol → primitive** configuration layer (`src/protocols/`), protocol library, custom-protocol roadmap card
-- Sport-specific terminology, featured metrics and drift-pattern names; demo athlete card with sport/protocol/session context
-- Live camera mode with on-device MediaPipe Pose (GPU, CPU fallback), skeleton overlay, One Euro smoothing
-- Robust squat rep segmentation (normalized hip-drop state machine, debounced), CMJ segmentation (takeoff/landing), and forward-lunge segmentation (beta: ready → descent → bottom → recovery)
-- CAPTURE QUALITY indicator (Excellent / Good / Poor); poor-quality reps are not scored
-- Personalized baseline ("YOUR BASELINE", not "ideal form"), saved locally, Reset Baseline
-- Movement state: STABLE · DRIFT EMERGING · BREAKING POINT, with explanation of the top contributors
-- **Form Drawdown** chart: per-rep drift, EWMA, normal band, warning/BreakingPoint levels, onset + alarm markers, CUSUM strip
-- Clickable rep timeline with full per-rep measurements vs baseline
-- Session summary as a **set record** (baseline locked, reps held at baseline, breaking point, recovery check), recovery check, JSON/CSV export (numbers only)
-- Session track (Calibrate → Monitor → Detect → Recover) with live per-stage progress; on-device personal best for reps held at baseline (live sessions only)
-- **Deterministic Demo Mode** — a synthetic athlete's landmarks run through the *entire* real pipeline
-- Research panel: method, science and limits, privacy, and in-app Lab validation with figures
+Jumps before and after a fatigue protocol ([Calisti, Mohr and Federolf 2025](https://doi.org/10.6084/m9.figshare.28890545.v1)): 43 participants with 3 jumps before and 3 after. The 38 with all six jumps measured form the primary sample. The fresh jumps were always recorded first, so every result is a change after the protocol, and fatigue can't be separated from order effects such as practice or warm-up.
 
-## Run it
+- None of the six prespecified tests was significant after Holm correction. The smallest adjusted p-value was 0.063, for jump height.
+- Jump height fell by 0.77% of leg length on average, about 0.8 cm, or -0.34 of each person's own spread (95% CI -0.57 to -0.11). RSI-mod fell by -0.54 (95% CI -0.93 to -0.15). Peak trunk lean rose by about 1.9 degrees, but that change was the least consistent across the sensitivity samples.
+- With each person's fresh jumps as the baseline, the real fresh-versus-post split ranked 7.55 out of 20 on average (95% CI 5.55 to 9.56), where 10.5 would mean no separation. A baseline built from other people's jumps showed no separation (10.37).
+- Within each block, the change from the first jump to the third was about as large as the shift between blocks.
 
-Requirements: Node 18+ (tested with Node 24). Python 3.9+ with numpy + matplotlib for the Lab.
+Squats with deliberate technique errors (REHAB24-6, [Černek, Sedmidubsky and Budikova 2024](https://doi.org/10.5281/zenodo.13305826)): 9 people. The incorrect reps are mistakes performed on purpose, so this part says nothing about fatigue.
+
+- Using each person's correct reps as the baseline, the shipped squat score separated correct from incorrect reps with a mean AUC of 0.92 (95% CI 0.83 to 1.00). No individual was below 0.67.
+- A baseline built from other people gave a mean AUC of 0.63 (95% CI 0.31 to 0.94). For three people it scored the incorrect reps as more typical than the correct ones.
+- 57% of the squat score's weight is on measurements that failed or weren't checked in the measurement-agreement pass, so a good separation doesn't validate each measurement.
+
+The full results, with the order confound, missing data, all intervals and the two prespecified outputs the frozen code didn't produce, are in [`research/results/phase4b/README.md`](research/results/phase4b/README.md). The segmentation and measurement-agreement reports are in [`research/reports/`](research/reports/).
+
+### 3. Webcam and MediaPipe validation: not done yet
+
+None of the above uses real camera footage. That needs recorded sessions run through MediaPipe and compared with a reference for rep segmentation, measurement agreement and alert behaviour, under real lighting, clothing, occlusion and camera placement. Until that's done, the live camera mode is a working prototype.
+
+## Running it locally
+
+The app needs Node 20 or newer, and the browser test suites need Node 22 or newer (tested with Node 24). The Lab needs Python 3.9 or newer with numpy and matplotlib. The research code needs Python 3.12 with the packages in [`research/requirements.txt`](research/requirements.txt).
 
 ```bash
-npm install          # also copies the MediaPipe WASM runtime and downloads the pose model into public/
-npm run dev          # http://localhost:5173
+npm install
+```
+
+Besides the npm packages, `npm install` copies the MediaPipe WASM runtime into `public/` and downloads the pinned pose model, checking its SHA-256.
+
+```bash
+npm run dev
+```
+
+The dev server runs at http://localhost:5173. To open a demo directly, add `?demo=strength`, `?demo=soccer`, `?demo=volleyball` or `?demo=pickleball` to the URL, and `&speed=4` to run it faster. During a demo, Space pauses, 1, 2 and 4 set the speed, and S skips to the end of the current stage.
+
+## Tests
+
+```bash
+npm test
 ```
 
 ```bash
-npm test             # 53 tests: detector, TS↔Python parity, demo story, sport/protocol layer, lunge primitive
-npm run build        # type-check + production build → dist/
-npm run preview      # serve the production build
+cd lab && python -m unittest discover -s tests
 ```
-
-Lab (local, small scale):
 
 ```bash
-python hpc/run_experiment.py --sessions 1000 --seed 42      # sweep + merge + figures + config export (~30 s)
-cd lab && python -m unittest discover -s tests               # 17 Lab tests
+python -I -m unittest discover -s hpc/tests
 ```
 
-HiPerGator: see **[hpc/README_HIPERGATOR.md](hpc/README_HIPERGATOR.md)** (`bash hpc/submit_all.sh`).
+```bash
+python -I -m unittest discover -s research/tests
+```
 
-## Demo mode (judging-safe)
+`npm test` covers the detector, the TypeScript and Python parity fixtures, the demo story, the sport and protocol layer, session protection, the wording rules and the checksums of the archived HiPerGator files. The Lab tests check the simulator's ground truth, the vectorized detector against the scalar reference, and the selection rule. Two browser suites run in headless Edge or Chrome. `npm run e2e:guard` checks session protection against `npm run dev`. `npm run e2e:release` runs the first-visit journeys against `npm run preview`: the demos, camera permissions, the evidence panel, phone width, keyboard use and reduced motion. The release suite uses the browser's fake camera, so it never opens a real one.
 
-The demo never depends on camera conditions. It is clearly labeled **DEMO DATASET · SYNTHETIC ATHLETE**,
-and its frames go through exactly the same code path as camera frames. Story: 6 calibration reps →
-reps 1–7 stable → 8–9 drift emerging → **10 BreakingPoint** (onset ≈ rep 7) → 11–14 persistent drift →
-recovery check. (When the alarm fires is decided by the real detector at runtime; `tests/demo.test.ts`,
-`tests/sports.test.ts` and `tests/lunge.test.ts` lock the story for the shipped config.)
+## Deploying
 
-Demo contexts (same primitive ⇒ same real pipeline; only the sport context differs):
-**Soccer** · Repeated CMJ (*explosive fatigue*), **Volleyball** · Repeated jump, **Strength** · Squat,
-**Pickleball** · Forward lunge (*recovery slowing*, beta).
-
-| shortcut / link | effect |
-|---|---|
-| `?demo=soccer` | open a demo context directly (`volleyball`, `strength`, `pickleball`; add `&speed=1|2|4`, `&skip=1`) |
-| `?sport=racquet&sub=tennis` | open a sport's protocol page (`&protocol=lunge-forward&demo=1` launches it) |
-| `?demo=1` | legacy: squat demo (`&exercise=cmj|lunge`) |
-| `?panel=lab` | open a panel: `lab`, `method`, `science`, `privacy`, `library` |
-| `Space` / `1` `2` `4` / `S` | pause · playback speed · skip to end of stage (demo) |
+The repository is set up for Vercel through [`vercel.json`](vercel.json). The build runs `npm ci`, then `npm run build`, then [`scripts/check-assets.mjs`](scripts/check-assets.mjs), which fails the build unless `dist/` contains the pinned pose model and WASM runtime byte for byte. The model is pinned to one object generation of Google's file and to its SHA-256, so a different model would fail the build. There is no backend.
 
 ## Privacy
 
-- Pose estimation runs locally (WebAssembly/WebGL); no backend, no uploads.
-- Video is never recorded. Only derived numeric features are kept, in memory.
-- Athlete profiles, personal baselines (per athlete and protocol) and set history are stored only in this browser's localStorage; Reset Baseline deletes that athlete's baseline for the protocol. The synthetic sample athlete lives in memory and never touches stored records.
-- The model and runtime are served from the app, so live mode also works offline.
+- Pose estimation runs on your device. Nothing is uploaded, and there is no server.
+- Video isn't recorded. The app keeps only per-rep measurements.
+- Athlete profiles, baselines and set history are stored in this browser's localStorage. Demos use a synthetic sample athlete held in memory and don't touch stored records.
 
-## Limitations (deliberately stated)
+## Limitations
 
-BreakingPoint **does not** diagnose injuries, predict ACL tears or any injury risk, replace coaches or
-clinicians, or provide laboratory-grade 3D kinematics or force measurements. A monocular camera has
-real limits (out-of-plane motion, far-limb occlusion, depth ambiguity), which is why BreakingPoint only
-compares an athlete **with themselves, from the same camera setup**. The Lab's stress test shows that if
-capture noise rises substantially *after* calibration, false alarms increase — hence the capture-quality
-gate and the advice to recalibrate when the camera moves. Validation is on synthetic sessions; prospective
-validation against motion capture / force plates and real fatigue protocols is future work.
+- One camera can't see out-of-plane motion or a limb hidden behind the other one, and it has no true depth. That's why BreakingPoint only compares an athlete with their own reps from the same camera setup.
+- Moving the camera or changing the lighting after calibration looks like a change in form. In the simulation, noise that increased only after calibration raised false alerts to 6.3% at 1.5 times the calibration noise and 17.3% at twice the noise. Recalibrate when the setup changes.
+- Calibration uses 5 to 8 reps, so the baseline itself is uncertain. The measurement floors and the leave-one-out reference reduce this, but they don't remove it.
+- The detector was tuned on simulated squat-like measurements. It hasn't been tuned separately for each movement or sport.
 
-The detector is calibrated at the movement-signal level (on squat-feature simulations); sport protocols only
-determine which repeatable movement and features are monitored. The Lab does **not** clinically validate any listed
-sport — sport-specific validation is future work. The forward lunge is **beta**: it is verified end to end on
-deterministic synthetic data, but its real-camera segmentation reliability has not yet been established.
-
-## Roadmap
-
-- More primitives: lateral movement / change-of-direction, single-leg hop & landing, gait cycle, hip hinge, strike step, kick
-- **Create your own protocol**: a coach records clean reps of any repeatable movement; BreakingPoint segments them and learns the athlete's distribution
-- Longitudinal athlete model: movement + HR/HRV + training load + sleep + RPE + prior sessions
-- Team dashboard: "Adam reached his breaking point significantly earlier than his 14-day baseline"
-- Covariance-aware (shrinkage Mahalanobis) drift score once more calibration data per athlete exists
-- More movements (lunge, hop, landing tasks) and multi-camera capture
-- Prospective validation studies with strength & conditioning and PT partners
-
-## Repository map
+## Repository layout
 
 ```
-src/                 BreakingPoint Edge (React + TypeScript)
-  protocols/         sport profiles, protocols, movement primitives, launch resolution, drift-pattern labels
-  pose/              MediaPipe wrapper, One Euro smoothing, drawing
-  biomechanics/      feature catalog, frame kinematics, per-rep features
-  reps/              squat / lunge / CMJ rep segmentation
-  baseline/          personal baseline + local storage
-  detection/         drift score, EWMA/CUSUM detector, config loader, recovery
-  session/           session engine, frame pipeline, runners, summary, export
-  demo/              deterministic synthetic athlete + demo story
-  components/        UI (design system: docs/DESIGN_SYSTEM.md, tokens in src/styles.css + src/ui/theme.ts)
-  progress/          reps held at baseline + on-device personal best
-lab/breakingpoint_lab BreakingPoint Lab (Python): core (scalar reference), vectorized, simulate,
-                     grid, evaluate, experiment, finalize, plots, parity
-hpc/                 run_experiment.py, merge_results.py, sweep.slurm, finalize.slurm, submit_all.sh
-shared/              feature_catalog.json, default_detector_config.json (single source of truth)
-results/             original HiPerGator study (report, config, figures, job records), PROVENANCE.md, archive/, runs/
-tests/               TypeScript tests (+ parity fixture generated by the Lab)
+src/            the app (React + TypeScript)
+  pose/         MediaPipe wrapper, smoothing, drawing
+  reps/         squat, jump and lunge segmentation
+  biomechanics/ per-rep measurements and the shared catalog
+  baseline/     personal baseline
+  detection/    Form Change Score, EWMA/CUSUM detector, recovery check
+  session/      session engine, runners, hands-free, voice cues, session protection
+  components/   UI, including the athlete view and detector evidence (components/session/)
+  protocols/    sports, protocols and movement primitives
+lab/            Python Lab: simulator, vectorised detector, sweep, evaluation
+hpc/            HiPerGator Slurm scripts and the run-output guard
+results/        the original HiPerGator study: report, config, figures, job records, provenance
+research/       motion-capture evaluation: adapters, protocols, frozen analysis, results
+scripts/        asset setup and checks, readability tool, browser test suites
+tests/          TypeScript tests
 ```
 
-More: [TECHNICAL_NOTES.md](TECHNICAL_NOTES.md) · [DEVPOST.md](DEVPOST.md) · [PITCH.md](PITCH.md)
+## License and data
 
----
+The original code and documentation are released under the [MIT License](LICENSE). Third-party components and the two datasets keep their own terms, listed in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). Results derived from REHAB24-6 are for non-commercial academic research only. Neither dataset is redistributed here.
 
-*BreakingPoint provides training information and is not a medical diagnosis.*
+If you use the research results, please cite the datasets: Calisti, Mohr and Federolf (2025), doi:10.6084/m9.figshare.28890545.v1, and Černek, Sedmidubsky and Budikova, "REHAB24-6: Physical Therapy Dataset for Analyzing Pose Estimation Methods", SISAP 2024.
+
+BreakingPoint provides training information. It is not a medical device and does not give medical advice.

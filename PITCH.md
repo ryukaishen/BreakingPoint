@@ -1,3 +1,14 @@
+> **Historical record.** This is the three-minute pitch script for the University of Florida Dream Team Engineering Designathon 2026, kept as it was written. For what BreakingPoint does now and the evidence behind it, see [README.md](README.md).
+>
+> Corrections, as of October 2026:
+>
+> - The app does not measure fatigue. It detects when an athlete's form has changed from their own fresh reps and the change keeps growing.
+> - A single unusual rep can still trigger the alert when the trend is already high. In the simulation study, isolated bad reps caused false alerts in 3.9% of sessions.
+> - The shipped detector has no persistence (run-length) rule. It is an EWMA with alpha 0.4, a warning at 1.0 and an alert at 2.0.
+> - The detector settings were validated only in a synthetic simulation of squat-like measurements on UF HiPerGator. They were not validated on real athletes, cameras, jumps, lunges or sports.
+> - The app's wording has changed: Movement Drift Score is now the Form Change Score, DRIFT EMERGING is FORM CHANGING, EXPLOSIVE FATIGUE is EXPLOSIVE OUTPUT DROPPING, and the Form Drawdown chart is Form Changes Over Time.
+> - Test counts and screenshots are as they were at submission.
+
 # BreakingPoint: 3-minute pitch
 
 **Setup before you start**
