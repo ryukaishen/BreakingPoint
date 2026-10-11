@@ -103,6 +103,9 @@ async function startLive(p, E) {
     check('2.1 the summary names the alert rep', /alert triggered at rep \d+/i.test(summary) || /Rep \d+/.test(summary), summary.slice(0, 120));
     check('2.2 a squat is never labelled with the jump pattern', !/EXPLOSIVE/i.test(summary));
     check('2.3 the summary explains what changed in plain words', /leaned forward|drive|bend|depth/i.test(summary));
+    // The chart keeps its technical axis labels; everything else in the summary is plain words.
+    const plain = await E(`(() => { const d = document.querySelector('[role=dialog][aria-labelledby=summary-title]').cloneNode(true); d.querySelectorAll('svg').forEach((x) => x.remove()); return d.textContent; })()`);
+    check('2.3b outside the chart, the summary shows no statistics symbols (σ, EWMA, CUSUM)', !/σ|EWMA|CUSUM/.test(plain), plain.match(/.{0,30}(σ|EWMA|CUSUM).{0,20}/)?.[0] ?? '');
     const ticks = await E(`[...document.querySelectorAll('[role=dialog] svg text')].map((t) => Number(t.textContent)).filter((n) => Number.isInteger(n) && n > 0)`);
     const reps = await E(`(() => { const m = document.querySelector('[role=dialog]').textContent.match(/(\\d+)\\s*reps? scored|Reps\\s*(\\d+)/); return m ? Number(m[1] ?? m[2]) : null; })()`);
     check('2.4 the chart axis ends at the last rep of the set', ticks.length > 0 && Math.max(...ticks) <= 12, `max tick ${Math.max(...ticks)}, reps ${reps}`);
@@ -112,6 +115,7 @@ async function startLive(p, E) {
     check('2.5 Escape closes the summary', true);
     const plate = await E(text('.focus .plate'));
     check('2.6 the athlete view says to rest', plate === 'Rest', plate);
+    check('2.6b the athlete view uses no statistics symbols', !/σ|EWMA|CUSUM/.test(await E(text('.focus'))));
     check('2.7 the next step is the primary action', /Start recovery check/.test(await E(text('.focus-actions .btn.primary'))));
     check('2.8 detector evidence is shown below in demos', await E(`!!document.querySelector('#evidence')`));
     await shot(p, 'desktop-squat-rest');

@@ -131,8 +131,8 @@ export function SummaryModal({ snap, launch, outcome, onClose, onRecovery, onNew
               <div className="v" style={{ fontSize: 20, lineHeight: 1.25 }}>
                 {top ? `${L.short(top.key)} ${arrow(top.meanZ)}` : '—'}
               </div>
-              <div className="s" title={SIGMA_TIP}>
-                {top ? `${top.meanZ >= 0 ? '+' : '−'}${Math.abs(top.meanZ).toFixed(1)}σ on average (${top.meanZ > 0 ? top.upWord : top.downWord})` : ''}
+              <div className="s" title={top ? `${top.meanZ >= 0 ? '+' : '−'}${Math.abs(top.meanZ).toFixed(1)}σ. ${SIGMA_TIP}` : undefined}>
+                {top ? `${top.meanZ > 0 ? top.upWord : top.downWord}, about ${Math.abs(top.meanZ).toFixed(1)}× your usual rep-to-rep variation` : ''}
               </div>
             </div>
           </div>
@@ -166,12 +166,13 @@ export function SummaryModal({ snap, launch, outcome, onClose, onRecovery, onNew
               <div className="panel-title">Biggest changes</div>
               <div className="row" style={{ flexWrap: 'wrap', gap: 8 }}>
                 {sm.topChanges.map((c) => (
-                  <span key={c.key} className="metric-chip" title={SIGMA_TIP} style={{ borderColor: Math.abs(c.meanZ) >= 2 ? 'var(--break)' : undefined }}>
-                    {L.short(c.key)} {arrow(c.meanZ)}{' '}
-                    <span className="mono">
-                      {c.meanZ >= 0 ? '+' : '−'}
-                      {Math.abs(c.meanZ).toFixed(1)}σ
-                    </span>
+                  <span
+                    key={c.key}
+                    className="metric-chip"
+                    title={`${c.meanZ >= 0 ? '+' : '−'}${Math.abs(c.meanZ).toFixed(1)}σ. ${SIGMA_TIP}`}
+                    style={{ borderColor: Math.abs(c.meanZ) >= 2 ? 'var(--break)' : undefined }}
+                  >
+                    {L.short(c.key)} {arrow(c.meanZ)} <span className="muted">{c.meanZ > 0 ? c.upWord : c.downWord}</span>
                   </span>
                 ))}
               </div>

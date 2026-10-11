@@ -109,7 +109,8 @@ export class DemoController {
         if (this.stopAfterWarning !== null && snap.alarmRep !== null && snap.monitorReps.length >= snap.alarmRep + Math.max(0, this.stopAfterWarning - 1)) {
           this.athlete.clearQueue();
         }
-        if (this.enqueued && idleFor() > 0.6) {
+        // After an alert the athlete stands for a moment before the set ends, so the stop instruction is seen.
+        if (this.enqueued && idleFor() > (snap.alarmRep !== null ? 2.0 : 0.6)) {
           this.engine.endSet();
           this.go('done');
         }

@@ -104,14 +104,14 @@
    ],
    "patternId": "explosive",
    "recovery": {
-    "percent": 0.42122,
+    "percent": 0.418506,
     "status": "partial",
-    "meanRecovery": 1.727137,
+    "meanRecovery": 1.732546,
     "meanPost": 2.566746,
     "scores": [
-     1.597214,
-     1.648002,
-     1.936193
+     1.629348,
+     1.685643,
+     1.882646
     ],
     "completedAt": "2000-01-01T00:00:00.000Z"
    },
@@ -237,14 +237,14 @@
    ],
    "patternId": "explosive",
    "recovery": {
-    "percent": 0.590753,
+    "percent": 0.5804,
     "status": "partial",
-    "meanRecovery": 1.482572,
+    "meanRecovery": 1.50367,
     "meanPost": 2.686368,
     "scores": [
-     1.933785,
-     1.691827,
-     0.822103
+     1.919629,
+     1.799284,
+     0.792096
     ],
     "completedAt": "2000-01-01T00:00:00.000Z"
    },
@@ -370,14 +370,14 @@
    ],
    "patternId": "explosive",
    "recovery": {
-    "percent": 0.635086,
+    "percent": 0.639841,
     "status": "partial",
-    "meanRecovery": 1.280969,
+    "meanRecovery": 1.270794,
     "meanPost": 2.640148,
     "scores": [
-     0.975458,
-     1.332897,
-     1.534552
+     0.86533,
+     1.354534,
+     1.592518
     ],
     "completedAt": "2000-01-01T00:00:00.000Z"
    },
@@ -511,14 +511,14 @@
    ],
    "patternId": "explosive",
    "recovery": {
-    "percent": 0.695329,
+    "percent": 0.619041,
     "status": "partial",
-    "meanRecovery": 1.142314,
+    "meanRecovery": 1.294327,
     "meanPost": 2.527832,
     "scores": [
-     1.101625,
-     0.970761,
-     1.354556
+     1.166682,
+     1.307354,
+     1.408945
     ],
     "completedAt": "2000-01-01T00:00:00.000Z"
    },
@@ -644,14 +644,14 @@
    ],
    "patternId": "explosive",
    "recovery": {
-    "percent": 0.740866,
+    "percent": 0.809311,
     "status": "partial",
-    "meanRecovery": 1.114177,
+    "meanRecovery": 0.973764,
     "meanPost": 2.634034,
     "scores": [
-     1.652458,
-     0.964548,
-     0.725525
+     1.365756,
+     0.907476,
+     0.648061
     ],
     "completedAt": "2000-01-01T00:00:00.000Z"
    },
@@ -785,14 +785,14 @@
    ],
    "patternId": "explosive",
    "recovery": {
-    "percent": 0.708318,
+    "percent": 0.700968,
     "status": "partial",
-    "meanRecovery": 1.211573,
+    "meanRecovery": 1.226043,
     "meanPost": 2.606128,
     "scores": [
-     1.401478,
-     1.138495,
-     1.094745
+     1.567272,
+     1.070733,
+     1.040125
     ],
     "completedAt": "2000-01-01T00:00:00.000Z"
    },
@@ -926,14 +926,14 @@
    ],
    "patternId": "explosive",
    "recovery": {
-    "percent": 0.731136,
+    "percent": 0.689853,
     "status": "partial",
-    "meanRecovery": 1.113747,
+    "meanRecovery": 1.192501,
     "meanPost": 2.5085,
     "scores": [
-     1.2811,
-     1.223181,
-     0.836959
+     1.395585,
+     1.184262,
+     0.997655
     ],
     "completedAt": "2000-01-01T00:00:00.000Z"
    },
@@ -1075,14 +1075,14 @@
    ],
    "patternId": "explosive",
    "recovery": {
-    "percent": 0.724999,
+    "percent": 0.616474,
     "status": "partial",
-    "meanRecovery": 1.207624,
+    "meanRecovery": 1.43462,
     "meanPost": 2.724062,
     "scores": [
-     1.133834,
-     1.182234,
-     1.306805
+     1.214862,
+     1.599555,
+     1.489443
     ],
     "completedAt": "2000-01-01T00:00:00.000Z"
    },
@@ -1224,14 +1224,14 @@
    ],
    "patternId": "explosive",
    "recovery": {
-    "percent": 0.779166,
+    "percent": 0.788246,
     "status": "partial",
-    "meanRecovery": 1.029124,
+    "meanRecovery": 1.008996,
     "meanPost": 2.75639,
     "scores": [
-     1.376972,
-     0.510649,
-     1.199752
+     1.333461,
+     0.413546,
+     1.279981
     ],
     "completedAt": "2000-01-01T00:00:00.000Z"
    },
@@ -1349,14 +1349,14 @@
    ],
    "patternId": "rom",
    "recovery": {
-    "percent": 0.601555,
+    "percent": 0.641676,
     "status": "partial",
-    "meanRecovery": 1.77269,
+    "meanRecovery": 1.673704,
     "meanPost": 3.256844,
     "scores": [
-     1.714771,
-     1.962356,
-     1.640943
+     1.862189,
+     2.080839,
+     1.078084
     ],
     "completedAt": "2000-01-01T00:00:00.000Z"
    },
@@ -1482,14 +1482,14 @@
    ],
    "patternId": "rom",
    "recovery": {
-    "percent": 0.619901,
+    "percent": 0.590053,
     "status": "partial",
-    "meanRecovery": 1.731212,
+    "meanRecovery": 1.813942,
     "meanPost": 3.449414,
     "scores": [
-     1.878702,
-     1.562947,
-     1.751986
+     1.59201,
+     2.064497,
+     1.78532
     ],
     "completedAt": "2000-01-01T00:00:00.000Z"
    },
@@ -1615,14 +1615,14 @@
    ],
    "patternId": "rom",
    "recovery": {
-    "percent": 0.652573,
+    "percent": 0.627656,
     "status": "partial",
-    "meanRecovery": 1.565812,
+    "meanRecovery": 1.64225,
     "meanPost": 3.567727,
     "scores": [
-     1.505452,
-     1.597127,
-     1.594857
+     1.938338,
+     1.650416,
+     1.337998
     ],
     "completedAt": "2000-01-01T00:00:00.000Z"
    },
@@ -1756,14 +1756,14 @@
    ],
    "patternId": "technique",
    "recovery": {
-    "percent": 0.801456,
+    "percent": 0.798655,
     "status": "partial",
-    "meanRecovery": 1.184093,
+    "meanRecovery": 1.191346,
     "meanPost": 3.2599,
     "scores": [
-     1.048193,
-     1.186281,
-     1.317805
+     0.969853,
+     1.163503,
+     1.440683
     ],
     "completedAt": "2000-01-01T00:00:00.000Z"
    },
@@ -1897,14 +1897,14 @@
    ],
    "patternId": "rom",
    "recovery": {
-    "percent": 0.680892,
+    "percent": 0.575086,
     "status": "partial",
-    "meanRecovery": 1.400147,
+    "meanRecovery": 1.63175,
     "meanPost": 2.890587,
     "scores": [
-     1.681116,
-     1.214046,
-     1.305279
+     1.449035,
+     1.636386,
+     1.80983
     ],
     "completedAt": "2000-01-01T00:00:00.000Z"
    },
@@ -2046,14 +2046,14 @@
    ],
    "patternId": "rom",
    "recovery": {
-    "percent": 0.821669,
+    "percent": 0.839476,
     "status": "partial",
-    "meanRecovery": 1.16434,
+    "meanRecovery": 1.120351,
     "meanPost": 3.194178,
     "scores": [
-     1.210399,
-     0.933202,
-     1.349418
+     1.171496,
+     0.857518,
+     1.33204
     ],
     "completedAt": "2000-01-01T00:00:00.000Z"
    },
@@ -2172,14 +2172,14 @@
    ],
    "patternId": "rom",
    "recovery": {
-    "percent": 0.659586,
+    "percent": 0.598518,
     "status": "partial",
-    "meanRecovery": 1.141684,
+    "meanRecovery": 1.250157,
     "meanPost": 2.313285,
     "scores": [
-     1.23296,
-     1.202064,
-     0.990028
+     1.201351,
+     0.97262,
+     1.576501
     ],
     "completedAt": "2000-01-01T00:00:00.000Z"
    },
@@ -2306,14 +2306,14 @@
    ],
    "patternId": "recovery",
    "recovery": {
-    "percent": 0.840252,
+    "percent": 0.669626,
     "status": "partial",
-    "meanRecovery": 0.809905,
+    "meanRecovery": 1.057231,
     "meanPost": 2.027874,
     "scores": [
-     1.020021,
-     0.703188,
-     0.706505
+     1.237329,
+     1.012837,
+     0.921528
     ],
     "completedAt": "2000-01-01T00:00:00.000Z"
    },
@@ -2448,14 +2448,14 @@
    ],
    "patternId": "recovery",
    "recovery": {
-    "percent": 0.842144,
+    "percent": 0.873228,
     "status": "partial",
-    "meanRecovery": 0.786419,
+    "meanRecovery": 0.730018,
     "meanPost": 2.314429,
     "scores": [
-     0.725002,
-     0.874173,
-     0.760083
+     0.635475,
+     0.826535,
+     0.728044
     ],
     "completedAt": "2000-01-01T00:00:00.000Z"
    },
@@ -2590,14 +2590,14 @@
    ],
    "patternId": "recovery",
    "recovery": {
-    "percent": 0.767986,
+    "percent": 0.780382,
     "status": "partial",
-    "meanRecovery": 0.910182,
+    "meanRecovery": 0.890413,
     "meanPost": 2.134972,
     "scores": [
-     0.669186,
-     0.946282,
-     1.115078
+     0.670572,
+     0.72239,
+     1.278278
     ],
     "completedAt": "2000-01-01T00:00:00.000Z"
    },
