@@ -1,0 +1,137 @@
+/* Session screen, Stage 2: the athlete view (FocusPanel, RecordLane), session options and
+   the detector evidence drawer. Built from the approved board's B1 frame held to
+   Direction A's discipline: one state plate, one instruction, one hero number, the record
+   lane, nothing else in the athlete's line of sight. The 12° cut is the only motif.
+   Readability targets (docs/READABILITY_3M.md): the hero number and the state plate are
+   sized for about 3 m on a laptop. */
+
+/* ------------------------------------------------------------------ athlete view */
+.focus {
+  --tone: var(--cobalt);
+  --tone-ink: var(--on-cobalt);
+  position: relative; display: flex; flex-direction: column; gap: 18px; flex: 1 0 auto;
+  padding: 24px 24px 22px 34px; background: var(--ink); border: 1px solid var(--line); border-radius: var(--r-md);
+}
+/* The 12° edge: a thin tone-coloured stripe down the left side, the board's HUD cut in miniature. */
+.focus::before {
+  content: ''; position: absolute; top: 0; bottom: 0; left: 0; width: 14px; background: var(--tone); border-radius: var(--r-md) 0 0 var(--r-md);
+  clip-path: polygon(0 0, 100% 0, calc(100% - 14px * var(--cut) * 4) 100%, 0 100%);
+  transition: background-color var(--t-base);
+}
+.focus.tone-stable { --tone: var(--cobalt); --tone-ink: var(--on-cobalt); }
+.focus.tone-drift { --tone: var(--drift); --tone-ink: var(--ink); }
+.focus.tone-break { --tone: var(--break); --tone-ink: var(--ink); }
+.focus.tone-calm { --tone: var(--cobalt-deep); --tone-ink: var(--text); }
+.focus.tone-neutral { --tone: var(--panel-3); --tone-ink: var(--text); }
+
+.focus-state { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; }
+.focus .plate {
+  font-family: var(--font-num); font-style: italic; font-weight: 900; font-stretch: 70%; font-variant-numeric: tabular-nums;
+  font-size: clamp(32px, 3.4vw, 56px); line-height: 1; letter-spacing: 0;
+  padding: 6px 22px 4px 16px; background: var(--tone); color: var(--tone-ink);
+  clip-path: polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%);
+  transition: background-color var(--t-base), color var(--t-base);
+}
+.focus-instruction { margin: 0; font-size: clamp(16px, 1.35vw, 20px); line-height: 1.35; color: var(--text); max-width: 34ch; }
+
+.focus-big { display: flex; flex-direction: column; gap: 6px; }
+.focus-num { --num-hero-size: clamp(96px, 11vw, 200px); color: var(--text); line-height: 0.82; }
+.focus.tone-break .focus-num { color: var(--break); }
+.focus-num-label { font-size: 15px; color: var(--text-2); }
+.focus-cells { display: flex; gap: 6px; margin-top: 6px; max-width: 360px; }
+.focus-cells i { flex: 1; height: 12px; background: var(--panel-2); clip-path: polygon(4px 0, 100% 0, calc(100% - 4px) 100%, 0 100%); }
+.focus-cells i.on { background: var(--cobalt-hi); }
+
+.focus-setup { display: flex; flex-direction: column; gap: 10px; }
+.focus-setup-how { margin: 0; font-size: 14px; color: var(--text-2); max-width: 46ch; }
+.focus-checks { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.focus-checks li { display: flex; align-items: center; gap: 10px; font-size: 14px; color: var(--text-2); }
+.focus-checks .ic {
+  width: 18px; height: 18px; flex: none; display: grid; place-items: center; border-radius: var(--r-xs);
+  border: 1.5px solid var(--line-2); color: var(--on-cobalt);
+}
+.focus-checks li.ok { color: var(--text); }
+.focus-checks li.ok .ic { background: var(--cobalt); border-color: var(--cobalt); }
+
+.focus-actions { margin-top: auto; display: flex; flex-wrap: wrap; gap: 10px; }
+.focus-actions .btn.lg { height: 52px; padding: 0 22px; font-size: 16px; }
+.focus-actions .btn .kbd { margin-left: 4px; }
+.btn.primary .kbd { color: var(--on-cobalt); border-color: rgba(255, 255, 255, 0.5); }
+
+/* ------------------------------------------------------------------ record lane */
+.lane { display: flex; flex-direction: column; gap: 8px; }
+.lane-top { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+.lane-label { font-size: 14px; font-weight: 600; color: var(--text-2); }
+.lane-value { font-size: 18px; font-weight: 700; color: var(--text); font-variant-numeric: tabular-nums; }
+.lane-track { position: relative; height: 28px; background: var(--panel); clip-path: polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%); }
+.lane-fill {
+  position: absolute; inset: 0; background: var(--cobalt); transform-origin: left center;
+  transition: transform var(--t-slow) var(--ease), background-color var(--t-base);
+}
+/* Your own best: a marker the full height of the lane (28 px, over the 12 px minimum in READABILITY_3M.md). */
+.lane-mark { position: absolute; top: 0; bottom: 0; width: 4px; margin-left: -2px; background: var(--text); }
+.lane.past .lane-fill { background: var(--cobalt-hi); }
+.lane.frozen .lane-fill { background: var(--cobalt-deep); }
+.lane-foot { font-size: 13px; color: var(--muted); }
+.lane.past .lane-foot { color: var(--text); font-weight: 600; }
+
+/* ------------------------------------------------------------------ session options */
+.session-options { display: flex; flex-wrap: wrap; gap: 6px; }
+.session-options .opt {
+  display: inline-flex; align-items: center; gap: 8px; height: 34px; padding: 0 12px; border-radius: var(--r-sm);
+  background: var(--panel); border: 1px solid var(--line-2); color: var(--text-2); font-size: 13px; cursor: pointer;
+}
+.session-options .opt:hover { color: var(--text); border-color: #34486b; }
+.session-options .opt-state { font-size: 12px; font-weight: 600; color: var(--muted); }
+.session-options .opt[aria-pressed='true'] { color: var(--text); border-color: rgba(107, 140, 255, 0.55); }
+.session-options .opt[aria-pressed='true'] .opt-state { color: var(--cobalt-hi); }
+
+/* ------------------------------------------------------------------ detector evidence */
+.evidence { display: flex; flex-direction: column; gap: 12px; scroll-margin-top: calc(var(--header-h) + 12px); }
+.evidence-title { margin: 6px 0 0; font-size: 18px; font-stretch: 92%; display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.evidence-title small { font-family: var(--font); font-stretch: 100%; font-weight: 400; font-size: 13px; color: var(--muted); }
+.evidence-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; align-items: start; }
+.chart-head h3 { margin: 0; font-size: 16px; font-stretch: 90%; font-weight: 700; color: var(--text); display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.chart-head h3 small { color: var(--muted); font-family: var(--font); font-stretch: 100%; font-weight: 400; font-size: 12.5px; }
+
+/* ------------------------------------------------------------------ phone-width navigation */
+.show-sm { display: none; }
+.more-nav { position: relative; }
+.more-list {
+  position: absolute; right: 0; top: calc(100% + 6px); z-index: 30; min-width: 200px; padding: 6px;
+  display: flex; flex-direction: column; gap: 2px; background: var(--panel-2); border: 1px solid var(--line-2); border-radius: var(--r-md);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+}
+.more-list .btn { justify-content: flex-start; gap: 8px; }
+
+/* ------------------------------------------------------------------ responsive */
+@media (min-width: 1101px) {
+  /* Demos show the sample-athlete banner (about 37px) above the session: keep the athlete view on screen. */
+  .sample-banner ~ .dashboard {
+    grid-template-rows: max(560px, calc(100vh - var(--header-h) - 61px)) auto;
+    grid-template-rows: max(560px, calc(100dvh - var(--header-h) - 61px)) auto;
+  }
+}
+@media (max-width: 1100px) {
+  .focus { flex: none; }
+  .evidence-grid { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 760px) {
+  /* The header wraps to two or three rows on a phone; sticky, it would cover a third of the screen. */
+  .app-header { position: static; }
+  .show-sm { display: block; }
+  .focus { padding: 18px 16px 18px 26px; gap: 14px; }
+  .focus::before { width: 10px; }
+  .focus-actions .btn.lg { flex: 1 1 100%; }
+}
+@media (max-width: 480px) {
+  /* The header's right-hand group must fit a 360 to 430px phone: shorter athlete name, Research as an icon. */
+  .header-right { gap: 2px; min-width: 0; }
+  .athlete-name { display: inline-block; max-width: 7.5em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; vertical-align: bottom; }
+  .label-wide { display: none; }
+}
+@media (pointer: coarse) {
+  /* No physical Enter key to point at on a touch screen. */
+  .focus-actions .kbd { display: none; }
+  .session-options .opt { height: 44px; }
+}

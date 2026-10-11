@@ -1,8 +1,68 @@
-import type { ReactNode } from 'react';
+import { useEffect, useId, useRef, useState, type ReactNode } from 'react';
 import type { LaunchContext } from '../protocols/launch';
 import { RECOVERY_REPS, type Snapshot } from '../session/engine';
-import { Book, Flask, LogoMark, Reset } from './Icons';
+import { Book, Flask, LogoMark, Menu, Reset } from './Icons';
 import { SportIcon } from './SportIcons';
+
+interface MenuItem {
+  label: string;
+  icon?: ReactNode;
+  run: () => void;
+}
+
+/**
+ * Phone-width navigation: the header buttons that do not fit (protocols, the Lab study,
+ * reset baseline) in one disclosure. A plain list of buttons, not an ARIA menu: Tab moves
+ * through it, Escape or a click outside closes it and returns focus to the toggle.
+ */
+function MoreMenu({ items }: { items: MenuItem[] }) {
+  const [open, setOpen] = useState(false);
+  const wrap = useRef<HTMLDivElement>(null);
+  const toggle = useRef<HTMLButtonElement>(null);
+  const id = useId();
+  useEffect(() => {
+    if (!open) return;
+    const onPointer = (e: PointerEvent) => {
+      if (!wrap.current?.contains(e.target as Node)) setOpen(false);
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape') return;
+      setOpen(false);
+      toggle.current?.focus();
+    };
+    document.addEventListener('pointerdown', onPointer);
+    document.addEventListener('keydown', onKey);
+    wrap.current?.querySelector<HTMLButtonElement>('.more-list button')?.focus();
+    return () => {
+      document.removeEventListener('pointerdown', onPointer);
+      document.removeEventListener('keydown', onKey);
+    };
+  }, [open]);
+  return (
+    <div className="more-nav show-sm" ref={wrap}>
+      <button ref={toggle} className="btn ghost sm" aria-expanded={open} aria-controls={id} onClick={() => setOpen((o) => !o)}>
+        <Menu size={15} /> More
+      </button>
+      {open && (
+        <div className="more-list" id={id}>
+          {items.map((it) => (
+            <button
+              key={it.label}
+              className="btn ghost sm block"
+              onClick={() => {
+                setOpen(false);
+                it.run();
+              }}
+            >
+              {it.icon}
+              {it.label}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 
 interface Props {
   view: 'landing' | 'sport' | 'session';
@@ -113,14 +173,21 @@ export function Header(p: Props) {
         <button className="btn ghost sm hide-sm" onClick={p.onLab} title="Synthetic validation study (UF HiPerGator)">
           <Flask size={15} /> Lab
         </button>
-        <button className="btn ghost sm" onClick={p.onResearch} title="How it works, evidence and limits">
-          <Book size={15} /> Research
+        <button className="btn ghost sm" onClick={p.onResearch} title="How it works, evidence and limits" aria-label="Research: how it works, evidence and limits">
+          <Book size={15} /> <span className="label-wide">Research</span>
         </button>
         {p.view === 'session' && (
           <button className="btn ghost sm hide-sm" onClick={p.onResetBaseline} title="Clear the personal baseline and recalibrate" aria-label="Reset baseline">
             <Reset size={15} />
           </button>
         )}
+        <MoreMenu
+          items={[
+            { label: 'Protocols', run: p.onLibrary },
+            { label: 'Lab study', icon: <Flask size={15} />, run: p.onLab },
+            ...(p.view === 'session' ? [{ label: 'Reset baseline', icon: <Reset size={15} />, run: p.onResetBaseline }] : []),
+          ]}
+        />
       </div>
     </header>
   );

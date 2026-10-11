@@ -23,7 +23,7 @@ export function SportPage({ sport, subSportId, onSubSport, onBack, onDemo, onLiv
   const refs = protocolRefs(sport, sub?.id);
   const contextName = sub?.name ?? sport.name;
   return (
-    <div className="landing">
+    <main className="landing" id="main" tabIndex={-1}>
       <section className="section sport-page">
         <button className="btn ghost sm" onClick={onBack}>
           <span aria-hidden>‹</span> All sports
@@ -115,6 +115,6 @@ export function SportPage({ sport, subSportId, onSubSport, onBack, onDemo, onLiv
           </button>
         </div>
       </section>
-    </div>
+    </main>
   );
 }

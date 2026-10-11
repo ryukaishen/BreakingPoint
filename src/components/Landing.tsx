@@ -85,7 +85,9 @@ export function Landing({ config, athlete, onSport, onDemo, onLibrary, onLab }: 
     if (!previewCtx) return;
     const id = setTimeout(() => {
       const engine = new SessionEngine(previewCtx.exercise, config, athlete, 'demo');
-      new DemoController(engine, previewCtx.exercise).runToEnd(false);
+      const demo = new DemoController(engine, previewCtx.exercise);
+      demo.stopAfterWarning = 1; // as in the app: the athlete stops after the warning
+      demo.runToEnd(false);
       setPreview(engine.getSnapshot());
     }, 30);
     return () => clearTimeout(id);
@@ -103,6 +105,7 @@ export function Landing({ config, athlete, onSport, onDemo, onLibrary, onLab }: 
 
   return (
     <div className="landing">
+      <main id="main" tabIndex={-1}>
       <section className="section hero">
         <div>
           <h1>
@@ -170,6 +173,7 @@ export function Landing({ config, athlete, onSport, onDemo, onLibrary, onLab }: 
                 onsetRep={preview.onsetRep}
                 exercise={previewCtx!.exercise}
                 height={190}
+                minReps={Math.max(6, preview.monitorReps.length)}
                 compact
               />
               <div className="hw-caption">
@@ -271,6 +275,8 @@ export function Landing({ config, athlete, onSport, onDemo, onLibrary, onLab }: 
           </span>
         </button>
       </section>
+
+      </main>
 
       <footer className="section site-foot">
         <span>{DISCLAIMER}</span>

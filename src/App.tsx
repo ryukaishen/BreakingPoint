@@ -4,15 +4,18 @@ import { AthleteMenu } from './components/athletes/AthleteMenu';
 import { LegacyDialog } from './components/athletes/LegacyDialog';
 import { CameraStage } from './components/CameraStage';
 import { ConfirmDialog } from './components/ConfirmDialog';
-import { FormDrawdown } from './components/FormDrawdown';
 import { Header } from './components/Header';
 import { Landing } from './components/Landing';
 import { ProtocolLibrary } from './components/ProtocolLibrary';
-import { RepTimeline } from './components/RepTimeline';
+import { RecoveryDialog } from './components/RecoveryDialog';
 import { ResearchModal, type ResearchTab } from './components/ResearchModal';
-import { SidePanel } from './components/SidePanel';
+import { SessionAnnouncer } from './components/SessionAnnouncer';
+import { Evidence } from './components/session/Evidence';
+import { FocusPanel } from './components/session/FocusPanel';
 import { SportPage } from './components/SportPage';
 import { SummaryModal } from './components/SummaryModal';
+import { clearDraft, draftAthleteId, interruptedRecord, listDrafts, type SetDraft } from './data/draft';
+import { browserStore } from './data/kv';
 import { claimLegacyBaseline } from './data/migrate';
 import { calibrationQuality } from './data/quality';
 import { SAMPLE_ATHLETE_NAME } from './data/sample';
@@ -20,14 +23,15 @@ import { useAthleteData } from './data/useAthleteData';
 import { DEFAULT_DETECTOR_CONFIG, loadDetectorConfig, type DetectorConfig } from './detection/config';
 import { LabelProvider, makeLabeler } from './protocols/labels';
 import { DEFAULT_LAUNCH, getSport, launchForExercise, resolveDemo, resolveLaunch, type LaunchContext } from './protocols/launch';
-import { sessionPattern } from './protocols/patterns';
 import { SessionEngine } from './session/engine';
-import { DemoRunner, LiveRunner, type Runner } from './session/runners';
+import { useNavGuard } from './session/useNavGuard';
+import { cameraErrorText, DemoRunner, LiveRunner, type Runner } from './session/runners';
 import { useSessionRecorder } from './session/useSessionRecorder';
-import { C } from './ui/theme';
-import { arrow } from './utils/format';
+import { useHandsFree } from './session/useHandsFree';
+import { usePref } from './session/usePref';
+import { useSetDraft } from './session/useSetDraft';
+import { useVoiceCues, voiceAvailable } from './session/voice';
 import { useEngine } from './utils/hooks';
-import { explainAlert } from './session/explain';
 
 type View = 'landing' | 'sport' | 'session';
 type Mode = 'demo' | 'live';
@@ -60,6 +64,13 @@ export default function App() {
   const [demoPaused, setDemoPaused] = useState(false);
   const [dialog, setDialog] = useState<Dialog>(null);
   const [confirm, setConfirm] = useState<Confirm>(null);
+  /** Detector evidence under the athlete view: open by default in demos (people exploring), closed in live sets (an athlete at 3 m). */
+  const [showEvidence, setShowEvidence] = useState(true);
+  const [voiceOn, setVoiceOn] = usePref('bp.pref.voice', false);
+  const [handsFreeOn, setHandsFreeOn] = usePref('bp.pref.handsFree', true);
+  /** Live sets cut off by a refresh, crash or closed tab, waiting for the athlete to keep or discard them (oldest first). */
+  const [recoveryQueue, setRecoveryQueue] = useState<SetDraft[]>([]);
+  const draftKv = useMemo(() => browserStore(), []);
   /** A live launch waiting for the user to create their first athlete profile. */
   const pendingLive = useRef<LaunchContext | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -85,6 +96,25 @@ export default function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Work cut off by a refresh, crash or closed tab: offer what was really measured (see data/draft.ts).
+  useEffect(() => {
+    if (!data.persistent) return;
+    const sets: SetDraft[] = [];
+    let lostCalibration = false;
+    for (const d of listDrafts(draftKv)) {
+      const owner = draftAthleteId(d);
+      if (!data.real.athlete(owner)) clearDraft(draftKv, owner); // the profile no longer exists: nothing to attach it to
+      else if (d.kind === 'calibration') {
+        clearDraft(draftKv, owner);
+        lostCalibration = true;
+      } else sets.push(d);
+    }
+    if (sets.length) setRecoveryQueue(sets);
+    else if (lostCalibration)
+      setToast({ text: 'Your last calibration was interrupted before it finished. Nothing was saved, and your saved baseline is unchanged.', kind: '' });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   /** The single entry point into analysis — only launchable (READY/BETA) contexts get here. */
   const startSession = useCallback(
     (m: Mode, ctx?: LaunchContext) => {
@@ -98,6 +128,7 @@ export default function App() {
       } else if (data.scope !== 'sample') data.setScope('sample');
       if (ctx) setLaunch(ctx);
       setMode(m);
+      setShowEvidence(m === 'demo');
       setSelectedRep(null);
       setShowSummary(false);
       setLibrary(false);
@@ -167,10 +198,24 @@ export default function App() {
     onStorageError: (text) => setToast({ text, kind: 'break' }),
   });
 
+  // Checkpoint a live set after every rep so an accidental refresh or close can be recovered (data/draft.ts).
+  const draft = useSetDraft({
+    snap,
+    mode,
+    kv: draftKv,
+    persistent: data.persistent,
+    athleteId: sessionAthlete?.id ?? null,
+    launch,
+    config,
+    active: view === 'session',
+    blocked: recoveryQueue.length > 0,
+  });
+
   // Frame source lifecycle (sessions start only once the Lab config is loaded)
   useEffect(() => {
     if (view !== 'session' || !configReady) return;
     let r: Runner;
+    let current = true; // a camera that fails after the session was left must not report into the next one
     setLiveError(null);
     if (mode === 'demo') {
       const d = new DemoRunner(engine, exercise);
@@ -180,13 +225,9 @@ export default function App() {
     } else {
       const video = videoRef.current as HTMLVideoElement;
       const l = new LiveRunner(engine, video);
-      l.start(setLiveStatus).catch((e: unknown) => {
-        const msg = e instanceof Error ? e.message : String(e);
-        setLiveError(
-          /Permission|NotAllowed/i.test(msg)
-            ? 'Camera permission was denied. Allow camera access in your browser, or run the demo dataset.'
-            : `Could not start the camera or pose model (${msg}).`,
-        );
+      l.start((st) => current && setLiveStatus(st)).catch((e: unknown) => {
+        if (!current) return;
+        setLiveError(cameraErrorText(e));
         setLiveStatus('');
       });
       r = l;
@@ -195,8 +236,10 @@ export default function App() {
     setDemoPaused(false);
     if (import.meta.env.DEV) (window as unknown as { __breakingpoint?: unknown }).__breakingpoint = { engine, runner: r, data };
     return () => {
+      current = false;
       r.stop();
       setRunner(null);
+      setLiveStatus('');
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [view, mode, engine, exercise, configReady]);
@@ -289,6 +332,9 @@ export default function App() {
     });
   };
 
+  // Browser Back/Forward, refresh and close get the same protection as the in-app buttons (session/navGuard.ts).
+  useNavGuard({ view, setView, isProtected: liveActive, requestLeave: guardLeave, persist: draft.flush });
+
   const newSet = () => {
     setShowSummary(false);
     setSelectedRep(null);
@@ -329,11 +375,32 @@ export default function App() {
   };
 
   const savedBaseline = mode === 'live' && sessionAthlete ? data.real.baseline(sessionAthlete.id, launch.protocol.id) : null;
-  const maxScore = Math.max(1, ...snap.monitorReps.map((r) => r.drift?.score ?? 0));
-  const contrib = snap.breakpointContributors?.slice(0, 3) ?? [];
-  const explanation = snap.alarmRep !== null ? explainAlert(exercise, snap.monitorReps, snap.onsetRep, snap.alarmRep) : null;
-  const pattern = snap.alarmRep !== null ? sessionPattern(exercise, snap.monitorReps, snap.onsetRep, snap.baseline?.reference.sigma0, launch.patternLabels) : null;
+  // Hands-free runs only in a live set with the camera working and nothing else asking for attention.
+  const handsFree = mode === 'live' && handsFreeOn;
+  const countdown = useHandsFree(
+    engine,
+    snap,
+    view === 'session' && handsFree && runner instanceof LiveRunner && !liveError && !confirm && !dialog && !showSummary && !recoveryQueue.length,
+  );
+  useVoiceCues(snap, view === 'session' && voiceOn);
+  const canSpeak = voiceAvailable();
+  const toggleEvidence = () => {
+    const next = !showEvidence;
+    setShowEvidence(next);
+    if (next)
+      requestAnimationFrame(() =>
+        document.getElementById('evidence')?.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' }),
+      );
+  };
   const sportForPage = getSport(sportView.sportId);
+
+  // Each view names itself for screen readers, tabs and history.
+  useEffect(() => {
+    document.title =
+      view === 'landing' ? 'BreakingPoint' : view === 'sport' ? `${sportForPage?.name ?? 'Sport'} | BreakingPoint` : `${launch.contextName}: ${launch.title} | BreakingPoint`;
+  }, [view, launch, sportForPage]);
+
+  const pendingRecovery = recoveryQueue[0] ?? null;
 
   const athleteMenu = (
     <AthleteMenu
@@ -361,6 +428,19 @@ export default function App() {
 
   return (
     <div className="app">
+      {/* Focuses <main> directly instead of navigating to #main, so it never adds a history entry (see session/navGuard.ts). */}
+      <a
+        className="skip-link"
+        href="#main"
+        onClick={(e) => {
+          e.preventDefault();
+          const main = document.getElementById('main');
+          main?.focus();
+          main?.scrollIntoView();
+        }}
+      >
+        Skip to main content
+      </a>
       <Header
         view={view}
         snap={view === 'session' ? snap : null}
@@ -414,7 +494,11 @@ export default function App() {
 
       {view === 'session' && (
         <LabelProvider value={labeler}>
-          <main className="dashboard">
+          <main className="dashboard" id="main" tabIndex={-1}>
+            <h1 className="visually-hidden">
+              {launch.contextName}: {launch.title}, {mode === 'demo' ? 'demo' : 'live'} session
+            </h1>
+            <SessionAnnouncer snap={snap} />
             <div className="stage-col">
               <CameraStage
                 snap={snap}
@@ -439,17 +523,18 @@ export default function App() {
                 onDemoSkip={() => runner instanceof DemoRunner && runner.skipToEnd()}
                 onRetryLive={() => startSession('live')}
                 onSwitchToDemo={() => startSession('demo')}
+                evidence={showEvidence}
               />
             </div>
-            <aside className="side-col">
-              <SidePanel
+            <aside className="side-col" aria-label="Session">
+              <FocusPanel
                 snap={snap}
                 mode={mode}
                 launch={launch}
-                selectedRep={selectedRep}
-                onSelectRep={setSelectedRep}
-                savedBaseline={savedBaseline?.baseline ?? null}
                 bestHeld={recorder.bestBefore}
+                savedBaseline={savedBaseline}
+                countdown={countdown}
+                handsFree={handsFree}
                 onStartCalibration={() => engine.startCalibration()}
                 onFinishCalibration={() => engine.finishCalibration()}
                 onUseSaved={() => {
@@ -461,62 +546,32 @@ export default function App() {
                 onShowSummary={() => setShowSummary(true)}
                 onNewSet={newSet}
               />
-            </aside>
-            <section className="bottom">
-              <div className="panel chart-card">
-                <div className="chart-head">
-                  <h2>
-                    Form Changes Over Time
-                    <small>Form Change Score for each rep, compared with {athleteName}'s usual form</small>
-                  </h2>
-                  <div className="legend">
-                    <span><i className="box" style={{ background: C.stable, opacity: 0.3 }} />your normal range</span>
-                    <span><i className="box" style={{ background: C.stable, opacity: 0.65 }} />score for each rep</span>
-                    <span><i style={{ background: C.text, height: 3 }} />trend (smoothed)</span>
-                    <span><i style={{ background: C.drift }} />warning line</span>
-                    <span><i style={{ background: C.break }} />alert line</span>
-                    <span><i style={{ background: C.violet }} />build-up of change (CUSUM)</span>
-                  </div>
-                </div>
-                <FormDrawdown
-                  reps={snap.monitorReps}
-                  thresholds={snap.thresholds}
-                  cusumH={snap.config.cusumH}
-                  mode={snap.config.mode}
-                  alarmRep={snap.alarmRep}
-                  onsetRep={snap.onsetRep}
-                  exercise={exercise}
-                  selected={selectedRep}
-                  onSelect={setSelectedRep}
-                  height={185}
-                />
-                <div className="chart-caption">
-                  {snap.alarmRep !== null ? (
-                    <>
-                      <span>
-                        {explanation?.what} <b className="c-break">{explanation?.when}</b>
-                        {pattern && (
-                          <>
-                            {' '}
-                            Pattern: <b>{pattern.label}</b>.
-                          </>
-                        )}
-                      </span>
-                      <span>
-                        Biggest changes at the alert rep: <b>{contrib.map((d) => `${labeler.short(d.key)} ${arrow(d.zClipped ?? 0)}`).join(', ')}</b>
-                      </span>
-                    </>
-                  ) : snap.monitorReps.length ? (
-                    <span>
-                      No alert yet. {snap.monitorReps.length} rep{snap.monitorReps.length > 1 ? 's' : ''} compared with your usual form.
-                    </span>
-                  ) : (
-                    <span className="muted">The chart fills in as monitored reps are completed. Hover or click a bar for its measurements.</span>
-                  )}
-                </div>
-                <RepTimeline reps={snap.monitorReps} alarmRep={snap.alarmRep} selected={selectedRep} onSelect={setSelectedRep} maxScore={maxScore} />
+              <div className="session-options" role="group" aria-label="Session options">
+                <button className="opt" aria-pressed={showEvidence} aria-controls="evidence" onClick={toggleEvidence}>
+                  Detector evidence <span className="opt-state">{showEvidence ? 'Shown' : 'Hidden'}</span>
+                </button>
+                {canSpeak && (
+                  <button className="opt" aria-pressed={voiceOn} onClick={() => setVoiceOn(!voiceOn)}>
+                    Voice cues <span className="opt-state">{voiceOn ? 'On' : 'Off'}</span>
+                  </button>
+                )}
+                {mode === 'live' && (
+                  <button
+                    className="opt"
+                    aria-pressed={handsFreeOn}
+                    onClick={() => setHandsFreeOn(!handsFreeOn)}
+                    title="Starts calibration and the set after a short countdown, and ends the set when you stand still. Every step can still be done by hand."
+                  >
+                    Hands-free <span className="opt-state">{handsFreeOn ? 'On' : 'Off'}</span>
+                  </button>
+                )}
               </div>
-            </section>
+            </aside>
+            {showEvidence && (
+              <div className="evidence-row">
+                <Evidence snap={snap} launch={launch} athleteName={athleteName} selectedRep={selectedRep} onSelectRep={setSelectedRep} />
+              </div>
+            )}
           </main>
           {showSummary && snap.summary && (
             <SummaryModal
@@ -580,6 +635,27 @@ export default function App() {
             data.refresh();
           }}
           onClose={() => setDialog(null)}
+        />
+      )}
+      {pendingRecovery && (
+        <RecoveryDialog
+          athleteName={data.real.athlete(pendingRecovery.record.athleteId)?.name ?? 'Athlete'}
+          draft={pendingRecovery}
+          onKeep={() => {
+            // Never drop a draft that did not reach the history: if saving fails, keep asking.
+            if (!data.real.saveSession(interruptedRecord(pendingRecovery))) {
+              setToast({ text: 'That set could not be saved: browser storage is full or unavailable.', kind: 'break' });
+              return;
+            }
+            clearDraft(draftKv, pendingRecovery.record.athleteId);
+            setRecoveryQueue((q) => q.slice(1));
+            data.refresh();
+            setToast({ text: 'Interrupted set kept. It does not count toward records.', kind: '' });
+          }}
+          onDiscard={() => {
+            clearDraft(draftKv, pendingRecovery.record.athleteId);
+            setRecoveryQueue((q) => q.slice(1));
+          }}
         />
       )}
       {confirm && (

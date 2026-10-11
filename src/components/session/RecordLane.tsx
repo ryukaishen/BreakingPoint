@@ -8,9 +8,9 @@ interface Props {
 }
 
 /**
- * The record line: how many reps you have held your baseline this set, against a
- * marker at your own best. It only grows while movement stays at baseline, so it
- * can never reward continuing after drift.
+ * The record line: how many reps you have held your usual form this set, against a
+ * marker at your own best. It only grows while your form stays usual, so it can
+ * never reward continuing after your form has changed.
  */
 export function RecordLane({ held, best, frozen }: Props) {
   const scale = Math.max(8, held, best ?? 0) + 2;
@@ -20,7 +20,7 @@ export function RecordLane({ held, best, frozen }: Props) {
   return (
     <div className={`lane ${frozen ? 'frozen' : ''} ${past ? 'past' : ''}`}>
       <div className="lane-top">
-        <span className="lane-label">Held at your baseline</span>
+        <span className="lane-label">Held your usual form</span>
         <span className="lane-value" aria-hidden>
           {held}
         </span>
@@ -28,7 +28,7 @@ export function RecordLane({ held, best, frozen }: Props) {
       <div
         className="lane-track"
         role="meter"
-        aria-label="Reps held at your baseline"
+        aria-label="Reps held at your usual form"
         aria-valuemin={0}
         aria-valuemax={scale}
         aria-valuenow={held}
@@ -39,7 +39,7 @@ export function RecordLane({ held, best, frozen }: Props) {
       </div>
       <div className="lane-foot">
         {frozen ? (
-          <span>The record line counts only reps before drift.</span>
+          <span>The record line counts only reps before your form started to change.</span>
         ) : best === null ? (
           <span>No record yet. This set draws your first line.</span>
         ) : past ? (

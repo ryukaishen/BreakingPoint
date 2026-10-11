@@ -38,8 +38,10 @@ const MAP: Record<ExerciseType, Record<string, [PatternId, Dir]>> = {
   squat: {
     kneeRomL: ['rom', -1], kneeRomR: ['rom', -1], hipRom: ['rom', -1], depth: ['rom', -1],
     trunkLean: ['technique', 1], eccentricDuration: ['technique', 0],
+    // Peak velocity is the drive out of the bottom: a slower drive is the "recovery" (ascent) family,
+    // never "explosive output", which describes jumps.
     repDuration: ['recovery', 1], concentricDuration: ['recovery', 1],
-    peakVelocity: ['explosive', -1], asymmetry: ['asymmetry', 1],
+    peakVelocity: ['recovery', -1], asymmetry: ['asymmetry', 1],
   },
   cmj: {
     jumpHeight: ['explosive', -1], rsiMod: ['explosive', -1], flightTime: ['explosive', -1], concentricDuration: ['explosive', 1],
@@ -90,7 +92,10 @@ export function classifyPattern(
   const scored = (Object.entries(groups) as [PatternId, { key: string; z: number; c: number }[]][])
     .map(([id, items]) => {
       const top = [...items].sort((a, b) => b.c - a.c);
-      const score = top.length >= 2 ? (top[0].c + top[1].c) / 2 : top[0].c;
+      // Every family is judged by its largest change. (Averaging the top two diluted families with
+      // several measurements, so a one-measurement family such as left-right difference could win
+      // with only the third-largest change of the set.)
+      const score = top[0].c;
       return { id, score, evidence: top.filter((t) => t.c >= 1).map(({ key, z: zz }) => ({ key, z: zz })) };
     })
     .sort((a, b) => b.score - a.score);

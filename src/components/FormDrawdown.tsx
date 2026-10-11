@@ -178,22 +178,34 @@ export function FormDrawdown({
         {onsetRep !== null && alarmRep !== null && onsetRep < alarmRep && (
           <g>
             <line x1={xc(onsetRep) - xStep / 2} x2={xc(onsetRep) - xStep / 2} y1={pad.t} y2={pad.t + plotH} stroke={C.violet} strokeDasharray="3 4" strokeWidth="1.4" />
-            {!compact && (
-              <text x={xc(onsetRep) - xStep / 2 + 4} y={pad.t + 10} fontSize="10.5" fill={C.violet} fontFamily={FONT_DISPLAY} letterSpacing="0.5">
-                changes began, about rep {onsetRep}
-              </text>
-            )}
+            {!compact &&
+              (() => {
+                // About 150px of text: put it left of the line when it would run past the right edge.
+                const lx = xc(onsetRep) - xStep / 2;
+                const flip = lx + 4 + 150 > W - pad.r;
+                return (
+                  <text x={flip ? lx - 4 : lx + 4} y={pad.t + 10} textAnchor={flip ? 'end' : 'start'} fontSize="10.5" fill={C.violet} fontFamily={FONT_DISPLAY} letterSpacing="0.5">
+                    changes began, about rep {onsetRep}
+                  </text>
+                );
+              })()}
           </g>
         )}
-        {alarmRep !== null && (
-          <g>
-            <line x1={xc(alarmRep)} x2={xc(alarmRep)} y1={pad.t} y2={pad.t + plotH} stroke={C.break} strokeWidth="2.2" />
-            <rect x={xc(alarmRep) + 5} y={pad.t + (compact ? 2 : 16)} width={compact ? 92 : 148} height={compact ? 16 : 18} rx="2" fill={C.break} />
-            <text x={xc(alarmRep) + 11} y={pad.t + (compact ? 14 : 29)} fontSize={compact ? 9.5 : 10.5} fontWeight="700" fill={C.void} fontFamily={FONT_DISPLAY}>
-              {compact ? `BREAK · REP ${alarmRep}` : `BREAKING POINT · REP ${alarmRep}`}
-            </text>
-          </g>
-        )}
+        {alarmRep !== null &&
+          (() => {
+            const labelW = compact ? 92 : 148;
+            // Right of the alert line, or left of it when the alert is near the end of the axis.
+            const lx = xc(alarmRep) + 5 + labelW > W - pad.r ? xc(alarmRep) - 5 - labelW : xc(alarmRep) + 5;
+            return (
+              <g>
+                <line x1={xc(alarmRep)} x2={xc(alarmRep)} y1={pad.t} y2={pad.t + plotH} stroke={C.break} strokeWidth="2.2" />
+                <rect x={lx} y={pad.t + (compact ? 2 : 16)} width={labelW} height={compact ? 16 : 18} rx="2" fill={C.break} />
+                <text x={lx + 6} y={pad.t + (compact ? 14 : 29)} fontSize={compact ? 9.5 : 10.5} fontWeight="700" fill={C.void} fontFamily={FONT_DISPLAY}>
+                  {compact ? `BREAK · REP ${alarmRep}` : `BREAKING POINT · REP ${alarmRep}`}
+                </text>
+              </g>
+            );
+          })()}
 
         {/* CUSUM evidence strip */}
         {stripH > 0 && (

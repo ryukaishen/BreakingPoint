@@ -63,6 +63,48 @@ export class DemoRunner implements Runner {
   }
 }
 
+/** Why a live session could not start, in terms the athlete can act on. */
+export type CameraProblem = 'denied' | 'missing' | 'busy' | 'insecure' | 'model' | 'other';
+
+export class CameraError extends Error {
+  constructor(
+    readonly problem: CameraProblem,
+    message: string,
+  ) {
+    super(message);
+    this.name = 'CameraError';
+  }
+
+  /** Map a getUserMedia failure (a DOMException name) to a problem the UI can explain. */
+  static from(e: unknown): CameraError {
+    const name = (e as { name?: string } | null)?.name ?? '';
+    const msg = e instanceof Error ? e.message : String(e);
+    if (name === 'NotAllowedError' || name === 'PermissionDeniedError' || name === 'SecurityError') return new CameraError('denied', msg);
+    if (name === 'NotFoundError' || name === 'DevicesNotFoundError' || name === 'OverconstrainedError') return new CameraError('missing', msg);
+    if (name === 'NotReadableError' || name === 'TrackStartError' || name === 'AbortError') return new CameraError('busy', msg);
+    return new CameraError('other', msg);
+  }
+}
+
+/** The message shown when a live session cannot start. */
+export function cameraErrorText(e: unknown): string {
+  const problem = e instanceof CameraError ? e.problem : 'other';
+  switch (problem) {
+    case 'denied':
+      return 'Camera permission was denied. Allow camera access for this site in your browser settings, then try again. You can also run a demo.';
+    case 'missing':
+      return 'No camera was found. Connect a camera and try again, or run a demo.';
+    case 'busy':
+      return 'The camera is being used by another app or tab. Close it, then try again.';
+    case 'insecure':
+      return 'Camera access needs a secure page. Open BreakingPoint over https (or on localhost) to use your camera.';
+    case 'model':
+      return 'The camera works, but the pose model could not load. Check your connection and try again.';
+    default:
+      return `Could not start the camera (${e instanceof Error ? e.message : String(e)}).`;
+  }
+}
+
 export class LiveRunner implements Runner {
   kind = 'live' as const;
   aspect = 16 / 9;
@@ -83,11 +125,26 @@ export class LiveRunner implements Runner {
   }
 
   async start(onStatus?: (s: string) => void) {
+    // Browsers expose the camera only to secure pages (https or localhost).
+    if (!window.isSecureContext || !navigator.mediaDevices?.getUserMedia) {
+      throw new CameraError('insecure', 'Camera access needs a secure (https) page.');
+    }
     onStatus?.('Requesting camera…');
-    this.stream = await navigator.mediaDevices.getUserMedia({
-      video: { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode: 'user' },
-      audio: false,
-    });
+    let stream: MediaStream;
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({
+        video: { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode: 'user' },
+        audio: false,
+      });
+    } catch (e) {
+      throw CameraError.from(e);
+    }
+    // The session may have been left while the permission prompt was open: release the camera at once.
+    if (this.stopped) {
+      stream.getTracks().forEach((t) => t.stop());
+      return;
+    }
+    this.stream = stream;
     this.video.srcObject = this.stream;
     this.video.muted = true;
     this.video.playsInline = true;
@@ -95,7 +152,15 @@ export class LiveRunner implements Runner {
     this.aspect = this.video.videoWidth / Math.max(1, this.video.videoHeight) || 16 / 9;
     this.pipeline.setAspect(this.aspect);
     onStatus?.('Loading pose model (runs locally)…');
-    await this.pose.init();
+    try {
+      await this.pose.init();
+    } catch (e) {
+      throw new CameraError('model', e instanceof Error ? e.message : String(e));
+    }
+    if (this.stopped) {
+      this.pose.close();
+      return;
+    }
     onStatus?.('');
     this.fpsT = performance.now();
     const loop = () => {

@@ -40,13 +40,16 @@ export function useVoiceCues(snap: Snapshot, enabled: boolean) {
           return speak(`Recovery check. ${RECOVERY_REPS} controlled reps.`, false);
         case 'recoveryDone': {
           const s = snap.recovery?.status;
-          return speak(`Recovery check complete. ${s === 'recovered' ? 'Back to baseline.' : s === 'partial' ? 'Partly recovered.' : 'Drift persists.'}`, false);
+          return speak(
+            `Recovery check complete. ${s === 'recovered' ? 'Back to your usual form.' : s === 'partial' ? 'Partly back to your usual form.' : 'Still different from your usual form.'}`,
+            false,
+          );
         }
         default:
           return;
       }
     }
-    if (snap.phase === 'monitoring' && snap.state === 'DRIFT' && p.state === 'STABLE') speak('Movement changing. Be ready to stop.', false);
+    if (snap.phase === 'monitoring' && snap.state === 'DRIFT' && p.state === 'STABLE') speak('Form changing. Be ready to stop.', false);
   }, [snap.phase, snap.state, snap.alarmRep, snap.event, snap.calibrationTarget, snap.recovery, enabled]);
 
   useEffect(() => () => {

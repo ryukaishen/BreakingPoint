@@ -158,6 +158,7 @@ export function SummaryModal({ snap, launch, outcome, onClose, onRecovery, onNew
               onsetRep={snap.onsetRep}
               exercise={snap.exercise}
               height={190}
+              minReps={Math.max(6, snap.monitorReps.length)}
             />
           </div>
           {sm.topChanges.length > 0 && (

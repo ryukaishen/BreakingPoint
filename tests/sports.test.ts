@@ -5,7 +5,7 @@ import { featureSpecs } from '../src/biomechanics/catalog';
 import { DEFAULT_DETECTOR_CONFIG, parseDetectorConfig, serializeDetectorConfig } from '../src/detection/config';
 import { DemoController } from '../src/demo/demoController';
 import { allProtocolEntries, DEMO_CONTEXTS, resolveDemo, resolveLaunch } from '../src/protocols/launch';
-import { sessionPattern } from '../src/protocols/patterns';
+import { classifyPattern, sessionPattern } from '../src/protocols/patterns';
 import { PRIMITIVES } from '../src/protocols/primitives';
 import { canLaunch, PROTOCOLS } from '../src/protocols/protocols';
 import { SPORTS } from '../src/protocols/sports';
@@ -169,6 +169,18 @@ describe('drift-pattern labels (descriptive, non-medical)', () => {
     const p2 = sessionPattern('cmj', soccer.s.monitorReps, soccer.s.onsetRep, soccer.s.baseline?.reference.sigma0, bb.patternLabels);
     expect(p2?.id).toBe('explosive');
     expect(p2?.label).toBe('JUMP CONSISTENCY CHANGING');
+  });
+  it('a squat is never labelled with the jump pattern "explosive output"', () => {
+    const strength = runDemo('strength');
+    const p = sessionPattern('squat', strength.s.monitorReps, strength.s.onsetRep, strength.s.baseline?.reference.sigma0, strength.ctx.patternLabels);
+    expect(p).not.toBeNull();
+    expect(p?.id).not.toBe('explosive');
+    expect(p?.label).not.toMatch(/explosive/i);
+    // The label follows the largest change: in this demo, more trunk lean.
+    expect(p?.id).toBe('technique');
+    // Whatever the data, no squat measurement can produce it.
+    const strongDrop = classifyPattern('squat', { peakVelocity: -4, repDuration: 0.5, concentricDuration: 0.5 });
+    expect(strongDrop?.id).toBe('recovery');
   });
   it('labels never use diagnostic language', () => {
     const text = JSON.stringify([SPORTS, PROTOCOLS]).toLowerCase();

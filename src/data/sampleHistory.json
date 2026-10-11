@@ -1754,7 +1754,7 @@
      "meanZ": -4.164284
     }
    ],
-   "patternId": "rom",
+   "patternId": "technique",
    "recovery": {
     "percent": 0.801456,
     "status": "partial",
@@ -1895,7 +1895,7 @@
      "meanZ": -3.150864
     }
    ],
-   "patternId": "explosive",
+   "patternId": "rom",
    "recovery": {
     "percent": 0.680892,
     "status": "partial",
@@ -2170,7 +2170,7 @@
      "meanZ": -2.693193
     }
    ],
-   "patternId": "asymmetry",
+   "patternId": "rom",
    "recovery": {
     "percent": 0.659586,
     "status": "partial",
@@ -2446,7 +2446,7 @@
      "meanZ": 2.005214
     }
    ],
-   "patternId": "asymmetry",
+   "patternId": "recovery",
    "recovery": {
     "percent": 0.842144,
     "status": "partial",

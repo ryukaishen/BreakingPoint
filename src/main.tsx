@@ -6,6 +6,8 @@ import '@fontsource-variable/anybody/standard-italic.css';
 import App from './App';
 import './styles.css';
 import './styles-platform.css';
+import './ui/numerals.css';
+import './styles-session.css';
 
 createRoot(document.getElementById('root') as HTMLElement).render(
   <StrictMode>

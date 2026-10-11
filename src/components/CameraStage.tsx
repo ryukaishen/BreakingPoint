@@ -17,7 +17,7 @@ interface Props {
   flash: boolean;
   demoSpeed: number;
   demoPaused: boolean;
-  /** Show detector overlays (joint angles, depth gauge, rep phase) for coaches. Optional until the athlete view is wired in. */
+  /** Show detector overlays (joint angles, depth gauge, rep phase) for coaches. Off keeps the athlete view quiet. */
   evidence?: boolean;
   onDemoSpeed: (s: number) => void;
   onDemoPause: () => void;
@@ -102,6 +102,7 @@ export function CameraStage(p: Props) {
   const gaugeMax = s.exercise === 'squat' ? 0.75 : s.exercise === 'lunge' ? 0.6 : 0.45;
   const phaseText = p.launch.primitive.phaseLabels[live.repPhase] ?? PHASE_TEXT[live.repPhase] ?? live.repPhase;
   const depthNow = Math.max(0, Math.min(gaugeMax, live.depth));
+  const overlays = p.evidence !== false;
 
   return (
     <div className={`stage ${p.flash ? 'flash' : ''} ${s.state === 'BREAKPOINT' && s.phase === 'monitoring' ? 'breakpoint' : ''}`} ref={wrapRef}>
@@ -118,10 +119,12 @@ export function CameraStage(p: Props) {
           <span className="val" style={{ color: s.phase === 'monitoring' && s.monitorReps.length ? STATE_COLOR[s.state] : C.text }}>{repCount}</span>
           <span className="ctx code">{ctxLabel}</span>
         </div>
-        <div className="phase-pill">
-          <span className="qdot" style={{ background: live.repPhase === 'standing' ? C.muted : C.sys }} />
-          {phaseText}
-        </div>
+        {overlays && (
+          <div className="phase-pill">
+            <span className="qdot" style={{ background: live.repPhase === 'standing' ? C.muted : C.sys }} />
+            {phaseText}
+          </div>
+        )}
       </div>
 
       {isDemo && (
@@ -138,7 +141,7 @@ export function CameraStage(p: Props) {
           <span className="qdot" style={{ background: QUALITY_COLOR[live.qualityLabel] }} />
           <span>{live.qualityLabel}</span>
         </div>
-        {live.kneeFlex !== null && (
+        {overlays && live.kneeFlex !== null && (
           <div className="chip">
             <span className="k">Knee</span>
             <span className="mono">{live.kneeFlex.toFixed(0)}°</span>
@@ -146,7 +149,8 @@ export function CameraStage(p: Props) {
             <span className="mono">{live.trunkLean !== null ? `${live.trunkLean.toFixed(0)}°` : '—'}</span>
           </div>
         )}
-        <div className="depth-gauge" title="Live hip drop vs your baseline depth range">
+        {overlays && (
+        <div className="depth-gauge" title="Live hip drop compared with your usual depth">
           <div className="lbl">Depth</div>
           <div className="track">
             {baseDepth && (
@@ -162,6 +166,7 @@ export function CameraStage(p: Props) {
           </div>
           {baseDepth && <div className="lbl" style={{ color: C.stable }}>Your<br />range</div>}
         </div>
+        )}
       </div>
 
       <div className="ov ov-bl">

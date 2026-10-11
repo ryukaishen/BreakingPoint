@@ -13,7 +13,13 @@ import { STATE_LABEL } from '../src/utils/format';
 /** Files whose visible text an athlete sees in the live app (the research panel is checked separately). */
 const LIVE_COPY_FILES = [
   'src/App.tsx',
-  'src/components/SidePanel.tsx',
+  'src/components/session/FocusPanel.tsx',
+  'src/components/session/RecordLane.tsx',
+  'src/components/session/Evidence.tsx',
+  'src/components/CameraStage.tsx',
+  'src/components/RecoveryDialog.tsx',
+  'src/session/voice.ts',
+  'src/session/announce.ts',
   'src/components/FormDrawdown.tsx',
   'src/components/RepTimeline.tsx',
   'src/components/SummaryModal.tsx',

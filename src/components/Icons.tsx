@@ -16,6 +16,10 @@ export const LogoMark = ({ size = 28 }: { size?: number }) => (
   </svg>
 );
 
+export const Menu = ({ size, ...p }: P) => (
+  <svg {...base(size)} {...p}><path d="M4 7h16M4 12h16M4 17h16" /></svg>
+);
+
 export const Lock = ({ size, ...p }: P) => (
   <svg {...base(size)} {...p}><rect x="4" y="11" width="16" height="10" rx="2" /><path d="M8 11V7a4 4 0 0 1 8 0v4" /></svg>
 );
