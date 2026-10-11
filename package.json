@@ -12,7 +12,10 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
-    "typecheck": "tsc -p tsconfig.json"
+    "typecheck": "tsc -p tsconfig.json",
+    "check:assets": "node scripts/check-assets.mjs",
+    "e2e:release": "node scripts/e2e/release-journeys.mjs",
+    "e2e:guard": "node scripts/e2e/session-guard.mjs"
   },
   "dependencies": {
     "@fontsource-variable/anybody": "5.3.0",

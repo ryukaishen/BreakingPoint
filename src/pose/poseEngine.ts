@@ -9,8 +9,9 @@ import type { Pose } from './landmarks';
 const LOCAL_WASM = '/mediapipe/wasm';
 const CDN_WASM = 'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.35/wasm';
 const LOCAL_MODEL = '/models/pose_landmarker_full.task';
+// Pinned to the same object generation as the self-hosted copy (scripts/setup-assets.mjs).
 const CDN_MODEL =
-  'https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_full/float16/latest/pose_landmarker_full.task';
+  'https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_full/float16/latest/pose_landmarker_full.task?generation=1682642787774579';
 
 export type PoseEngineStatus = 'idle' | 'loading' | 'ready' | 'error';
 
