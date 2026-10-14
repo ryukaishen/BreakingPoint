@@ -6,6 +6,8 @@ import { describe, expect, it } from 'vitest';
 import { existsSync, readFileSync } from 'node:fs';
 import { HIPERGATOR_STUDY as S, PER_SCENARIO, RECOVERY_CHECK } from '../src/research/hipergatorStudy';
 import { REAL_WORLD_SCOPE, REAL_WORLD_STUDIES } from '../src/research/realWorldStudies';
+import { studyHeadline } from '../src/research/studyHeadline';
+import { parseDetectorConfig } from '../src/detection/config';
 import { pct } from '../src/utils/format';
 
 const report = readFileSync('results/VALIDATION_REPORT.md', 'utf8');
@@ -111,6 +113,37 @@ describe('HiPerGator study facts match the original files', () => {
     const [t0, t1] = v.true_positive_rate_ci95;
     expect(report).toContain(`| ${pct(v.false_positive_rate)} | ${pct(f0)} – ${pct(f1)} |`);
     expect(report).toContain(`| ${pct(v.true_positive_rate)} | ${pct(t0)} – ${pct(t1)} |`);
+  });
+});
+
+describe('the landing page figures are the frozen study results', () => {
+  const frozenRaw = readFileSync('results/breakingpoint_detector_config.json', 'utf8');
+  const shippedRaw = readFileSync('public/breakingpoint_detector_config.json', 'utf8');
+  const headline = studyHeadline(parseDetectorConfig(config).validation)!;
+
+  it('the shipped config is the frozen study output, unchanged', () => {
+    expect(shippedRaw.replace(/\r\n/g, '\n')).toBe(frozenRaw.replace(/\r\n/g, '\n'));
+    expect(JSON.parse(frozenRaw).validation.reported_on).toBe('held-out evaluation split');
+  });
+
+  it('prints the held-out rates exactly as the report does', () => {
+    const [sessions, falseAlerts, detected, delay] = headline.figures.map((f) => f.value);
+    expect(report).toContain(`Simulated sessions: **${sessions}**`);
+    expect(report).toContain(`| False-positive rate (no-change sessions A,B,E,F,G) | ${falseAlerts} |`);
+    expect(report).toContain(`| True-positive rate (drift sessions C,D,H) | ${detected} |`);
+    expect(report).toContain(`| Median detection delay (reps) | ${delay.replace(' reps', '.0')} |`);
+    expect(report).toContain(`**${falseAlerts}** of no-change sessions and detected **${detected}** of drift sessions, with a median delay of **${delay.replace(' reps', '.0')} reps**`);
+    expect(headline.figures.map((f) => f.value)).toEqual(['100,000', '2.2%', '89.6%', '4 reps']);
+  });
+
+  it('says the rates come from the held-out half', () => {
+    expect(headline.heldOutSessions).toBe(S.heldOutSessions);
+    expect(report).toContain(`${n(S.heldOutSessions)} held-out split`);
+  });
+
+  it('shows nothing until a config with the study has loaded', () => {
+    expect(studyHeadline(undefined)).toBeNull();
+    expect(studyHeadline({ numSessions: NaN })).toBeNull();
   });
 });
 

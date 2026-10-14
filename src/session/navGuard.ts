@@ -1,4 +1,4 @@
-// Keeps the browser's history in step with the app's three views, and protects
+// Keeps the browser's history in step with the app's views, and protects
 // live work in progress from an accidental Back, refresh or close.
 //
 // What can and cannot be guaranteed:
@@ -12,7 +12,7 @@
 // The controller takes its window and handlers as arguments so it can be tested
 // without a browser.
 
-export type NavView = 'landing' | 'sport' | 'session';
+export type NavView = 'landing' | 'sport' | 'session' | 'status' | 'athletes';
 
 interface Entry {
   view: NavView;
@@ -61,7 +61,7 @@ export interface NavGuard {
   dispose(): void;
 }
 
-const VIEWS: readonly string[] = ['landing', 'sport', 'session'];
+const VIEWS: readonly string[] = ['landing', 'sport', 'session', 'status', 'athletes'];
 
 function parse(state: unknown): Entry | null {
   const bp = (state as { bp?: { view?: unknown; pos?: unknown } } | null)?.bp;

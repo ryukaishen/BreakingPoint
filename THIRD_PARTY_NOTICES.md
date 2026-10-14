@@ -12,6 +12,9 @@ These are not stored in git. `npm install` fetches them, and the build copies th
 | Pose Landmarker (full) model, `pose_landmarker_full.task` | Google, MediaPipe model card "BlazePose GHUM 3D" | Apache License 2.0, as stated on the [model card](https://storage.googleapis.com/mediapipe-assets/Model%20Card%20BlazePose%20GHUM%203D.pdf) |
 | Mona Sans variable font, `@fontsource-variable/mona-sans` | The Mona Sans Project Authors (GitHub) | SIL Open Font License 1.1 |
 | Anybody variable font, `@fontsource-variable/anybody` | The Anybody Project Authors (Etcetera Type Co.) | SIL Open Font License 1.1 |
+| Barlow Condensed font (SemiBold, Bold), `@fontsource/barlow-condensed` | The Barlow Project Authors | SIL Open Font License 1.1 |
+| Inter variable font, `@fontsource-variable/inter` | The Inter Project Authors | SIL Open Font License 1.1 |
+| JetBrains Mono variable font, `@fontsource-variable/jetbrains-mono` | The JetBrains Mono Project Authors | SIL Open Font License 1.1 |
 | React and React DOM | Meta Platforms, Inc. and affiliates | MIT |
 
 The model card lists "fitness and repetition counting" among the model's intended uses, and rules out surveillance and identity recognition. BreakingPoint uses it only on the device, for one person in frame.

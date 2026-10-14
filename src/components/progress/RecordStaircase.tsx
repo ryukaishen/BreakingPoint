@@ -8,6 +8,11 @@ interface Props {
   model: StaircaseModel;
   /** Where the title sits in the page outline. */
   headingLevel?: 2 | 3;
+  /**
+   * Lime marks only a genuine new record. Leave this off for sample history:
+   * acid lime is reserved for an eligible live record.
+   */
+  limeRecord?: boolean;
 }
 
 // Geometry in SVG user units. The chart scrolls sideways on narrow screens instead of shrinking its text.
@@ -36,7 +41,7 @@ const CLASS: Record<StairSession['status'], string> = {
  * Every bar carries its value as text. Lime is used only for the newest session when it
  * is a genuine new record.
  */
-export function RecordStaircase({ model, headingLevel = 2 }: Props) {
+export function RecordStaircase({ model, headingLevel = 2, limeRecord = true }: Props) {
   const Heading = `h${headingLevel}` as 'h2' | 'h3';
   const { sessions, record, yMax } = model;
   const n = sessions.length;
@@ -111,7 +116,7 @@ export function RecordStaircase({ model, headingLevel = 2 }: Props) {
           {/* bars and the staircase share one lean, so the risers lean too */}
           <g transform={`translate(0 ${base}) skewX(-12) translate(0 ${-base})`}>
             {sessions.map((s, i) => {
-              const isLatestRecord = latestRecord && s.sessionId === latest.sessionId;
+              const isLatestRecord = limeRecord && latestRecord && s.sessionId === latest.sessionId;
               const h = Math.max(2, base - y(s.held));
               return (
                 <g key={s.sessionId} className={`rs-bar ${CLASS[s.status]}${isLatestRecord ? ' is-new' : ''}`} style={vars({ '--i': i })}>
@@ -127,7 +132,7 @@ export function RecordStaircase({ model, headingLevel = 2 }: Props) {
           {sessions.map((s, i) => {
             const top = y(s.held);
             const px = lean(cx(i), top);
-            const isLatestRecord = latestRecord && s.sessionId === latest.sessionId;
+            const isLatestRecord = limeRecord && latestRecord && s.sessionId === latest.sessionId;
             return (
               <g key={s.sessionId} className={`rs-mark ${CLASS[s.status]}${isLatestRecord ? ' is-new' : ''}`}>
                 {(s.status === 'record' || s.status === 'first') && <path className="rs-diamond" d={`M ${px} ${top - 17} l 6 6 l -6 6 l -6 -6 z`} />}
@@ -166,7 +171,7 @@ export function RecordStaircase({ model, headingLevel = 2 }: Props) {
         <li>
           <i className="rs-sw rs-sw-line" /> Your record line
         </li>
-        {latestRecord && (
+        {limeRecord && latestRecord && (
           <li>
             <i className="rs-sw is-record is-new" /> Newest record
           </li>

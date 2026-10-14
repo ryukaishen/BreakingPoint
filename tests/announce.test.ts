@@ -70,6 +70,18 @@ describe('announcements', () => {
     expect(announce(snapAt('monitoring', { alarmRep: 9 }), broke).polite).toMatch(/alert triggered at rep 9\. Rest, then run the recovery check/);
   });
 
+  it('says both the stop and the summary when one update carries the alert and the end of the set', () => {
+    // Between two renders the engine can fire the alert and end the set; the summary must still be heard.
+    const prev = snapAt('monitoring', { state: 'DRIFT', alarmRep: null });
+    const next = snapAt('summary', { state: 'BREAKPOINT', alarmRep: 10 });
+    const a = announce(prev, next);
+    expect(a.assertive).toBe('Stop. The alert triggered at rep 10. End the set and rest.');
+    expect(a.polite).toBe('Set ended. The alert triggered at rep 10. Rest, then run the recovery check.');
+    // A first form change folded into the same update is not added on top of the stop.
+    const quiet = announce(snapAt('monitoring', { state: 'STABLE', alarmRep: null }), snapAt('monitoring', { state: 'BREAKPOINT', alarmRep: 4 }));
+    expect(quiet.polite).toBeNull();
+  });
+
   it('reports the recovery result as a whole percent', () => {
     const done = snapAt('recoveryDone', { recovery: { percent: 0.8349 } as Snapshot['recovery'] });
     expect(announce(snapAt('recovery'), done).polite).toBe('Recovery check complete. 83 percent of the change has gone.');

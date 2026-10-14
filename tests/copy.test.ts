@@ -25,6 +25,16 @@ const LIVE_COPY_FILES = [
   'src/components/SummaryModal.tsx',
   'src/components/Landing.tsx',
   'src/components/Header.tsx',
+  'src/components/athletes/AthleteMenu.tsx',
+  'src/components/athletes/AthletesView.tsx',
+  'src/components/athletes/AthleteDialog.tsx',
+  'src/components/athletes/AthleteNameField.tsx',
+  'src/components/ConfirmDialog.tsx',
+  'src/components/system/SystemNav.tsx',
+  'src/components/system/SystemNotification.tsx',
+  'src/components/status/StatusView.tsx',
+  'src/components/system/SignalSpine.tsx',
+  'src/components/system/stageTrack.ts',
   'src/components/SportPage.tsx',
   'src/components/ProtocolLibrary.tsx',
   'src/components/debrief/SplitsBand.tsx',
@@ -56,6 +66,8 @@ const BANNED: [RegExp, string][] = [
   // Negations such as "it does not measure fatigue or injury risk" are fine; claims are not.
   [/(predicts?|prevents?|reduces?|lowers?|measures?|detects?) (your )?(injur|ACL)|injury prediction|ACL risk/i, 'no injury claims'],
   [/validated detector|clinically validated/i, 'say what the validation was (synthetic)'],
+  // The detector is statistical (EWMA and CUSUM against a personal baseline). Machine learning is future work.
+  [/machine[- ]learning|\bAI[- ]powered\b|artificial intelligence|neural network|trained model|\bpredicts?\b/i, 'no machine-learning or prediction claims'],
 ];
 
 /** Source text without comments, so explanatory code comments do not count as visible copy. */

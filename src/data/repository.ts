@@ -95,6 +95,23 @@ export class AthleteRepository {
     return writeJson(this.kv, this.key('athletes'), list) ? next : null;
   }
 
+  /**
+   * Remove one athlete with their baselines and sets. Nothing else is touched: other athletes,
+   * earlier-version baselines and preferences keep their keys. If the athlete was active, the
+   * next profile (or none) becomes active. Returns false when the profile list could not be written,
+   * in which case nothing was removed.
+   */
+  deleteAthlete(id: string): boolean {
+    const list = this.athletes();
+    if (!list.some((a) => a.id === id)) return false;
+    const rest = list.filter((a) => a.id !== id);
+    if (!writeJson(this.kv, this.key('athletes'), rest)) return false;
+    this.kv.remove(this.key('baselines', id));
+    this.kv.remove(this.key('sessions', id));
+    if (this.meta().activeAthleteId === id) this.writeMeta({ ...this.meta(), schemaVersion: SCHEMA_VERSION, activeAthleteId: rest[0]?.id ?? null });
+    return true;
+  }
+
   // ---------------------------------------------------------------- baselines (athlete × protocol)
   private baselineMap(athleteId: string): Record<string, StoredBaseline> {
     const m = readJson<Record<string, StoredBaseline>>(this.kv, this.key('baselines', athleteId));
@@ -104,6 +121,13 @@ export class AthleteRepository {
   baseline(athleteId: string, protocolId: string): StoredBaseline | null {
     const b = this.baselineMap(athleteId)[protocolId];
     return b && b.athleteId === athleteId && b.protocolId === protocolId && b.baseline?.features && b.baseline?.reference ? b : null;
+  }
+
+  /** Every saved baseline for an athlete. Read-only; storage keys are unchanged. */
+  baselines(athleteId: string): StoredBaseline[] {
+    return Object.values(this.baselineMap(athleteId))
+      .filter((b) => b && b.athleteId === athleteId && b.protocolId && b.baseline?.features && b.baseline?.reference)
+      .sort((a, b) => a.savedAt.localeCompare(b.savedAt));
   }
 
   saveBaseline(stored: StoredBaseline): boolean {

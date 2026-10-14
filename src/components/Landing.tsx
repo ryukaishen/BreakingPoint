@@ -1,284 +1,335 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import type { DetectorConfig } from '../detection/config';
 import { DemoController } from '../demo/demoController';
 import { heldReps } from '../data/progress';
 import { makeLabeler } from '../protocols/labels';
-import { DEMO_CONTEXTS, protocolRefs, resolveDemo } from '../protocols/launch';
-import { sessionPattern } from '../protocols/patterns';
-import { PRIMITIVES } from '../protocols/primitives';
+import { DEFAULT_LAUNCH, DEMO_CONTEXTS, protocolRefs, resolveDemo } from '../protocols/launch';
 import { PROTOCOLS, type ProtocolStatus } from '../protocols/protocols';
 import { SPORTS, type SportProfile } from '../protocols/sports';
+import { studyHeadline } from '../research/studyHeadline';
 import { SessionEngine, type Snapshot } from '../session/engine';
 import { DISCLAIMER } from '../session/summary';
-import { arrow, pct } from '../utils/format';
-import { FormDrawdown } from './FormDrawdown';
-import { Camera, Chevron, Flask, Lock, Play } from './Icons';
-import { SportIcon } from './SportIcons';
+import { arrow } from '../utils/format';
+import { SystemNav } from './system/SystemNav';
+import { TechnicalCorners } from './system/TechnicalCorners';
 
 interface Props {
   config: DetectorConfig;
   athlete: string;
+  /** Bumped by the app to bring the sport roster into view (e.g. "Choose a movement" on the Athletes page). */
+  sportsRequest?: number;
   onSport: (sportId: string) => void;
   onDemo: (demoId: string) => void;
+  onSample: () => void;
+  /** The live camera flow for DEFAULT_LAUNCH: athlete profile if needed, then camera set-up and calibration. */
+  onCamera: () => void;
   onLibrary: () => void;
   onLab: () => void;
+  onResearch: () => void;
+  onStatus: () => void;
+  onAthletes: () => void;
 }
 
-function statusSummary(sport: SportProfile): { ready: number; beta: number; roadmap: number; primitives: string[] } {
+function readiness(sport: SportProfile): { ready: number; beta: number; roadmap: number } {
   const ids = new Set<string>();
   for (const sub of sport.subSports?.length ? sport.subSports : [undefined]) {
     for (const r of protocolRefs(sport, sub?.id)) ids.add(r.protocolId);
   }
   const statuses = [...ids].map((id) => PROTOCOLS[id].status as ProtocolStatus);
-  const primitives = [...new Set([...ids].map((id) => PROTOCOLS[id]).filter((p) => p.status === 'READY' || p.status === 'BETA').map((p) => PRIMITIVES[p.primitive].name))];
   return {
     ready: statuses.filter((s) => s === 'READY').length,
     beta: statuses.filter((s) => s === 'BETA').length,
     roadmap: statuses.filter((s) => s === 'COMING_SOON' || s === 'FUTURE').length,
-    primitives,
   };
 }
 
-function RosterRow({ sport, onClick }: { sport: SportProfile; onClick: () => void }) {
-  const s = statusSummary(sport);
-  const subs = sport.subSports?.map((x) => x.name).join(', ');
-  const launchable = s.ready + s.beta > 0;
-  return (
-    <li>
-      <button className={`roster-row ${launchable ? '' : 'roadmap'}`} onClick={onClick}>
-        <span className="sport-icon" aria-hidden>
-          <SportIcon id={sport.icon} size={24} />
-        </span>
-        <span className="rr-body">
-          <span className="rr-name">{sport.name}</span>
-          <span className="rr-desc">{sport.descriptor}</span>
-          {subs && <span className="rr-subs">{subs}</span>}
-        </span>
-        <span className="rr-side">
-          {s.ready > 0 && <span className="status-badge ready">{s.ready} ready</span>}
-          {s.beta > 0 && <span className="status-badge beta">{s.beta} beta</span>}
-          {!launchable && (
-            <span className="status-badge soon">
-              <Lock size={10} /> roadmap
-            </span>
-          )}
-          <Chevron size={16} className="rr-chev" aria-hidden />
-        </span>
-      </button>
-    </li>
-  );
-}
-
-const FLOW = [
-  ['Calibrate', 'Do 5 to 8 controlled reps while you’re fresh. BreakingPoint learns your usual form from them, not from an “ideal” athlete.'],
-  ['Monitor', 'Keep training. The camera tracks every rep, and BreakingPoint compares it with your usual form: depth, tempo, trunk angle and more.'],
-  ['Detect', 'One odd rep has little effect. When the changes repeat, BreakingPoint triggers an alert and shows which measurements changed.'],
-  ['Recover', 'After a rest, three more reps show how close you are to your usual form again.'],
+const STAGES = [
+  ['Calibrate', 'Do five to eight controlled reps while you’re fresh. They set your usual form.'],
+  ['Monitor', 'Every rep is compared with your usual form: depth, tempo, trunk angle and more.'],
+  ['Detect', 'One odd rep has little effect. When changes repeat, an alert shows which measurements changed.'],
+  ['Recover', 'After a rest, three reps show how close you are to your usual form again.'],
 ] as const;
 
-export function Landing({ config, athlete, onSport, onDemo, onLibrary, onLab }: Props) {
+const pad = (n: number) => String(n).padStart(2, '0');
+const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/** Make's ENTRY screen: what BreakingPoint does, a real demo result, and every way in. */
+export function Landing(p: Props) {
   const [preview, setPreview] = useState<Snapshot | null>(null);
   const previewCtx = useMemo(() => resolveDemo('soccer'), []);
+  const sportsHeading = useRef<HTMLHeadingElement>(null);
 
   // A real headless run of the soccer demo through the full pipeline (~0.1 s).
   useEffect(() => {
     if (!previewCtx) return;
     const id = setTimeout(() => {
-      const engine = new SessionEngine(previewCtx.exercise, config, athlete, 'demo');
+      const engine = new SessionEngine(previewCtx.exercise, p.config, p.athlete, 'demo');
       const demo = new DemoController(engine, previewCtx.exercise);
       demo.stopAfterWarning = 1; // as in the app: the athlete stops after the warning
       demo.runToEnd(false);
       setPreview(engine.getSnapshot());
     }, 30);
     return () => clearTimeout(id);
-  }, [config, athlete, previewCtx]);
+  }, [p.config, p.athlete, previewCtx]);
 
-  const v = config.validation;
-  const validated = v && Number.isFinite(v.numSessions);
+  const toSports = () => {
+    const h = sportsHeading.current;
+    h?.scrollIntoView({ behavior: reducedMotion() ? 'auto' : 'smooth', block: 'start' });
+    h?.focus({ preventScroll: true });
+  };
+  useEffect(() => {
+    if (p.sportsRequest) toSports();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [p.sportsRequest]);
+
+  const study = studyHeadline(p.config.validation);
   const labels = previewCtx ? makeLabeler(previewCtx.exercise, previewCtx.featureLabels) : null;
-  const pattern =
-    preview && previewCtx ? sessionPattern(previewCtx.exercise, preview.monitorReps, preview.onsetRep, preview.baseline?.reference.sigma0, previewCtx.patternLabels) : null;
-  const top = preview?.breakpointContributors?.slice(0, 3) ?? [];
   const featured = DEMO_CONTEXTS[0];
-  const others = DEMO_CONTEXTS.slice(1);
+  const others = DEMO_CONTEXTS.slice(1).map((d) => ({ def: d, ctx: resolveDemo(d.id) })).filter((d) => d.ctx);
+
+  const reps = preview?.monitorReps ?? [];
   const alarm = preview?.alarmRep ?? null;
+  const onset = preview?.onsetRep ?? null;
+  const scores = reps.map((r) => (r.drift?.score ?? null) as number | null);
+  const top = Math.max(1e-9, ...scores.filter((s): s is number => s !== null));
+  const changed = preview?.breakpointContributors?.slice(0, 3) ?? [];
+  const chartLabel = preview
+    ? `Form Change Score for each of the ${reps.length} reps in the demo set.${onset !== null ? ` Changes began around rep ${onset}.` : ''}${alarm !== null ? ` The alert triggered at rep ${alarm}.` : ''}`
+    : '';
 
   return (
-    <div className="landing">
-      <main id="main" tabIndex={-1}>
-      <section className="section hero">
-        <div>
-          <h1>
-            <span>Your movement.</span>
-            <span className="base">Your baseline.</span>
-          </h1>
-          <p className="lead">BreakingPoint learns how you move when you’re fresh, then tracks how your form changes throughout a workout.</p>
-          <p className="lead-2">Most fitness apps count your reps. BreakingPoint looks at how those reps change.</p>
-          <div className="hero-actions">
-            <button className="btn primary lg" onClick={() => onDemo(featured.id)}>
-              <Play size={13} /> Run the {resolveDemo(featured.id)?.contextName.toLowerCase()} demo
-            </button>
-            <div className="demo-more">
-              <span className="lbl">Other demos</span>
-              {others.map((d) => (
-                <button key={d.id} onClick={() => onDemo(d.id)}>
-                  <b>{resolveDemo(d.id)?.contextName}</b>
-                  {d.label.toLowerCase()}
+    <div className="landing st-page entry-page">
+      <div className="threshold-environment" aria-hidden="true">
+        <i />
+        <i />
+        <i />
+        <i />
+      </div>
+      <SystemNav current="landing" onEntry={() => window.scrollTo({ top: 0 })} onStatus={p.onStatus} onAthletes={p.onAthletes} onResearch={p.onResearch} />
+
+      <main className="threshold-canvas entry-canvas" id="main" tabIndex={-1}>
+        <div className="entry-view">
+          <section className="hero entry-hero" aria-labelledby="entry-title">
+            <div className="entry-backplane entry-backplane-cyan" aria-hidden="true" />
+            <div className="entry-backplane entry-backplane-violet" aria-hidden="true" />
+            <div className="entry-hero-copy">
+              <span className="threshold-code">Entry / personal movement system</span>
+              <h1 id="entry-title" className="entry-headline">
+                <span>Your movement.</span> <strong>Your baseline.</strong>
+              </h1>
+              <p className="entry-lede">BreakingPoint learns how you move when you’re fresh, then tracks how your form changes throughout a workout.</p>
+              <div className="entry-actions">
+                <button type="button" className="threshold-action entry-primary" onClick={() => p.onDemo(featured.id)}>
+                  Run the {resolveDemo(featured.id)?.contextName.toLowerCase()} demo <span>No webcam needed</span>
                 </button>
-              ))}
+                <div className="entry-demo-actions" role="group" aria-label="Other demos">
+                  {others.map(({ def, ctx }) => (
+                    <button key={def.id} type="button" className="threshold-action" onClick={() => p.onDemo(def.id)}>
+                      <b>{ctx!.contextName}</b>
+                      <small>
+                        {def.label}
+                        {ctx!.status === 'BETA' ? ' · beta' : ''}
+                      </small>
+                    </button>
+                  ))}
+                </div>
+                <div className="entry-text-actions">
+                  <button type="button" className="threshold-action" onClick={p.onSample}>
+                    Explore the sample athlete <span aria-hidden="true">↗</span>
+                    <small>Synthetic history, kept in memory</small>
+                  </button>
+                  <button type="button" className="threshold-action" onClick={p.onCamera}>
+                    Start with your camera <span aria-hidden="true">↗</span>
+                    <small>
+                      {DEFAULT_LAUNCH.title}, with set-up checks first
+                    </small>
+                  </button>
+                </div>
+              </div>
             </div>
-          </div>
-          <ul className="hero-facts">
-            <li>
-              <Lock size={14} /> Video never leaves your device
-            </li>
-            <li>
-              <Camera size={14} /> Any laptop or phone camera. No wearables, no force plates.
-            </li>
-          </ul>
-        </div>
 
-        <div className={`sys-window toned hero-window ${alarm !== null ? 'tone-break' : ''}`}>
-          <div className="hw-head">
-            <span className="eyebrow">
-              {previewCtx?.contextName} / {previewCtx?.title}
-            </span>
-            <span className="badge demo">Synthetic athlete</span>
-          </div>
-          {preview ? (
-            <>
-              <div className="hw-readout">{alarm !== null ? `Breaking point · rep ${alarm}` : 'Stable'}</div>
-              <div className="hw-stats">
-                <div className="hw-stat">
-                  <div className="k">Reps at usual form</div>
-                  <div className="v">{heldReps(preview.monitorReps)} reps</div>
-                </div>
-                <div className="hw-stat">
-                  <div className="k">Changes began</div>
-                  <div className="v">{preview.onsetRep !== null ? `about rep ${preview.onsetRep}` : '—'}</div>
-                </div>
-                <div className="hw-stat">
-                  <div className="k">Pattern</div>
-                  <div className="v" title={pattern?.explain}>
-                    {pattern?.label ?? '—'}
+            <section className={`entry-live-window ${alarm !== null ? 'has-alert' : ''}`} aria-labelledby="entry-demo-title">
+              <TechnicalCorners />
+              <div className="entry-window-rail">
+                <h2 id="entry-demo-title" className="threshold-code">
+                  Synthetic athlete
+                </h2>
+                <span>
+                  {previewCtx?.contextName} / {previewCtx?.title}
+                </span>
+              </div>
+              {preview ? (
+                <>
+                  <div className="entry-readout">
+                    <div>
+                      <span>State</span>
+                      <strong className={alarm !== null ? 'is-stop' : ''}>{alarm !== null ? 'STOP' : 'STABLE'}</strong>
+                      <small>{alarm !== null ? `Alert at rep ${alarm}` : 'No alert in this set'}</small>
+                    </div>
+                    <div>
+                      <span>Reps at usual form</span>
+                      <strong>{pad(heldReps(preview.monitorReps))}</strong>
+                      <small>of {reps.length} reps</small>
+                    </div>
+                    <div>
+                      <span>Changes began</span>
+                      <strong>
+                        {onset !== null ? (
+                          <>
+                            <span aria-hidden="true">~</span>
+                            <span className="visually-hidden">About rep </span>
+                            {pad(onset)}
+                          </>
+                        ) : (
+                          '—'
+                        )}
+                      </strong>
+                      <small>{onset !== null ? 'estimated rep' : 'no lasting change'}</small>
+                    </div>
                   </div>
-                </div>
-              </div>
-              <FormDrawdown
-                reps={preview.monitorReps}
-                thresholds={preview.thresholds}
-                cusumH={config.cusumH}
-                mode={config.mode}
-                alarmRep={preview.alarmRep}
-                onsetRep={preview.onsetRep}
-                exercise={previewCtx!.exercise}
-                height={190}
-                minReps={Math.max(6, preview.monitorReps.length)}
-                compact
-              />
-              <div className="hw-caption">
-                {top.length > 0 ? (
-                  <>
-                    Biggest changes at the alert rep: <b>{top.map((d) => `${labels!.short(d.key)} ${arrow(d.zClipped ?? 0)}`).join(', ')}</b>
-                  </>
-                ) : (
-                  'Every rep is compared with the athlete’s usual form.'
-                )}
-              </div>
-            </>
-          ) : (
-            <div className="hw-loading">Running the demo pipeline…</div>
-          )}
-        </div>
-      </section>
+                  <div className="entry-mini-chart">
+                    <span>Form Change Score, rep by rep</span>
+                    <div className="entry-bars" role="img" aria-label={chartLabel}>
+                      {reps.map((r, i) => {
+                        const s = scores[i];
+                        const cls = r.index === alarm ? 'is-alert' : onset !== null && r.index >= onset ? 'is-changing' : '';
+                        return (
+                          <i
+                            key={r.index}
+                            className={`${cls} ${s === null ? 'is-unscored' : ''}`}
+                            style={{ '--height': `${s === null ? 4 : Math.max(4, (Math.max(0, s) / top) * 100)}%`, '--i': i } as CSSProperties}
+                          />
+                        );
+                      })}
+                    </div>
+                    <div className="entry-bar-labels" aria-hidden="true">
+                      {reps.map((r) => (
+                        <span key={r.index}>{pad(r.index)}</span>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="entry-measurements">
+                    <span>{changed.length ? 'Measurements that changed most at the alert' : 'Every rep is compared with this athlete’s usual form'}</span>
+                    {changed.length > 0 && (
+                      <ul>
+                        {changed.map((d) => (
+                          <li key={d.key}>
+                            {labels!.short(d.key)} {arrow(d.zClipped ?? 0)}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+                </>
+              ) : (
+                <div className="entry-window-loading">Running the demo pipeline…</div>
+              )}
+            </section>
+          </section>
 
-      <section className="section flow" aria-labelledby="flow-h">
-        <div className="section-head">
-          <h2 id="flow-h">How a session runs</h2>
-          <p>The same four stages track your progress at the top of every session.</p>
-        </div>
-        <ol className="flow-track">
-          {FLOW.map(([name, text], i) => (
-            <li key={name} className="flow-stage">
-              <span className="track-node" aria-hidden />
-              <span className="flow-n">Stage {i + 1}</span>
-              <h3>{name}</h3>
-              <p>{text}</p>
-            </li>
-          ))}
-        </ol>
-      </section>
-
-      <section className="section roster" aria-labelledby="roster-h">
-        <div className="roster-intro">
-          <h2 id="roster-h">What do you play?</h2>
-          <p>Choose a sport and BreakingPoint will recommend a movement protocol.</p>
-          <button className="btn" onClick={onLibrary}>
-            Browse the protocol library
-          </button>
-          <div className="locked-card">
-            <div className="lc-head">
-              <span className="lc-title">
-                <Lock size={14} /> Create your own protocol
-              </span>
-              <span className="status-badge soon">Roadmap</span>
+          <section className="entry-session" aria-labelledby="flow-h">
+            <div className="entry-section-heading">
+              <span className="threshold-code">Session signal / 4 stages</span>
+              <h2 id="flow-h">How a session runs</h2>
             </div>
-            <p>Record a few clean reps of any repeatable movement. BreakingPoint learns your usual form for it and tracks how later reps change.</p>
-          </div>
-        </div>
-        <ul className="roster-list">
-          {SPORTS.map((s) => (
-            <RosterRow key={s.id} sport={s} onClick={() => onSport(s.id)} />
-          ))}
-        </ul>
-      </section>
+            <ol className="entry-signal-spine">
+              {STAGES.map(([name, text], i) => (
+                <li key={name}>
+                  <i aria-hidden="true" />
+                  <span>{pad(i + 1)}</span>
+                  <h3>{name}</h3>
+                  <p>{text}</p>
+                </li>
+              ))}
+            </ol>
+            <p className="entry-thesis">
+              Most form apps ask whether you move like an ideal athlete. <b>BreakingPoint asks whether you still move like yourself.</b>
+            </p>
+          </section>
 
-      <section className="section thesis">
-        <div className="thesis-q">
-          <p className="q-old">
-            <span className="eyebrow">Most form apps ask</span>
-            <span className="q">Do you move like the ideal athlete?</span>
-          </p>
-          <p className="q-new">
-            <span className="eyebrow">BreakingPoint asks</span>
-            <span className="q">Are you still moving like yourself?</span>
-          </p>
-        </div>
-        <button className="sys-window lab-readout" onClick={onLab}>
-          <span className="lr-head">
-            <Flask size={14} /> Synthetic Validation | UF HiPerGator | October 2026
-          </span>
-          {validated ? (
-            <span className="lr-stats">
-              <span className="lr-stat">
-                <span className="v">{v!.numSessions!.toLocaleString()}</span>
-                <span className="k">simulated sessions</span>
-              </span>
-              <span className="lr-stat">
-                <span className="v">{pct(v!.falsePositiveRate)}</span>
-                <span className="k">false alerts on stable simulated sessions</span>
-              </span>
-              <span className="lr-stat">
-                <span className="v">{pct(v!.truePositiveRate)}</span>
-                <span className="k">simulated changes detected</span>
-              </span>
-              <span className="lr-stat">
-                <span className="v">{v!.medianDetectionDelay} reps</span>
-                <span className="k">median reps from change to alert</span>
-              </span>
-            </span>
-          ) : (
-            <span className="lr-stats">Open the study for its results.</span>
-          )}
-          <span className="lr-foot">
-            Simulated squat-like sessions, not real athletes. <b>See the study</b>
-          </span>
-        </button>
-      </section>
+          <section className="entry-sports" id="entry-sports" aria-labelledby="roster-h">
+            <div className="entry-section-heading entry-section-heading--split">
+              <div>
+                <span className="threshold-code">Protocol roster / {SPORTS.length} sports</span>
+                <h2 id="roster-h" ref={sportsHeading} tabIndex={-1}>
+                  Choose a sport
+                </h2>
+                <p>Each sport recommends movement screens. The method is the same for all of them: learn your usual form, then watch for lasting changes.</p>
+              </div>
+              <button type="button" className="threshold-action entry-quiet-action" onClick={p.onLibrary}>
+                Browse the protocol library
+              </button>
+            </div>
+            <ul className="entry-sports-grid">
+              {SPORTS.map((s, i) => {
+                const r = readiness(s);
+                const launchable = r.ready + r.beta > 0;
+                return (
+                  <li key={s.id}>
+                    <button type="button" className={`threshold-action ${launchable ? '' : 'is-roadmap'}`} onClick={() => p.onSport(s.id)}>
+                      <span>{pad(i + 1)}</span>
+                      <strong>{s.name}</strong>
+                      <small>
+                        {r.ready} ready · {r.beta} beta · {r.roadmap} roadmap
+                      </small>
+                    </button>
+                  </li>
+                );
+              })}
+              <li className="entry-locked-card">
+                <span>Locked / roadmap</span>
+                <strong>Create your own protocol</strong>
+                <small>Record a few clean reps of any repeatable movement and track how later reps change.</small>
+              </li>
+            </ul>
+          </section>
 
+          <section className="entry-research-strip" aria-labelledby="research-strip-h">
+            <div>
+              <span className="threshold-code">Synthetic validation / UF HiPerGator</span>
+              <h2 id="research-strip-h">Detector validation</h2>
+              <button type="button" className="threshold-action entry-strip-link" onClick={p.onLab}>
+                See the study <span aria-hidden="true">↗</span>
+              </button>
+            </div>
+            {study ? (
+              study.figures.map((f) => (
+                <div key={f.label}>
+                  <strong>{f.value}</strong>
+                  <span>{f.label}</span>
+                </div>
+              ))
+            ) : (
+              <div className="entry-strip-empty">
+                <span>Open the study for its results.</span>
+              </div>
+            )}
+            <p>
+              {study ? `Rates from the ${study.heldOutSessions.toLocaleString('en-US')} held-out sessions. ` : ''}Simulated side-view bodyweight squats, not real
+              athletes or real cameras.
+            </p>
+          </section>
+
+          <section className="entry-built" aria-labelledby="built-h">
+            <div className="entry-section-heading">
+              <span className="threshold-code">System specification</span>
+              <h2 id="built-h">Built with</h2>
+              <button type="button" className="threshold-action entry-quiet-action" onClick={p.onResearch}>
+                How it works
+              </button>
+            </div>
+            <ul>
+              <li>React, TypeScript and Vite</li>
+              <li>MediaPipe Pose, running in the browser</li>
+              <li>Statistical change detection (EWMA and CUSUM) against each athlete’s own baseline</li>
+              <li>Any laptop or phone camera. No wearables or force plates</li>
+              <li>Athletes, baselines and sets stored only on this device</li>
+            </ul>
+          </section>
+        </div>
       </main>
 
-      <footer className="section site-foot">
+      <footer className="entry-footer">
         <span>{DISCLAIMER}</span>
         <span>Pose estimation runs in your browser. No video is uploaded or stored.</span>
       </footer>

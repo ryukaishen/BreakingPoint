@@ -1,0 +1,743 @@
+/* System Threshold: the visual language of the Figma Make project "Visual Redesign of
+   BreakingPoint" (eJIa9GBUDJDimMsfKD9k5W, src/index.css, the .threshold-* and .system-*
+   rules). Tokens, the numeral face, the session stage track, notices and the Status screen.
+   Legacy (Breakaway) screens keep their own rules in styles.css.
+
+   Deliberate departures from the Make stylesheet:
+   - Labels Make sets at 7 to 9px are 12px here (the app's text floor).
+   - Make's illustrative demo content (fixed chart bars, "Preview stop state", the floating
+     onset tag) is not reproduced: every figure on these screens comes from stored data. */
+
+:root {
+  /* Palette, as in Make's .threshold-app. Canvas mirror: ST in src/ui/theme.ts. */
+  --threshold-void: #050811;
+  --threshold-plane: #091423;
+  --threshold-cyan: #54e4ff;
+  --threshold-cyan-hi: #b9f6ff;
+  --threshold-violet: #a75bff;
+  --threshold-violet-hi: #d3adff;
+  --threshold-amber: #ffbd66;
+  --threshold-stop: #ff435f;
+  --threshold-text: #f4f8ff;
+  --threshold-muted: #91a5bd;
+  /* Text on a cyan or amber fill (Make's #041019). */
+  --threshold-ink: #041019;
+  --threshold-line: rgb(112 180 222 / 32%);
+  /* Make's .threshold-desktop ground: a cold glow over a near-black sweep. */
+  --threshold-glow: rgb(18 83 125 / 18%);
+  --threshold-sweep: linear-gradient(110deg, #040710 0 16%, #080e19 45%, #060914 100%);
+  /* Make's header ground (.threshold-header), a little more opaque because ours is sticky. */
+  --threshold-header: rgb(4 8 15 / 92%);
+
+  /* Motion, from the Make stylesheet: one arrival curve, one snap curve, four durations. */
+  --st-ease-arrive: cubic-bezier(0.16, 0.8, 0.22, 1);
+  --st-ease-snap: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --st-dur-feedback: 180ms;
+  --st-dur-detail: 280ms;
+  --st-dur-assemble: 480ms;
+  --st-dur-stage: 600ms;
+
+  /* Type, as in Make: Barlow Condensed for display words and numerals, Inter for text,
+     JetBrains Mono for system codes. All three are self-hosted (Fontsource, src/main.tsx). */
+  --threshold-font-display: 'Barlow Condensed', 'Mona Sans Variable', ui-sans-serif, system-ui, sans-serif;
+  --threshold-font-body: 'Inter Variable', 'Mona Sans Variable', ui-sans-serif, system-ui, sans-serif;
+  --threshold-font-code: 'JetBrains Mono Variable', ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+}
+
+/* Numerals on System Threshold screens: Barlow Condensed Bold, upright, tabular. Callers set the size. */
+.st-numeral {
+  font-family: var(--threshold-font-display);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums lining-nums;
+  line-height: 0.82;
+  letter-spacing: -0.01em;
+}
+
+.st-page ::selection,
+.st-session ::selection { background: color-mix(in srgb, var(--threshold-cyan) 38%, transparent); color: var(--threshold-text); }
+
+/* ------------------------------------------------------------------ app shell
+   Make's .threshold-header on the app's existing header: the movement mark and
+   BREAKINGPOINT wordmark, a context plate for the session protocol, the athlete as a
+   profile block, and quiet uppercase actions. Class names stay the same (tests and
+   other screens rely on them); only their presentation changes. */
+.app-header {
+  gap: 16px;
+  border-bottom: 1px solid color-mix(in srgb, var(--threshold-line) 62%, transparent);
+  background: var(--threshold-header);
+}
+.brand { gap: 10px; border-radius: 0; }
+.brand-mark {
+  width: 29px;
+  height: 30px;
+  flex: none;
+  filter: drop-shadow(0 0 8px color-mix(in srgb, var(--threshold-cyan) 28%, transparent));
+  transition: filter var(--st-dur-feedback) ease;
+}
+.brand:hover .brand-mark { filter: drop-shadow(0 0 12px color-mix(in srgb, var(--threshold-cyan) 60%, transparent)); }
+.brand-name {
+  color: var(--threshold-text);
+  font-family: var(--threshold-font-body);
+  font-stretch: normal;
+  font-weight: 700;
+  font-size: 20px;
+  letter-spacing: -0.04em;
+  text-transform: uppercase;
+}
+.brand-name b { color: var(--threshold-cyan); }
+
+.app-header .btn.ghost {
+  border-radius: 0;
+  color: var(--threshold-muted);
+  font-family: var(--threshold-font-body);
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transition: color var(--st-dur-feedback) ease, box-shadow var(--st-dur-feedback) ease;
+}
+.app-header .btn.ghost:hover { background: transparent; color: var(--threshold-text); box-shadow: inset 0 -2px var(--threshold-cyan); }
+.app-header .btn.ghost svg { color: var(--threshold-cyan); }
+.header-sep { background: var(--threshold-line); }
+
+.app-header .badge {
+  border-radius: 0;
+  font: 400 12px/1 var(--threshold-font-code);
+  font-stretch: normal;
+  letter-spacing: 0.1em;
+}
+.app-header .badge.demo { border-color: color-mix(in srgb, var(--threshold-cyan) 40%, transparent); background: color-mix(in srgb, var(--threshold-cyan) 8%, transparent); color: var(--threshold-cyan); }
+.app-header .badge.live { border-color: color-mix(in srgb, var(--threshold-stop) 50%, transparent); background: color-mix(in srgb, var(--threshold-stop) 8%, transparent); color: var(--threshold-stop); }
+
+/* The session protocol as Make's header context plate: sport as a code, movement in caps. */
+.context-chip {
+  height: 44px;
+  max-width: 420px;
+  gap: 10px;
+  padding: 0 22px;
+  border: 0;
+  border-right: 1px solid color-mix(in srgb, var(--threshold-violet) 50%, transparent);
+  border-left: 1px solid color-mix(in srgb, var(--threshold-violet) 50%, transparent);
+  border-radius: 0;
+  background: color-mix(in srgb, var(--threshold-violet) 10%, var(--threshold-void));
+  clip-path: polygon(9px 0, calc(100% - 9px) 0, 100% 50%, calc(100% - 9px) 100%, 9px 100%, 0 50%);
+  transition: background-color var(--st-dur-feedback) ease;
+}
+.context-chip:hover:not(:disabled) { background: color-mix(in srgb, var(--threshold-violet) 22%, var(--threshold-void)); }
+.context-chip svg { color: var(--threshold-violet-hi); }
+.cc-text { display: grid; gap: 4px; min-width: 0; text-align: left; }
+.context-chip .cc-sport { color: var(--threshold-violet-hi); font: 400 12px/1 var(--threshold-font-code); letter-spacing: 0.14em; text-transform: uppercase; }
+.context-chip .cc-proto {
+  overflow: hidden;
+  color: var(--threshold-text);
+  font: 700 13px/1 var(--threshold-font-body);
+  letter-spacing: 0.06em;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* The athlete as Make's profile block: a code line over the name. */
+.athlete-trigger {
+  height: 44px;
+  max-width: 240px;
+  gap: 10px;
+  padding: 0 12px 0 6px;
+  border: 1px solid var(--threshold-line);
+  border-radius: 0;
+  background: color-mix(in srgb, var(--threshold-void) 70%, transparent);
+  clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
+  transition: border-color var(--st-dur-feedback) ease, background-color var(--st-dur-feedback) ease;
+}
+.athlete-trigger:hover { border-color: var(--threshold-cyan); background: color-mix(in srgb, var(--threshold-cyan) 8%, var(--threshold-void)); }
+.athlete-trigger.sample { border-style: dashed; border-color: color-mix(in srgb, var(--threshold-cyan) 55%, transparent); }
+.athlete-initial {
+  width: 30px;
+  height: 30px;
+  border: 1px solid color-mix(in srgb, var(--threshold-cyan) 45%, transparent);
+  border-radius: 0;
+  background: color-mix(in srgb, var(--threshold-cyan) 12%, var(--threshold-void));
+  color: var(--threshold-cyan-hi);
+  font-family: var(--threshold-font-display);
+  font-size: 16px;
+}
+.athlete-text { display: grid; gap: 4px; min-width: 0; text-align: left; }
+.athlete-kicker { color: var(--threshold-cyan); font: 400 12px/1 var(--threshold-font-code); letter-spacing: 0.12em; text-transform: uppercase; white-space: nowrap; }
+.athlete-name { color: var(--threshold-text); font: 600 13px/1.1 var(--threshold-font-body); }
+.athlete-pop,
+.more-list {
+  border: 1px solid var(--threshold-line);
+  border-top: 2px solid var(--threshold-cyan);
+  border-radius: 0;
+  background: var(--threshold-plane);
+  box-shadow: 0 18px 40px rgb(0 0 0 / 50%);
+  animation: detail-arrive var(--st-dur-feedback) var(--st-ease-arrive) both;
+}
+.athlete-list,
+.athlete-actions { border-color: var(--threshold-line); }
+.athlete-option { border-radius: 0; font-family: var(--threshold-font-body); }
+.athlete-option:hover { background: color-mix(in srgb, var(--threshold-cyan) 10%, transparent); }
+.athlete-option[aria-current='true'],
+.athlete-option.strong { color: var(--threshold-cyan-hi); }
+.athlete-option small { color: var(--threshold-muted); }
+
+/* Sample data is always announced, in the System's own voice. */
+.sample-banner {
+  gap: 12px;
+  padding: 7px 16px;
+  border-bottom: 1px solid color-mix(in srgb, var(--threshold-cyan) 28%, transparent);
+  background: color-mix(in srgb, var(--threshold-cyan) 6%, var(--threshold-void));
+  color: var(--threshold-muted);
+  font-family: var(--threshold-font-body);
+}
+.sample-banner b { color: var(--threshold-cyan-hi); font: 400 12px/1 var(--threshold-font-code); letter-spacing: 0.12em; text-transform: uppercase; }
+.sample-banner .link-btn { color: var(--threshold-cyan); }
+
+@media (max-width: 760px) {
+  .athlete-trigger { height: 40px; }
+  .athlete-kicker { display: none; }
+  /* On a phone the plate keeps the movement, not the sport, so the athlete can tell what is running. */
+  .context-chip { padding: 0 14px; }
+  .context-chip .cc-sport { display: none; }
+  .context-chip .cc-proto { display: block; font-size: 12px; }
+}
+
+/* ------------------------------------------------------------------ frame */
+.st-frame {
+  --st-tone: var(--threshold-cyan);
+  position: relative;
+  isolation: isolate;
+}
+.st-frame--context { --st-tone: var(--threshold-violet-hi); }
+.st-frame--stable { --st-tone: var(--threshold-cyan); }
+.st-frame--attention { --st-tone: var(--threshold-amber); }
+.st-frame--critical { --st-tone: var(--threshold-stop); }
+.st-frame--neutral { --st-tone: var(--threshold-muted); }
+.st-frame__backplane {
+  position: absolute;
+  z-index: 0;
+  inset: 12px -8px -12px 10px;
+  background: color-mix(in srgb, var(--threshold-cyan) 10%, var(--threshold-void));
+  clip-path: polygon(0 0, calc(100% - 22px) 0, 100% 22px, 100% 100%, 0 100%);
+  pointer-events: none;
+}
+.st-frame__content {
+  position: relative;
+  z-index: 1;
+  background: var(--threshold-plane);
+  color: var(--threshold-text);
+  border: 1px solid var(--threshold-line);
+  border-top: 2px solid var(--st-tone);
+  clip-path: polygon(0 0, calc(100% - 22px) 0, 100% 22px, 100% 100%, 0 100%);
+  padding: 18px 20px 20px;
+}
+.st-frame__header {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: flex-start;
+  margin-bottom: 14px;
+}
+.st-frame__heading { min-width: 0; }
+.st-frame__label {
+  margin-bottom: 4px;
+  color: var(--st-tone);
+  font: 400 12px/1.4 var(--threshold-font-code);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.st-frame__title { margin: 0; font-family: var(--threshold-font-display); font-weight: 600; font-size: 24px; line-height: 1; }
+.st-frame__description { margin: 6px 0 0; color: var(--threshold-muted); max-width: 62ch; }
+.st-frame__header-side { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
+.st-frame__body { min-width: 0; }
+.st-frame__footer {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--threshold-line);
+  color: var(--threshold-muted);
+  font-size: 13px;
+}
+
+/* ------------------------------------------------------------------ notice */
+.st-notice {
+  --st-tone: var(--threshold-cyan);
+  position: relative;
+  display: grid;
+  grid-template-columns: 4px minmax(0, 1fr);
+  gap: 14px;
+  align-items: start;
+  margin-top: 14px;
+  padding: 14px 16px;
+  background: var(--threshold-plane);
+  border: 1px solid var(--threshold-line);
+  clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 0 100%);
+}
+.st-notice--context { --st-tone: var(--threshold-violet-hi); }
+.st-notice--attention { --st-tone: var(--threshold-amber); }
+.st-notice--critical { --st-tone: var(--threshold-stop); background: color-mix(in srgb, var(--threshold-stop) 12%, var(--threshold-void)); }
+.st-notice--stable { --st-tone: var(--threshold-cyan); }
+.st-notice--neutral { --st-tone: var(--threshold-muted); }
+.st-notice__rail { background: var(--st-tone); align-self: stretch; }
+.st-notice__label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--st-tone);
+  font: 400 12px/1.3 var(--threshold-font-code);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.st-notice__signal {
+  width: 8px;
+  height: 8px;
+  transform: rotate(45deg);
+  background: var(--st-tone);
+}
+.st-notice__title { margin: 6px 0 0; font-family: var(--threshold-font-display); font-weight: 600; font-size: 22px; line-height: 1.05; }
+.st-notice__body { margin-top: 4px; color: var(--threshold-muted); font-size: 15px; }
+.st-notice__body p { margin: 0; }
+.st-notice__actions { grid-column: 2; display: flex; flex-wrap: wrap; gap: 8px; }
+
+/* ------------------------------------------------------------------ session stage track
+   Make's .mobile-stage-track: code labels joined by hairlines between two rules, the
+   active stage in cyan, a changing form in amber and the alert in stop red. It heads the
+   session panel at every width. */
+.signal-spine {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  margin: 0;
+  padding: 14px 2px;
+  border-top: 1px solid var(--threshold-line);
+  border-bottom: 1px solid var(--threshold-line);
+  list-style: none;
+  color: var(--threshold-muted);
+  font: 400 12px/1 var(--threshold-font-code);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+/* Stages never shrink below their words; only the hairlines between them give way. */
+.signal-spine__stage { display: flex; flex: 0 0 auto; align-items: center; gap: 8px; white-space: nowrap; }
+.signal-spine__stage + .signal-spine__stage { flex: 1 1 auto; }
+.signal-spine__link { flex: 1 1 auto; min-width: 10px; height: 1px; background: var(--threshold-line); }
+.signal-spine__count { color: var(--threshold-cyan-hi); font-variant-numeric: tabular-nums; }
+.signal-spine__stage.is-done { color: var(--threshold-cyan); }
+.signal-spine__stage.is-current { color: var(--threshold-cyan-hi); font-weight: 700; }
+.signal-spine__stage.is-warning { color: var(--threshold-amber); font-weight: 700; }
+.signal-spine__stage.is-alert { color: var(--threshold-stop); font-weight: 700; }
+.signal-spine__stage.is-alert .signal-spine__count { color: var(--threshold-stop); }
+/* On a phone the counts drop, as on Make's track: the camera strip above already shows the rep. */
+@media (max-width: 420px) {
+  .signal-spine { gap: 6px; }
+  .signal-spine__stage { gap: 6px; }
+  .signal-spine__count { display: none; }
+}
+
+/* ------------------------------------------------------------------ Status screen
+   Make's desktop Status window. Geometry and colour follow the Make source; type uses
+   the Make faces at the 12px floor. */
+.st-page {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  min-height: calc(100dvh - var(--header-h));
+  background: radial-gradient(ellipse at 54% 46%, var(--threshold-glow), transparent 38%), var(--threshold-sweep);
+  color: var(--threshold-text);
+  font-family: var(--threshold-font-body);
+}
+.threshold-environment { opacity: 0.65; pointer-events: none; position: absolute; inset: 0; overflow: hidden; }
+.threshold-environment::before,
+.threshold-environment::after { content: ''; position: absolute; }
+.threshold-environment::before {
+  --env-line: color-mix(in srgb, var(--threshold-cyan) 5%, transparent);
+  inset: 0;
+  background:
+    linear-gradient(90deg, transparent 0 9%, var(--env-line) 9.1%, transparent 9.3% 90%, var(--env-line) 90.1%, transparent 90.3%),
+    linear-gradient(0deg, transparent 0 17%, var(--env-line) 17.1%, transparent 17.3% 82%, var(--env-line) 82.1%, transparent 82.3%);
+}
+.threshold-environment::after {
+  width: 44vw;
+  height: 44vw;
+  top: 9%;
+  left: 32%;
+  border: 1px solid color-mix(in srgb, var(--threshold-cyan) 5%, transparent);
+  transform: rotate(45deg);
+}
+.threshold-environment i {
+  position: absolute;
+  width: 2px;
+  height: 34vh;
+  background: linear-gradient(transparent, color-mix(in srgb, var(--threshold-cyan) 26%, transparent), transparent);
+}
+.threshold-environment i:first-child { top: 18%; left: 15%; transform: rotate(22deg); }
+.threshold-environment i:nth-child(2) { top: 8%; right: 12%; transform: rotate(-18deg); }
+.threshold-environment i:nth-child(3) { bottom: -8%; left: 48%; transform: rotate(72deg); }
+.threshold-environment i:nth-child(4) { top: 4%; right: 31%; transform: rotate(86deg); }
+
+.threshold-nav {
+  position: absolute;
+  z-index: 20;
+  top: 50%;
+  left: 2.4%;
+  display: grid;
+  gap: 7px;
+  width: 150px;
+  transform: translateY(-43%);
+}
+.threshold-nav .nav-spine {
+  position: absolute;
+  top: -15px;
+  bottom: -15px;
+  left: -9px;
+  width: 1px;
+  background: linear-gradient(transparent, var(--threshold-cyan), transparent);
+}
+.threshold-nav .threshold-action {
+  position: relative;
+  display: grid;
+  grid-template-columns: 32px 1fr;
+  gap: 10px;
+  align-items: center;
+  min-height: 48px;
+  padding: 0 15px 0 8px;
+  border: 1px solid color-mix(in srgb, var(--threshold-line) 85%, transparent);
+  background: color-mix(in srgb, var(--threshold-void) 72%, transparent);
+  color: var(--threshold-muted);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transform: perspective(240px) rotateY(5deg);
+  transition: color 0.18s ease, border-color 0.18s ease, background-color 0.18s ease, transform 0.18s ease;
+}
+.threshold-nav .threshold-action::before {
+  content: '';
+  position: absolute;
+  top: 7px;
+  bottom: 7px;
+  left: -10px;
+  width: 2px;
+  background: color-mix(in srgb, var(--threshold-cyan) 28%, transparent);
+}
+.threshold-nav .threshold-action:hover,
+.threshold-nav .threshold-action.is-active {
+  border-color: var(--threshold-cyan);
+  background: color-mix(in srgb, var(--threshold-cyan) 12%, var(--threshold-void));
+  color: var(--threshold-text);
+  transform: perspective(240px) rotateY(0deg) translateX(8px);
+}
+.threshold-nav .threshold-action.is-active { box-shadow: inset 3px 0 var(--threshold-cyan), 0 0 18px color-mix(in srgb, var(--threshold-cyan) 10%, transparent); }
+.threshold-nav .threshold-action span { color: var(--threshold-cyan); font: 400 12px/1 var(--threshold-font-code); font-variant-numeric: tabular-nums; }
+.threshold-nav .threshold-action strong { font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
+
+/* Clipped sideways: the corners lock in from 8px outside the frame, which on a phone is past the screen edge. */
+.threshold-canvas { position: relative; min-height: calc(100dvh - var(--header-h)); padding: 34px 3.5% 34px 14.5%; overflow-x: clip; }
+.system-stage {
+  position: relative;
+  width: 100%;
+  max-width: 1360px;
+  min-height: calc(100dvh - var(--header-h) - 68px);
+  margin: 0 auto;
+  animation: stage-arrive var(--st-dur-stage) var(--st-ease-arrive) both;
+}
+.system-backplane {
+  position: absolute;
+  border: 1px solid color-mix(in srgb, var(--threshold-cyan) 18%, transparent);
+  background: color-mix(in srgb, var(--threshold-plane) 33%, transparent);
+  pointer-events: none;
+}
+.system-backplane.plane-a { inset: 3% 1.8% 2% -1.5%; transform: perspective(900px) rotateY(1deg) rotate(-0.3deg); }
+.system-backplane.plane-b { inset: 1.2% -1.2% 4% 2.5%; border-color: color-mix(in srgb, var(--threshold-violet) 17%, transparent); transform: perspective(900px) rotateY(-1.4deg) rotate(0.35deg); }
+.sample-banner ~ .st-page .threshold-canvas { padding-top: 12px; padding-bottom: 12px; }
+.sample-banner ~ .st-page .status-core { min-height: 176px; }
+.sample-banner ~ .st-page .system-stage,
+.sample-banner ~ .st-page .system-frame { min-height: 0; }
+.system-frame {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-rows: 34px minmax(0, 1fr) auto 28px;
+  min-height: calc(100dvh - var(--header-h) - 80px);
+  border-left: 1px solid color-mix(in srgb, var(--threshold-cyan) 34%, transparent);
+  border-right: 1px solid color-mix(in srgb, var(--threshold-cyan) 34%, transparent);
+  background: color-mix(in srgb, var(--threshold-plane) 82%, transparent);
+  box-shadow: inset 0 0 70px color-mix(in srgb, var(--threshold-cyan) 6%, transparent), 0 26px 60px rgb(0 0 0 / 30%);
+  clip-path: polygon(20px 0, calc(100% - 54px) 0, 100% 34px, 100% calc(100% - 22px), calc(100% - 22px) 100%, 0 100%, 0 20px);
+}
+.tech-corners { position: absolute; inset: 0; z-index: 5; pointer-events: none; }
+.system-rail {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 18px;
+  align-items: center;
+  color: var(--threshold-cyan-hi);
+  font: 400 12px/1 var(--threshold-font-code);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.system-rail i { height: 2px; background: linear-gradient(90deg, transparent, var(--threshold-cyan)); box-shadow: 0 0 8px color-mix(in srgb, var(--threshold-cyan) 70%, transparent); }
+.system-rail i:last-child { background: linear-gradient(90deg, var(--threshold-cyan), transparent); }
+.rail-top {
+  border-top: 3px solid var(--threshold-cyan);
+  box-shadow: inset 0 5px 12px color-mix(in srgb, var(--threshold-cyan) 6%, transparent), 0 -2px 16px color-mix(in srgb, var(--threshold-cyan) 18%, transparent);
+}
+.rail-bottom {
+  border-bottom: 3px solid var(--threshold-cyan);
+  box-shadow: inset 0 -5px 12px color-mix(in srgb, var(--threshold-cyan) 6%, transparent), 0 2px 16px color-mix(in srgb, var(--threshold-cyan) 18%, transparent);
+}
+.tech-corner { position: absolute; width: 30px; height: 22px; }
+.tech-corner::before,
+.tech-corner::after { content: ''; position: absolute; background: var(--threshold-cyan); box-shadow: 0 0 7px color-mix(in srgb, var(--threshold-cyan) 45%, transparent); }
+.tech-corner::before { width: 30px; height: 1px; }
+.tech-corner::after { width: 1px; height: 22px; }
+.tech-corner-nw { top: 0; left: 0; }
+.tech-corner-ne { top: 0; right: 0; transform: scaleX(-1); }
+.tech-corner-sw { bottom: 0; left: 0; transform: scaleY(-1); }
+.tech-corner-se { bottom: 0; right: 0; transform: scale(-1); }
+
+.system-stage-grid { display: grid; grid-template-columns: minmax(260px, 0.72fr) minmax(460px, 1.55fr); gap: 18px; min-width: 0; padding: 20px 22px 18px; }
+.threshold-status { position: relative; display: grid; align-content: start; min-width: 0; border: 1px solid var(--threshold-line); background: color-mix(in srgb, var(--threshold-void) 55%, transparent); }
+.status-heading { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 14px 16px; border-bottom: 1px solid var(--threshold-line); }
+.status-heading h1,
+.status-empty h1 { margin: 0; font-family: var(--threshold-font-display); font-weight: 600; font-size: 26px; line-height: 1; }
+.threshold-code { color: var(--threshold-cyan); font: 400 12px/1.45 var(--threshold-font-code); letter-spacing: 0.1em; text-transform: uppercase; }
+.status-empty { display: grid; align-content: center; gap: 10px; min-height: 280px; max-width: 42ch; padding: 28px 22px; }
+.status-empty p,
+.status-note { margin: 0; color: var(--threshold-muted); font-size: 16px; line-height: 1.45; }
+.status-empty__status { color: var(--threshold-text); font-family: var(--threshold-font-display); font-weight: 600; font-size: 30px; line-height: 1; }
+.status-core { display: grid; grid-template-columns: 1fr 1fr; min-height: 214px; border-bottom: 1px solid var(--threshold-line); }
+.status-number,
+.status-context { display: grid; place-content: center; text-align: center; }
+.status-number { border-right: 1px solid var(--threshold-line); }
+.status-number .st-hero__value {
+  margin: 0;
+  color: var(--threshold-cyan-hi);
+  font-size: 118px;
+  line-height: 0.72;
+  letter-spacing: -0.03em;
+  text-shadow: 0 0 18px color-mix(in srgb, var(--threshold-cyan) 28%, transparent);
+}
+.status-pending { margin: 0; color: var(--threshold-text); font-family: var(--threshold-font-display); font-weight: 600; font-size: 30px; line-height: 1; }
+.st-measure { margin-top: 17px; color: var(--threshold-muted); font: 400 12px/1.3 var(--threshold-font-code); letter-spacing: 0.1em; text-transform: uppercase; }
+.status-context span { color: var(--threshold-muted); font: 400 12px/1.3 var(--threshold-font-code); letter-spacing: 0.1em; text-transform: uppercase; }
+.status-context strong { margin: 8px 0; font-family: var(--threshold-font-display); font-weight: 700; font-size: 38px; line-height: 0.9; letter-spacing: 0.02em; }
+.status-context p { max-width: 18ch; margin: 0 auto; color: var(--threshold-muted); font-size: 14px; line-height: 1.45; }
+.status-rule { display: grid; grid-template-columns: 1fr auto 1fr; gap: 10px; align-items: center; padding: 13px 14px; color: var(--threshold-cyan); font: 400 12px/1.4 var(--threshold-font-code); }
+.status-rule i { height: 1px; background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--threshold-cyan) 55%, transparent)); }
+.status-rule i:last-child { background: linear-gradient(90deg, color-mix(in srgb, var(--threshold-cyan) 55%, transparent), transparent); }
+.status-rule span { text-align: center; }
+.status-details { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; border-top: 1px solid var(--threshold-line); background: var(--threshold-line); }
+.status-details > div { display: grid; gap: 5px; padding: 13px; background: color-mix(in srgb, var(--threshold-void) 96%, transparent); }
+.status-details span { color: var(--threshold-muted); font: 400 12px/1.3 var(--threshold-font-code); letter-spacing: 0.08em; text-transform: uppercase; }
+.status-details strong { font-family: var(--threshold-font-display); font-weight: 600; font-size: 22px; line-height: 1.05; }
+.status-note { padding: 0 16px 14px; }
+
+.threshold-chart {
+  --chart-grid: color-mix(in srgb, var(--threshold-cyan) 5%, transparent);
+  position: relative;
+  min-width: 0;
+  padding: 17px 18px 14px;
+  overflow: hidden;
+  border: 1px solid var(--threshold-line);
+  background-color: color-mix(in srgb, var(--threshold-void) 62%, transparent);
+  background-image: linear-gradient(var(--chart-grid) 1px, transparent 1px), linear-gradient(90deg, var(--chart-grid) 1px, transparent 1px);
+  background-size: 36px 36px;
+}
+.threshold-chart::before { content: ''; position: absolute; top: 0; right: 13%; width: 30%; height: 1px; background: var(--threshold-cyan); box-shadow: 0 0 8px var(--threshold-cyan); }
+.st-move { position: relative; z-index: 1; display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; margin: 0 0 8px; }
+.st-move button {
+  min-height: 36px;
+  padding: 0 12px;
+  border: 1px solid color-mix(in srgb, var(--threshold-violet) 50%, transparent);
+  background: transparent;
+  color: var(--threshold-violet-hi);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.st-move button[aria-pressed='true'] {
+  border-color: var(--threshold-violet-hi);
+  background: color-mix(in srgb, var(--threshold-violet) 20%, var(--threshold-void));
+  box-shadow: 0 0 18px color-mix(in srgb, var(--threshold-violet) 18%, transparent);
+}
+.st-chart .rs h2,
+.st-chart__empty h2 { margin: 6px 0 2px; font-family: var(--threshold-font-display); font-weight: 600; font-size: 30px; line-height: 0.95; letter-spacing: 0.01em; }
+.st-chart .rs-summary,
+.st-chart__empty p { color: var(--threshold-muted); }
+.st-chart__empty { display: grid; align-content: center; min-height: 220px; max-width: 40ch; }
+.st-chart__empty h2 { margin-bottom: 8px; }
+.st-chart .rs-grid { stroke: color-mix(in srgb, var(--threshold-cyan) 12%, transparent); }
+.st-chart .rs-axis { stroke: color-mix(in srgb, var(--threshold-cyan) 40%, transparent); }
+.st-chart .rs-line,
+.st-chart .rs-record-label { stroke: var(--threshold-cyan); fill: var(--threshold-cyan-hi); }
+.st-chart { --sys: color-mix(in srgb, var(--threshold-cyan) 32%, var(--threshold-void)); --stable: var(--threshold-cyan); --ice: var(--threshold-cyan); }
+.st-chart .rs-svg { max-width: 100%; }
+
+.system-lower { display: grid; grid-template-columns: 1.1fr 0.75fr 0.65fr 0.8fr; border-top: 1px solid var(--threshold-line); }
+.system-lower > div { display: grid; gap: 5px; min-width: 0; padding: 13px 17px; border-right: 1px solid var(--threshold-line); }
+.system-lower > div:last-child { border-right: 0; }
+.system-lower span { color: var(--threshold-cyan); font: 400 12px/1.3 var(--threshold-font-code); letter-spacing: 0.08em; text-transform: uppercase; }
+.system-lower strong { font-family: var(--threshold-font-display); font-weight: 600; font-size: 20px; line-height: 1.05; }
+.system-lower small { color: var(--threshold-muted); font-size: 13px; }
+.system-lower__action { align-content: center; }
+.lower-link { min-height: 32px; padding: 0; border: 0; background: transparent; color: var(--threshold-cyan); font-size: 13px; text-align: left; cursor: pointer; }
+.cyan-action {
+  position: relative;
+  width: 100%;
+  min-height: 60px;
+  border: 0;
+  background: color-mix(in srgb, var(--threshold-cyan) 24%, var(--threshold-void));
+  color: var(--threshold-cyan-hi);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+}
+.cyan-action::after { content: ''; position: absolute; inset: 0; border: 1px solid var(--threshold-cyan); clip-path: inherit; pointer-events: none; }
+.cyan-action:hover { background: color-mix(in srgb, var(--threshold-cyan) 36%, var(--threshold-void)); }
+/* The clip-path would cut an outside focus ring, so focus thickens the inner frame instead. */
+.cyan-action:focus-visible { outline: none; }
+.cyan-action:focus-visible::after { border: 3px solid var(--threshold-text); }
+.st-page .st-notice { margin: 12px 16px; }
+
+/* ------------------------------------------------------------------ Status assembly
+   Make's stage-arrive, then the System lights its frame: the rails ignite outward from the
+   label, the corners lock, the readouts arrive in reading order and the hero number is
+   scanned in. Real values are on screen from the first frame; nothing counts up and no
+   placeholder figure is ever shown. */
+.system-rail i { transform-origin: right center; animation: rail-ignite var(--st-dur-assemble) var(--st-ease-arrive) 120ms both; }
+.system-rail i:last-child { transform-origin: left center; }
+.tech-corner { animation: corner-lock 240ms var(--st-ease-snap) both; }
+.tech-corner-nw { --corner-from: -8px -8px; animation-delay: 160ms; }
+.tech-corner-ne { --corner-from: 8px -8px; animation-delay: 200ms; }
+.tech-corner-se { --corner-from: 8px 8px; animation-delay: 240ms; }
+.tech-corner-sw { --corner-from: -8px 8px; animation-delay: 280ms; }
+.status-number { position: relative; overflow: hidden; }
+.status-number .st-hero__value { animation: readout-reveal 420ms var(--st-ease-arrive) 140ms both; }
+.status-number::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    transparent 46%,
+    color-mix(in srgb, var(--threshold-cyan) 18%, transparent) 49%,
+    color-mix(in srgb, var(--threshold-cyan) 85%, transparent) 50%,
+    color-mix(in srgb, var(--threshold-cyan) 18%, transparent) 51%,
+    transparent 54%
+  );
+  background-size: 100% 200%;
+  opacity: 0;
+  animation: readout-scan 520ms var(--st-ease-arrive) 120ms both;
+}
+/* Readouts arrive in reading order and are all settled by about half a second. Rows whose
+   background draws their dividers move as one block, so no empty grid shows through. */
+.status-context > *,
+.status-rule,
+.status-details,
+.system-lower { animation: detail-arrive 240ms var(--st-ease-arrive) both; }
+.status-context > :nth-child(1) { animation-delay: 160ms; }
+.status-context > :nth-child(2) { animation-delay: 190ms; }
+.status-context > :nth-child(3) { animation-delay: 220ms; }
+.status-rule { animation-delay: 240ms; }
+.status-details { animation-delay: 270ms; }
+.system-lower { animation-delay: 300ms; }
+/* The record line rises with the frame; its labels follow the bars. */
+.st-chart .rs-bar { animation-delay: calc(180ms + var(--i) * 35ms); }
+.st-chart .rs-line { animation-delay: 480ms; }
+.st-chart .rs-mark { animation: rs-fade 260ms ease-out 420ms both; }
+
+/* Feedback: the controls answer within one Make beat (180ms). */
+.cyan-action,
+.cyan-action::after { transition: background-color var(--st-dur-feedback) ease, border-color var(--st-dur-feedback) ease; }
+.cyan-action:hover::after { border-color: var(--threshold-cyan-hi); }
+.st-move button { transition: border-color var(--st-dur-feedback) ease, background-color var(--st-dur-feedback) ease, box-shadow var(--st-dur-feedback) ease; }
+.st-move button:hover { border-color: var(--threshold-violet-hi); }
+.threshold-nav .threshold-action.is-active::before { background: var(--threshold-cyan); box-shadow: 0 0 8px var(--threshold-cyan); }
+
+/* Make's keyframes, verbatim, plus the assembly keyframes above. */
+@keyframes stage-arrive {
+  from { opacity: 0; transform: perspective(900px) translateY(14px) rotateX(1.5deg); }
+  to { opacity: 1; transform: perspective(900px) translateY(0) rotateX(0deg); }
+}
+@keyframes threshold-assemble {
+  0% { opacity: 0; transform: translate(-50%, -47%) scaleX(0.82) scaleY(0.9); }
+  55% { opacity: 1; transform: translate(-50%, -50%) scaleX(1.018) scaleY(1); }
+  100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+@keyframes detail-arrive {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes rail-ignite {
+  from { opacity: 0; transform: scaleX(0); }
+  to { opacity: 1; transform: scaleX(1); }
+}
+@keyframes corner-lock {
+  from { opacity: 0; translate: var(--corner-from, 0 0); }
+  to { opacity: 1; translate: 0 0; }
+}
+@keyframes readout-reveal {
+  from { clip-path: inset(0 0 100% 0); }
+  to { clip-path: inset(0 0 0 0); }
+}
+@keyframes readout-scan {
+  from { background-position: 0 100%; opacity: 1; }
+  80% { opacity: 1; }
+  to { background-position: 0 0; opacity: 0; }
+}
+
+@media (max-width: 1120px) {
+  .threshold-canvas { padding-left: 16.5%; }
+  .threshold-nav { width: 132px; }
+  .system-stage-grid { grid-template-columns: 290px minmax(0, 1fr); }
+  .status-number .st-hero__value { font-size: 84px; }
+}
+@media (max-width: 860px) {
+  .st-page { overflow: visible; }
+  .threshold-environment { display: none; }
+  .threshold-nav { position: static; grid-template-columns: repeat(3, minmax(0, 1fr)); width: auto; margin: 10px 10px 0; transform: none; }
+  .threshold-nav .nav-spine { display: none; }
+  .threshold-nav .threshold-action,
+  .threshold-nav .threshold-action:hover,
+  .threshold-nav .threshold-action.is-active { grid-template-columns: auto minmax(0, 1fr); gap: 6px; min-width: 0; padding: 0 8px; transform: none; }
+  .threshold-nav .threshold-action strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; letter-spacing: 0.04em; }
+  .threshold-nav .threshold-action::before { display: none; }
+  .system-frame { grid-template-rows: auto minmax(0, 1fr) auto auto; }
+  .system-rail { grid-template-columns: minmax(16px, 1fr) minmax(0, auto) minmax(16px, 1fr); gap: 10px; padding: 9px 0; letter-spacing: 0.08em; }
+  .system-rail span { text-align: center; }
+  .status-number,
+  .status-context { padding: 20px 14px; }
+  .threshold-canvas { min-height: 0; padding: 10px; }
+  .system-stage,
+  .system-frame { min-height: 0; }
+  .system-backplane { display: none; }
+  .system-stage-grid,
+  .status-core,
+  .system-lower { grid-template-columns: 1fr; }
+  .status-number { border-right: 0; border-bottom: 1px solid var(--threshold-line); }
+  .system-frame { box-shadow: inset 0 0 40px color-mix(in srgb, var(--threshold-cyan) 6%, transparent); }
+  .system-lower > div { border-right: 0; border-top: 1px solid var(--threshold-line); }
+  .st-move button { min-height: 44px; }
+}
+/* Reduced motion: every screen arrives in its final state at once; state colour and text
+   still change, they just do not move. */
+@media (prefers-reduced-motion: reduce) {
+  .system-stage,
+  .system-rail i,
+  .tech-corner,
+  .status-number .st-hero__value,
+  .status-context > *,
+  .status-rule,
+  .status-details,
+  .system-lower,
+  .st-chart .rs-mark,
+  .athlete-pop,
+  .more-list { animation: none; }
+  .status-number::after { display: none; }
+  .threshold-nav .threshold-action { transition: none; }
+  .status-number .st-hero__value { text-shadow: none; }
+}

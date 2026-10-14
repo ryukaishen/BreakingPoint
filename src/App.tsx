@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { AthleteDialog } from './components/athletes/AthleteDialog';
 import { AthleteMenu } from './components/athletes/AthleteMenu';
-import { LegacyDialog } from './components/athletes/LegacyDialog';
+import { AthletesView, type Panel as AthletesPanel } from './components/athletes/AthletesView';
 import { CameraStage } from './components/CameraStage';
 import { ConfirmDialog } from './components/ConfirmDialog';
 import { Header } from './components/Header';
@@ -13,6 +13,8 @@ import { SessionAnnouncer } from './components/SessionAnnouncer';
 import { Evidence } from './components/session/Evidence';
 import { FocusPanel } from './components/session/FocusPanel';
 import { SportPage } from './components/SportPage';
+import { StatusView } from './components/status/StatusView';
+import { SignalSpine } from './components/system/SignalSpine';
 import { SummaryModal } from './components/SummaryModal';
 import { clearDraft, draftAthleteId, interruptedRecord, listDrafts, type SetDraft } from './data/draft';
 import { browserStore } from './data/kv';
@@ -25,6 +27,7 @@ import { LabelProvider, makeLabeler } from './protocols/labels';
 import { DEFAULT_LAUNCH, getSport, launchForExercise, resolveDemo, resolveLaunch, type LaunchContext } from './protocols/launch';
 import { SessionEngine } from './session/engine';
 import { useNavGuard } from './session/useNavGuard';
+import type { NavView } from './session/navGuard';
 import { cameraErrorText, DemoRunner, LiveRunner, type Runner } from './session/runners';
 import { useSessionRecorder } from './session/useSessionRecorder';
 import { useHandsFree } from './session/useHandsFree';
@@ -33,11 +36,14 @@ import { useSetDraft } from './session/useSetDraft';
 import { useVoiceCues, voiceAvailable } from './session/voice';
 import { useEngine } from './utils/hooks';
 
-type View = 'landing' | 'sport' | 'session';
+type View = NavView;
 type Mode = 'demo' | 'live';
 
-type Dialog = { kind: 'add'; intro?: string } | { kind: 'rename' } | { kind: 'legacy' } | null;
-type Confirm = { title: string; body: ReactNode; confirmLabel: string; onConfirm: () => void } | null;
+type Dialog = { kind: 'add'; intro?: string } | { kind: 'rename' } | null;
+type Confirm = { title: string; body: ReactNode; confirmLabel: string; bar?: string; code?: string; onConfirm: () => void } | null;
+
+const NEEDS_PROFILE = 'Live sets, baselines and records are saved to an athlete profile on this device. Who is training?';
+const STORAGE_FULL = 'browser storage is full or unavailable.';
 
 /** Phases in which leaving would throw away work in progress. */
 const ACTIVE_PHASES = new Set(['calibrating', 'monitoring', 'recovery']);
@@ -64,6 +70,10 @@ export default function App() {
   const [demoPaused, setDemoPaused] = useState(false);
   const [dialog, setDialog] = useState<Dialog>(null);
   const [confirm, setConfirm] = useState<Confirm>(null);
+  /** Which Athletes panel to open; the key remounts the page when asked again while it is showing. */
+  const [athletesPanel, setAthletesPanel] = useState<{ panel: AthletesPanel; key: number }>({ panel: 'list', key: 0 });
+  /** Bumped to bring the landing page's sport roster into view. */
+  const [sportsRequest, setSportsRequest] = useState(0);
   /** Detector evidence under the athlete view: open by default in demos (people exploring), closed in live sets (an athlete at 3 m). */
   const [showEvidence, setShowEvidence] = useState(true);
   const [voiceOn, setVoiceOn] = usePref('bp.pref.voice', false);
@@ -92,7 +102,7 @@ export default function App() {
   useEffect(() => {
     if (!data.persistent) setToast({ text: 'Browser storage is unavailable, so sets will only be kept for this visit.', kind: 'break' });
     else if (data.migration.ran && data.migration.legacyBaselines > 0)
-      setToast({ text: 'Found saved baselines from an earlier version. Review them in the athlete menu.', kind: '' });
+      setToast({ text: 'Found saved baselines from an earlier version. Review them on the Athletes page.', kind: '' });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -122,7 +132,7 @@ export default function App() {
         if (data.scope === 'sample') data.setScope('real');
         if (!data.real.activeAthlete()) {
           pendingLive.current = ctx ?? launch;
-          setDialog({ kind: 'add', intro: 'Live sets, baselines and records are saved to an athlete profile on this device. Who is training?' });
+          setDialog({ kind: 'add', intro: NEEDS_PROFILE });
           return;
         }
       } else if (data.scope !== 'sample') data.setScope('sample');
@@ -142,6 +152,12 @@ export default function App() {
     setSportView({ sportId, subSportId });
     setLibrary(false);
     setView('sport');
+  }, []);
+
+  const openAthletes = useCallback((panel: AthletesPanel = 'list') => {
+    setAthletesPanel((a) => ({ panel, key: a.key + 1 }));
+    setLibrary(false);
+    setView('athletes');
   }, []);
 
   // Presenter deep links:
@@ -166,6 +182,10 @@ export default function App() {
     else if (demo && demo !== '1' && resolveDemo(demo)) startSession('demo', resolveDemo(demo)!);
     else if (demo === '1') startSession('demo', launchForExercise(q.get('exercise')));
     else if (q.get('live') === '1') startSession('live', launchForExercise(q.get('exercise')));
+    else if (q.get('status') === '1') {
+      if (q.get('sample') === '1') data.setScope('sample');
+      setView('status');
+    }
     const panel = q.get('panel');
     if (panel === 'lab' || panel === 'method' || panel === 'realworld' || panel === 'science' || panel === 'privacy') setResearch(panel);
     if (panel === 'library') setLibrary(true);
@@ -315,6 +335,7 @@ export default function App() {
     const p = snap.phase;
     setConfirm({
       title: p === 'calibrating' ? 'Leave calibration?' : p === 'recovery' ? 'Leave the recovery check?' : 'End this set and leave?',
+      bar: p === 'calibrating' ? 'Calibration in progress' : p === 'recovery' ? 'Recovery check in progress' : 'Live set in progress',
       body:
         p === 'calibrating' ? (
           <p>The calibration in progress will be discarded. Your saved baselines are not affected.</p>
@@ -363,6 +384,8 @@ export default function App() {
     if (mode === 'demo') return doResetBaseline();
     setConfirm({
       title: 'Reset this baseline?',
+      bar: 'Reset baseline',
+      code: 'Local records / permanent action',
       body: (
         <p>
           This deletes {athleteName}’s saved {launch.protocol.name.toLowerCase()} baseline on this device and starts a new calibration. Saved sets and records
@@ -372,6 +395,62 @@ export default function App() {
       confirmLabel: 'Reset baseline',
       onConfirm: doResetBaseline,
     });
+  };
+
+  // ---------------------------------------------------------------- athletes
+  /** Every profile change goes through the device repository; a failed write is reported, never ignored. */
+  const createAthlete = (name: string): boolean => {
+    try {
+      const p = data.real.createAthlete(name);
+      data.real.setActive(p.id);
+    } catch {
+      setToast({ text: `The athlete could not be saved: ${STORAGE_FULL}`, kind: 'break' });
+      return false;
+    }
+    if (data.scope === 'sample') data.setScope('real');
+    data.refresh();
+    return true;
+  };
+
+  const renameAthlete = (id: string, name: string) => {
+    if (!data.real.updateAthlete(id, { name })) setToast({ text: `The new name could not be saved: ${STORAGE_FULL}`, kind: 'break' });
+    data.refresh();
+  };
+
+  const switchAthlete = (id: string) => {
+    if (data.scope === 'sample') data.setScope('real');
+    data.real.setActive(id);
+    data.refresh();
+  };
+
+  const deleteAthlete = (a: { id: string; name: string }) => {
+    if (liveActive) return; // the athlete of a running live set cannot be removed
+    setConfirm({
+      title: `Delete ${a.name}?`,
+      bar: 'Delete athlete',
+      code: 'Local records / permanent action',
+      body: (
+        <>
+          <p>This deletes {a.name}’s baselines, sets and records from this device.</p>
+          <p>This can’t be undone.</p>
+        </>
+      ),
+      confirmLabel: 'Delete athlete',
+      onConfirm: () => {
+        if (!data.real.deleteAthlete(a.id)) {
+          setToast({ text: `${a.name} could not be deleted: ${STORAGE_FULL}`, kind: 'break' });
+          return;
+        }
+        clearDraft(draftKv, a.id);
+        data.refresh();
+        setToast({ text: `${a.name} was deleted from this device.`, kind: '' });
+      },
+    });
+  };
+
+  const exploreSample = () => {
+    data.setScope('sample');
+    setView('status');
   };
 
   const savedBaseline = mode === 'live' && sessionAthlete ? data.real.baseline(sessionAthlete.id, launch.protocol.id) : null;
@@ -397,7 +476,15 @@ export default function App() {
   // Each view names itself for screen readers, tabs and history.
   useEffect(() => {
     document.title =
-      view === 'landing' ? 'BreakingPoint' : view === 'sport' ? `${sportForPage?.name ?? 'Sport'} | BreakingPoint` : `${launch.contextName}: ${launch.title} | BreakingPoint`;
+      view === 'landing'
+        ? 'BreakingPoint'
+        : view === 'status'
+          ? 'Status | BreakingPoint'
+          : view === 'athletes'
+            ? 'Athletes | BreakingPoint'
+          : view === 'sport'
+            ? `${sportForPage?.name ?? 'Sport'} | BreakingPoint`
+            : `${launch.contextName}: ${launch.title} | BreakingPoint`;
   }, [view, launch, sportForPage]);
 
   const pendingRecovery = recoveryQueue[0] ?? null;
@@ -409,21 +496,32 @@ export default function App() {
       athletes={data.real.athletes()}
       legacyCount={data.real.legacy().length}
       locked={liveActive}
-      onLockedAttempt={() => setToast({ text: 'Finish or end the set before switching athletes.', kind: '' })}
       onSwitch={(id) => {
-        if (data.scope === 'sample') data.setScope('real');
-        data.real.setActive(id);
-        data.refresh();
+        switchAthlete(id);
         if (view === 'session') setView('landing');
       }}
       onAdd={() => setDialog({ kind: 'add' })}
       onRename={() => setDialog({ kind: 'rename' })}
-      onLegacy={() => setDialog({ kind: 'legacy' })}
+      onManage={() => guardLeave(() => openAthletes())}
+      onLegacy={() => guardLeave(() => openAthletes('migration'))}
       onScope={(s) => {
         data.setScope(s);
         if (view === 'session') setView('landing');
       }}
     />
+  );
+
+  // During a session the toast sits inside the camera column (see styles-session.css), so it
+  // never covers the camera's bottom overlays or the side panel's controls.
+  const toastEl = toast && (
+    <div
+      className={`sys-window toned toast ${toast.kind} ${toast.kind === 'break' ? 'tone-break' : toast.kind === 'milestone' ? 'tone-violet' : ''}`}
+      role="status"
+      aria-live="polite"
+    >
+      <span className="toast-mark" aria-hidden />
+      {toast.text}
+    </div>
   );
 
   return (
@@ -448,6 +546,8 @@ export default function App() {
         launch={launch}
         athleteSlot={athleteMenu}
         onHome={() => guardLeave(() => setView('landing'))}
+        onStatus={() => guardLeave(() => setView('status'))}
+        onAthletes={() => guardLeave(() => openAthletes())}
         onChangeProtocol={() => guardLeave(() => openSport(launch.sport.id, launch.subSport?.id))}
         onLibrary={() => setLibrary(true)}
         onResearch={() => setResearch('method')}
@@ -458,7 +558,7 @@ export default function App() {
       {data.scope === 'sample' && (
         <div className="sample-banner" role="note">
           <span>
-            <b>Sample athlete.</b> Synthetic example data — does not affect your records.
+            <b>Sample athlete.</b> Synthetic data, held in memory and never saved to your records.
           </span>
           <button className="link-btn" onClick={() => guardLeave(() => (data.setScope('real'), setView('landing')))}>
             Back to my data
@@ -466,17 +566,78 @@ export default function App() {
         </div>
       )}
 
+      {view === 'status' && (
+        <StatusView
+          scope={data.scope}
+          athleteName={data.athlete?.name ?? null}
+          sessions={data.athlete ? data.repo.sessions(data.athlete.id) : []}
+          baselines={data.athlete ? data.repo.baselines(data.athlete.id) : []}
+          persistent={data.persistent}
+          onAddAthlete={() => setDialog({ kind: 'add', intro: NEEDS_PROFILE })}
+          onBrowse={() => guardLeave(() => setView('landing'))}
+          onOpenSport={(sportId, subSportId) => guardLeave(() => openSport(sportId, subSportId))}
+          onLive={(ctx) => guardLeave(() => startSession('live', ctx))}
+          onDemo={(ctx) => guardLeave(() => startSession('demo', ctx))}
+          onResearch={() => setResearch('method')}
+          onAthletes={() => openAthletes()}
+        />
+      )}
+
       {view === 'landing' && (
         <Landing
           config={config}
           athlete={SAMPLE_ATHLETE_NAME}
+          sportsRequest={sportsRequest}
           onSport={(id) => openSport(id)}
           onDemo={(id) => {
             const ctx = resolveDemo(id);
             if (ctx) startSession('demo', ctx);
           }}
+          onSample={exploreSample}
+          onCamera={() => startSession('live', DEFAULT_LAUNCH)}
           onLibrary={() => setLibrary(true)}
           onLab={() => setResearch('lab')}
+          onResearch={() => setResearch('method')}
+          onStatus={() => setView('status')}
+          onAthletes={() => openAthletes()}
+        />
+      )}
+
+      {view === 'athletes' && (
+        <AthletesView
+          key={athletesPanel.key}
+          initialPanel={athletesPanel.panel}
+          scope={data.scope}
+          athletes={data.real.athletes()}
+          activeId={data.real.activeAthlete()?.id ?? null}
+          summaries={Object.fromEntries(
+            data.real.athletes().map((a) => [a.id, { sets: data.real.sessions(a.id).length, baselines: data.real.baselines(a.id).length }]),
+          )}
+          legacy={data.real.legacy()}
+          persistent={data.persistent}
+          onSwitch={switchAthlete}
+          onCreate={createAthlete}
+          onRename={renameAthlete}
+          onDelete={deleteAthlete}
+          onSample={exploreSample}
+          onRealData={() => data.setScope('real')}
+          onDemo={() => startSession('demo', resolveDemo('soccer')!)}
+          onChooseMovement={() => {
+            setView('landing');
+            setSportsRequest((n) => n + 1);
+          }}
+          onAssignLegacy={(id, athleteId) => {
+            const ok = claimLegacyBaseline(data.real, id, athleteId, config);
+            setToast(ok ? { text: 'Baseline assigned.', kind: '' } : { text: 'That baseline could not be assigned.', kind: 'break' });
+            data.refresh();
+          }}
+          onDiscardLegacy={(id) => {
+            data.real.discardLegacy(id);
+            data.refresh();
+          }}
+          onEntry={() => setView('landing')}
+          onStatus={() => setView('status')}
+          onResearch={() => setResearch('method')}
         />
       )}
 
@@ -494,11 +655,14 @@ export default function App() {
 
       {view === 'session' && (
         <LabelProvider value={labeler}>
-          <main className="dashboard" id="main" tabIndex={-1}>
+          <main className="dashboard st-session" id="main" tabIndex={-1}>
             <h1 className="visually-hidden">
               {launch.contextName}: {launch.title}, {mode === 'demo' ? 'demo' : 'live'} session
             </h1>
             <SessionAnnouncer snap={snap} />
+            <p className="session-movement" aria-hidden="true">
+              {launch.contextName} / <b>{launch.title}</b>
+            </p>
             <div className="stage-col">
               <CameraStage
                 snap={snap}
@@ -523,10 +687,13 @@ export default function App() {
                 onDemoSkip={() => runner instanceof DemoRunner && runner.skipToEnd()}
                 onRetryLive={() => startSession('live')}
                 onSwitchToDemo={() => startSession('demo')}
+                onEndSet={mode === 'live' ? () => engine.endSet() : undefined}
                 evidence={showEvidence}
               />
+              {toastEl}
             </div>
             <aside className="side-col" aria-label="Session">
+              <SignalSpine snapshot={snap} />
               <FocusPanel
                 snap={snap}
                 mode={mode}
@@ -598,10 +765,7 @@ export default function App() {
             setDialog(null);
           }}
           onSubmit={(name) => {
-            const p = data.real.createAthlete(name);
-            data.real.setActive(p.id);
-            if (data.scope === 'sample') data.setScope('real');
-            data.refresh();
+            if (!createAthlete(name)) return;
             setDialog(null);
             const next = pendingLive.current;
             pendingLive.current = null;
@@ -615,26 +779,9 @@ export default function App() {
           initialName={data.real.activeAthlete()!.name}
           onCancel={() => setDialog(null)}
           onSubmit={(name) => {
-            data.real.updateAthlete(data.real.activeAthlete()!.id, { name });
-            data.refresh();
+            renameAthlete(data.real.activeAthlete()!.id, name);
             setDialog(null);
           }}
-        />
-      )}
-      {dialog?.kind === 'legacy' && (
-        <LegacyDialog
-          items={data.real.legacy()}
-          athletes={data.real.athletes()}
-          onAssign={(id, athleteId) => {
-            const ok = claimLegacyBaseline(data.real, id, athleteId, config);
-            setToast(ok ? { text: 'Baseline assigned.', kind: '' } : { text: 'That baseline could not be assigned.', kind: 'break' });
-            data.refresh();
-          }}
-          onDiscard={(id) => {
-            data.real.discardLegacy(id);
-            data.refresh();
-          }}
-          onClose={() => setDialog(null)}
         />
       )}
       {pendingRecovery && (
@@ -661,6 +808,8 @@ export default function App() {
       {confirm && (
         <ConfirmDialog
           title={confirm.title}
+          bar={confirm.bar}
+          code={confirm.code}
           confirmLabel={confirm.confirmLabel}
           onCancel={() => setConfirm(null)}
           onConfirm={() => {
@@ -673,16 +822,7 @@ export default function App() {
         </ConfirmDialog>
       )}
 
-      {toast && (
-        <div
-          className={`sys-window toned toast ${toast.kind} ${toast.kind === 'break' ? 'tone-break' : toast.kind === 'milestone' ? 'tone-violet' : ''}`}
-          role="status"
-          aria-live="polite"
-        >
-          <span className="toast-mark" aria-hidden />
-          {toast.text}
-        </div>
-      )}
+      {view !== 'session' && toastEl}
     </div>
   );
 }

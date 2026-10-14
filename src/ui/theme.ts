@@ -28,6 +28,20 @@ export const C = {
   lime: '#c8ff2e',
 } as const;
 
+/**
+ * System Threshold palette for canvas drawing on System Threshold screens (the live
+ * session). Mirrors the --threshold-* tokens in src/styles-system-threshold.css, which
+ * come from the Figma Make source; keep both in sync.
+ */
+export const ST = {
+  cyan: '#54e4ff',
+  cyanHi: '#b9f6ff',
+  violet: '#a75bff',
+  violetHi: '#d3adff',
+  amber: '#ffbd66',
+  stop: '#ff435f',
+} as const;
+
 export const FONT_DISPLAY = "'Mona Sans Variable', system-ui, sans-serif";
 export const FONT_NUM = "'Anybody Variable', 'Mona Sans Variable', system-ui, sans-serif";
 export const FONT_TEXT = "'Mona Sans Variable', system-ui, sans-serif";

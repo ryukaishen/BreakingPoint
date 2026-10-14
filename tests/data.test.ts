@@ -113,6 +113,64 @@ describe('athlete identity and isolation', () => {
   });
 });
 
+describe('deleting an athlete', () => {
+  const setup = () => {
+    const kv = new MemoryStore();
+    const repo = new AthleteRepository(kv, 'real');
+    const a = repo.createAthlete('Avery');
+    const b = repo.createAthlete('Blake');
+    repo.saveBaseline(stored(a.id));
+    repo.saveBaseline(stored(b.id));
+    repo.saveSession(session(a.id, 6));
+    repo.saveSession(session(b.id, 4));
+    repo.writeLegacy([{ id: 'legacy-1', protocolId: 'squat-bodyweight', exercise: 'squat', createdAt: '2025-01-01T00:00:00.000Z', baseline: baseline() } as never]);
+    kv.set('bp.pref.voice', 'true');
+    return { kv, repo, a, b };
+  };
+
+  it('removes only that athlete’s profile, baselines and sets', () => {
+    const { kv, repo, a, b } = setup();
+    const before = kv.keys().filter((k) => !k.includes(a.id)).sort();
+    expect(repo.deleteAthlete(a.id)).toBe(true);
+    expect(repo.athletes().map((x) => x.name)).toEqual(['Blake']);
+    expect(repo.baseline(a.id, 'squat-bodyweight')).toBeNull();
+    expect(repo.sessions(a.id)).toEqual([]);
+    expect(kv.keys().some((k) => k.includes(a.id))).toBe(false);
+    // Everything that did not belong to Avery is still there, unchanged.
+    expect(kv.keys().sort()).toEqual(before);
+    expect(repo.baseline(b.id, 'squat-bodyweight')).not.toBeNull();
+    expect(repo.sessions(b.id)).toHaveLength(1);
+    expect(repo.legacy()).toHaveLength(1);
+    expect(kv.get('bp.pref.voice')).toBe('true');
+  });
+
+  it('moves the active athlete to the next profile, or to none', () => {
+    const { repo, a, b } = setup();
+    expect(repo.activeAthlete()?.id).toBe(a.id);
+    repo.deleteAthlete(a.id);
+    expect(repo.activeAthlete()?.id).toBe(b.id);
+    repo.deleteAthlete(b.id);
+    expect(repo.activeAthlete()).toBeNull();
+    expect(repo.meta().activeAthleteId).toBeNull();
+  });
+
+  it('leaves the active athlete alone when another is deleted', () => {
+    const { repo, a, b } = setup();
+    repo.deleteAthlete(b.id);
+    expect(repo.activeAthlete()?.id).toBe(a.id);
+  });
+
+  it('refuses unknown ids and removes nothing when the profile list cannot be written', () => {
+    const { kv, repo, a } = setup();
+    expect(repo.deleteAthlete('ghost')).toBe(false);
+    const snapshot = kv.keys().map((k) => [k, kv.get(k)]);
+    const full = Object.assign(Object.create(Object.getPrototypeOf(kv)), kv, { set: () => false });
+    const blocked = new AthleteRepository(full, 'real');
+    expect(blocked.deleteAthlete(a.id)).toBe(false);
+    expect(kv.keys().map((k) => [k, kv.get(k)])).toEqual(snapshot);
+  });
+});
+
 describe('synthetic data isolation', () => {
   it('the real repository never accepts synthetic sessions', () => {
     const repo = new AthleteRepository(new MemoryStore(), 'real');

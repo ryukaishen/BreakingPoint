@@ -18,34 +18,40 @@ export interface Announcement {
 const NONE: Announcement = { polite: null, assertive: null };
 const polite = (text: string): Announcement => ({ polite: text, assertive: null });
 
+function phaseMessage(next: Snapshot): string | null {
+  switch (next.phase) {
+    case 'calibrating':
+      return `Calibration started. Perform ${next.calibrationTarget} controlled reps at your normal tempo.`;
+    case 'baseline':
+      return 'Baseline locked.';
+    case 'monitoring':
+      return 'Set started.';
+    case 'summary': {
+      if (next.alarmRep !== null) return `Set ended. The alert triggered at rep ${next.alarmRep}. Rest, then run the recovery check.`;
+      const held = heldReps(next.monitorReps);
+      return `Set ended. ${next.monitorReps.length} reps, ${held} at your usual form.`;
+    }
+    case 'recovery':
+      return `Recovery check started. Perform ${RECOVERY_REPS} controlled reps.`;
+    case 'recoveryDone':
+      return next.recovery ? `Recovery check complete. ${Math.round(next.recovery.percent * 100)} percent of the change has gone.` : 'Recovery check complete.';
+    default:
+      return null;
+  }
+}
+
 export function announce(prev: Snapshot | null, next: Snapshot): Announcement {
   if (!prev || prev === next) return NONE;
 
+  const phase = prev.phase !== next.phase ? phaseMessage(next) : null;
+
+  // The alert and the end of the set can reach the screen in the same update (the snapshot moved on
+  // twice between renders). Both are said then: the stop instruction assertively, the summary politely.
   if (prev.alarmRep === null && next.alarmRep !== null) {
-    return { polite: null, assertive: `Stop. The alert triggered at rep ${next.alarmRep}. End the set and rest.` };
+    return { polite: phase, assertive: `Stop. The alert triggered at rep ${next.alarmRep}. End the set and rest.` };
   }
 
-  if (prev.phase !== next.phase) {
-    switch (next.phase) {
-      case 'calibrating':
-        return polite(`Calibration started. Perform ${next.calibrationTarget} controlled reps at your normal tempo.`);
-      case 'baseline':
-        return polite('Baseline locked.');
-      case 'monitoring':
-        return polite('Set started.');
-      case 'summary': {
-        if (next.alarmRep !== null) return polite(`Set ended. The alert triggered at rep ${next.alarmRep}. Rest, then run the recovery check.`);
-        const held = heldReps(next.monitorReps);
-        return polite(`Set ended. ${next.monitorReps.length} reps, ${held} at your usual form.`);
-      }
-      case 'recovery':
-        return polite(`Recovery check started. Perform ${RECOVERY_REPS} controlled reps.`);
-      case 'recoveryDone':
-        return polite(next.recovery ? `Recovery check complete. ${Math.round(next.recovery.percent * 100)} percent of the change has gone.` : 'Recovery check complete.');
-      default:
-        return NONE;
-    }
-  }
+  if (prev.phase !== next.phase) return phase === null ? NONE : polite(phase);
 
   if (next.phase === 'monitoring' && prev.state === 'STABLE' && next.state === 'DRIFT') {
     return polite('Your form is starting to change. Be ready to stop.');

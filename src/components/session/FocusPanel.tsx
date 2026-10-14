@@ -32,7 +32,7 @@ interface Props {
   onNewSet: () => void;
 }
 
-type Tone = 'stable' | 'drift' | 'break' | 'neutral' | 'calm';
+type Tone = 'stable' | 'drift' | 'break' | 'neutral' | 'calm' | 'recover';
 
 interface View {
   plate: string;
@@ -195,7 +195,7 @@ export function FocusPanel(p: Props) {
       case 'recovery':
         return {
           plate: 'Recovery check',
-          tone: 'calm',
+          tone: 'recover',
           instruction: `${RECOVERY_REPS} controlled reps, compared with your usual form.`,
           big: String(s.recoveryReps.length),
           bigLabel: `of ${RECOVERY_REPS} reps`,
@@ -251,11 +251,11 @@ export function FocusPanel(p: Props) {
           {counting ? (
             <>
               <span className="focus-num-label">{counting.label}</span>
-              <span className="num-hero focus-num">{counting.seconds}</span>
+              <span className="st-numeral focus-num">{counting.seconds}</span>
             </>
           ) : (
             <>
-              <span className="num-hero focus-num">{view.big}</span>
+              <span className="st-numeral focus-num">{view.big}</span>
               <span className="focus-num-label">{view.bigLabel}</span>
             </>
           )}

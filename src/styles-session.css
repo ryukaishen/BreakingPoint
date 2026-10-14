@@ -1,60 +1,251 @@
 /* Session screen, Stage 2: the athlete view (FocusPanel, RecordLane), session options and
-   the detector evidence drawer. Built from the approved board's B1 frame held to
-   Direction A's discipline: one state plate, one instruction, one hero number, the record
-   lane, nothing else in the athlete's line of sight. The 12° cut is the only motif.
+   the detector evidence drawer. One state plate, one instruction, one hero number and the
+   record lane in the athlete's line of sight.
    Readability targets (docs/READABILITY_3M.md): the hero number and the state plate are
    sized for about 3 m on a laptop. */
 
+/* ------------------------------------------------------------------ live workout console
+   System Threshold (Figma Make) applied to the working session: Make's frame geometry,
+   palette (--threshold-* in styles-system-threshold.css) and faces. Make designs this flow
+   for phones only; wider layouts keep the working arrangement and take the same language. */
+.st-session {
+  background: radial-gradient(ellipse at 28% 42%, var(--threshold-glow), transparent 46%), var(--threshold-sweep);
+  font-family: var(--threshold-font-body);
+}
+@media (min-width: 1101px) {
+  .st-session.dashboard { grid-template-columns: minmax(0, 1.7fr) minmax(340px, 0.9fr); }
+}
+
+/* camera ------------------------------------------------------------ */
+.st-session .stage-col { position: relative; }
+.st-session .stage {
+  --stage-tone: var(--threshold-cyan);
+  border: 1px solid var(--threshold-line);
+  border-radius: 0;
+  background: var(--threshold-void);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--threshold-cyan) 16%, transparent), inset 0 0 56px color-mix(in srgb, var(--threshold-cyan) 8%, transparent);
+  clip-path: polygon(18px 0, calc(100% - 40px) 0, 100% 28px, 100% 100%, 0 100%, 0 18px);
+}
+.st-session .stage.tone-drift {
+  --stage-tone: var(--threshold-amber);
+  border-color: var(--threshold-amber);
+  box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--threshold-amber) 66%, transparent), inset 0 0 48px color-mix(in srgb, var(--threshold-amber) 8%, transparent);
+}
+.st-session .stage.tone-break {
+  --stage-tone: var(--threshold-text);
+  border-color: var(--threshold-stop);
+  box-shadow: inset 0 0 0 3px var(--threshold-stop), inset 0 0 80px color-mix(in srgb, var(--threshold-stop) 18%, transparent);
+}
+.st-session .stage.tone-recover {
+  --stage-tone: var(--threshold-violet-hi);
+  border-color: color-mix(in srgb, var(--threshold-violet) 60%, transparent);
+  box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--threshold-violet-hi) 53%, transparent), inset 0 0 56px color-mix(in srgb, var(--threshold-violet) 14%, transparent);
+}
+.st-session .stage .vf { width: 22px; height: 22px; border-color: var(--stage-tone); }
+/* The alert flash, in the one stop red. */
+.st-session .stage.flash::after {
+  border-radius: 0;
+  box-shadow: inset 0 0 0 2px var(--threshold-stop), inset 0 0 90px color-mix(in srgb, var(--threshold-stop) 42%, transparent);
+}
+
+/* The state and rep readout over the camera (Make's status matrix). */
+.st-session .ov-tl {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  max-width: min(100% - 36px, 420px);
+  padding: 12px 18px 14px;
+  border: 1px solid var(--threshold-line);
+  background: color-mix(in srgb, var(--threshold-void) 84%, transparent);
+  clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px);
+}
+.st-session .stage.tone-drift .ov-tl { border-color: color-mix(in srgb, var(--threshold-amber) 68%, transparent); }
+.st-session .stage.tone-break .ov-tl { border: 2px solid var(--threshold-stop); }
+.st-session .stage.tone-recover .ov-tl { border-color: color-mix(in srgb, var(--threshold-violet-hi) 60%, transparent); }
+
+.st-session .stage-state {
+  display: block;
+  color: var(--threshold-cyan-hi);
+  font-family: var(--threshold-font-display);
+  font-weight: 700;
+  font-size: clamp(32px, 2.6vw, 44px);
+  line-height: 0.9;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  text-shadow: 0 0 12px color-mix(in srgb, var(--threshold-cyan) 33%, transparent);
+}
+.st-session .rep-counter .lbl,
+.st-session .rep-counter .ctx {
+  color: var(--threshold-muted);
+  font: 400 12px/1.3 var(--threshold-font-code);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.st-session .rep-counter .val {
+  color: var(--threshold-cyan-hi);
+  font-family: var(--threshold-font-display);
+  font-stretch: normal;
+  font-weight: 700;
+  font-size: clamp(104px, 10vw, 176px);
+  font-variant-numeric: tabular-nums lining-nums;
+  line-height: 0.82;
+  letter-spacing: -0.01em;
+  text-shadow: 0 0 18px color-mix(in srgb, var(--threshold-cyan) 28%, transparent);
+}
+.st-session .stage.tone-drift .stage-state,
+.st-session .stage.tone-drift .rep-counter .val { color: var(--threshold-amber); text-shadow: none; }
+/* STOP, as Make's alert matrix: the word in white on the dark field, the rep count in a stop-red cell. */
+.st-session .stage.tone-break .stage-state { color: var(--threshold-text); text-shadow: none; }
+.st-session .stage.tone-break .rep-counter .val {
+  align-self: flex-start;
+  padding: 0.06em 0.1em 0;
+  background: var(--threshold-stop);
+  color: var(--threshold-text);
+  text-shadow: none;
+}
+.st-session .stage.tone-recover .stage-state,
+.st-session .stage.tone-recover .rep-counter .val { color: var(--threshold-violet-hi); text-shadow: 0 0 16px color-mix(in srgb, var(--threshold-violet) 40%, transparent); }
+
+/* The STOP cue and End set appear on the camera only where the athlete view is below it. */
+.st-session .stage-cue,
+.st-session .stage-end { display: none; }
+
+/* Session toasts take the System Threshold tones (the stop red and violet of this screen). */
+.st-session .toast {
+  --tone: var(--threshold-cyan);
+  border-color: var(--threshold-line);
+  border-top-color: var(--tone);
+  background: color-mix(in srgb, var(--threshold-void) 94%, transparent);
+  color: var(--threshold-text);
+}
+.st-session .toast.tone-break { --tone: var(--threshold-stop); }
+.st-session .toast.tone-violet { --tone: var(--threshold-violet-hi); }
+
+/* Session toasts: top centre of the camera, clear of its corner overlays (wide layout). */
+@media (min-width: 1101px) {
+  .st-session .stage-col > .toast {
+    position: absolute;
+    top: 64px;
+    bottom: auto;
+    left: 50%;
+    max-width: min(480px, calc(100% - 400px));
+  }
+  /* Beside the camera, the athlete view carries the state and the rep count at 3 m sizes,
+     so the camera keeps only the movement phase and its frame colour. */
+  .st-session .ov-tl {
+    padding: 0;
+    border: 0;
+    background: none;
+    clip-path: none;
+  }
+  .st-session .stage.tone-break .ov-tl { border: 0; }
+  .st-session .ov-tl .stage-state,
+  .st-session .ov-tl .rep-counter { display: none; }
+  .st-session .ov-tl .phase-pill { margin-top: 0; }
+}
+
+/* Protocol in the header is the violet selection accent. The chip only renders during a session. */
+.context-chip { border-color: color-mix(in srgb, var(--threshold-violet) 50%, transparent); background: color-mix(in srgb, var(--threshold-violet) 10%, var(--threshold-void)); border-radius: 0; }
+.context-chip .cc-proto { color: var(--threshold-violet-hi); }
+.context-chip:hover:not(:disabled) { border-color: var(--threshold-violet-hi); }
+/* Shown below 1101px only, where the header chip runs out of room for the movement name (the h1 announces it). */
+.st-session .session-movement { display: none; }
+
 /* ------------------------------------------------------------------ athlete view */
 .focus {
-  --tone: var(--cobalt);
-  --tone-ink: var(--on-cobalt);
+  --tone: var(--threshold-cyan);
+  --tone-ink: var(--threshold-ink);
   position: relative; display: flex; flex-direction: column; gap: 18px; flex: 1 0 auto;
-  padding: 24px 24px 22px 34px; background: var(--ink); border: 1px solid var(--line); border-radius: var(--r-md);
+  padding: 22px 22px 20px;
+  border: 1px solid var(--threshold-line); border-radius: 0;
+  background: color-mix(in srgb, var(--threshold-plane) 90%, transparent);
+  box-shadow: inset 0 0 40px color-mix(in srgb, var(--threshold-cyan) 6%, transparent);
+  clip-path: polygon(16px 0, calc(100% - 28px) 0, 100% 22px, 100% 100%, 0 100%, 0 16px);
 }
-/* The 12° edge: a thin tone-coloured stripe down the left side, the board's HUD cut in miniature. */
+/* Make's rail: a lit top edge in the state colour. */
 .focus::before {
-  content: ''; position: absolute; top: 0; bottom: 0; left: 0; width: 14px; background: var(--tone); border-radius: var(--r-md) 0 0 var(--r-md);
-  clip-path: polygon(0 0, 100% 0, calc(100% - 14px * var(--cut) * 4) 100%, 0 100%);
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--tone);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--tone) 70%, transparent);
   transition: background-color var(--t-base);
 }
-.focus.tone-stable { --tone: var(--cobalt); --tone-ink: var(--on-cobalt); }
-.focus.tone-drift { --tone: var(--drift); --tone-ink: var(--ink); }
-.focus.tone-break { --tone: var(--break); --tone-ink: var(--ink); }
-.focus.tone-calm { --tone: var(--cobalt-deep); --tone-ink: var(--text); }
-.focus.tone-neutral { --tone: var(--panel-3); --tone-ink: var(--text); }
+.focus.tone-stable,
+.focus.tone-calm { --tone: var(--threshold-cyan); --tone-ink: var(--threshold-ink); }
+.focus.tone-drift { --tone: var(--threshold-amber); --tone-ink: var(--threshold-ink); }
+.focus.tone-recover { --tone: var(--threshold-violet-hi); --tone-ink: var(--threshold-ink); }
+.focus.tone-neutral { --tone: var(--threshold-muted); --tone-ink: var(--threshold-text); }
+/* STOP, as Make's stop notice: a dark field with stop-red rails, so every line of text keeps its contrast. */
+.focus.tone-break {
+  --tone: var(--threshold-stop);
+  --tone-ink: var(--threshold-text);
+  border-color: var(--threshold-stop);
+  background: color-mix(in srgb, var(--threshold-stop) 12%, var(--threshold-void));
+}
 
-.focus-state { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; }
+.focus-state { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; }
 .focus .plate {
-  font-family: var(--font-num); font-style: italic; font-weight: 900; font-stretch: 70%; font-variant-numeric: tabular-nums;
-  font-size: clamp(32px, 3.4vw, 56px); line-height: 1; letter-spacing: 0;
-  padding: 6px 22px 4px 16px; background: var(--tone); color: var(--tone-ink);
+  max-width: 100%;
+  padding: 8px 18px 6px 12px;
+  background: transparent;
+  box-shadow: inset 0 0 0 2px var(--tone);
+  color: var(--tone);
+  font-family: var(--threshold-font-display);
+  font-weight: 700;
+  font-size: clamp(40px, 3.4vw, 64px);
+  line-height: 0.9;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  text-wrap: balance;
   clip-path: polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%);
   transition: background-color var(--t-base), color var(--t-base);
 }
-.focus-instruction { margin: 0; font-size: clamp(16px, 1.35vw, 20px); line-height: 1.35; color: var(--text); max-width: 34ch; }
+.focus.tone-stable .plate,
+.focus.tone-drift .plate { background: var(--tone); box-shadow: none; color: var(--tone-ink); }
+.focus.tone-recover .plate { background: color-mix(in srgb, var(--threshold-violet) 18%, var(--threshold-void)); box-shadow: inset 0 0 0 2px var(--threshold-violet-hi); color: var(--threshold-violet-hi); }
+.focus.tone-break .plate { background: var(--threshold-stop); box-shadow: none; color: var(--threshold-text); font-size: clamp(72px, 8vw, 128px); }
+/* Make's instruction line: Barlow Condensed SemiBold, large enough to read from the training spot. */
+.focus-instruction {
+  max-width: 30ch;
+  margin: 0;
+  color: var(--threshold-text);
+  font-family: var(--threshold-font-display);
+  font-weight: 600;
+  font-size: clamp(24px, 1.9vw, 32px);
+  line-height: 1.02;
+}
+.focus.tone-drift .focus-instruction { color: var(--threshold-amber); }
 
 .focus-big { display: flex; flex-direction: column; gap: 6px; }
-.focus-num { --num-hero-size: clamp(96px, 11vw, 200px); color: var(--text); line-height: 0.82; }
-.focus.tone-break .focus-num { color: var(--break); }
-.focus-num-label { font-size: 15px; color: var(--text-2); }
-.focus-cells { display: flex; gap: 6px; margin-top: 6px; max-width: 360px; }
-.focus-cells i { flex: 1; height: 12px; background: var(--panel-2); clip-path: polygon(4px 0, 100% 0, calc(100% - 4px) 100%, 0 100%); }
-.focus-cells i.on { background: var(--cobalt-hi); }
+.focus-num { color: var(--threshold-cyan-hi); font-size: clamp(88px, 8vw, 148px); text-shadow: 0 0 16px color-mix(in srgb, var(--threshold-cyan) 24%, transparent); }
+.focus.tone-drift .focus-num { color: var(--threshold-amber); text-shadow: none; }
+.focus.tone-recover .focus-num { color: var(--threshold-violet-hi); text-shadow: 0 0 16px color-mix(in srgb, var(--threshold-violet) 33%, transparent); }
+.focus.tone-break .focus-num { color: var(--threshold-text); text-shadow: none; }
+.focus-num-label { color: var(--threshold-muted); font: 400 13px/1.3 var(--threshold-font-code); letter-spacing: 0.08em; text-transform: uppercase; }
+.focus-cells { display: flex; gap: 6px; max-width: 360px; margin-top: 6px; }
+.focus-cells i { flex: 1; height: 14px; background: color-mix(in srgb, var(--threshold-cyan) 12%, var(--threshold-void)); clip-path: polygon(4px 0, 100% 0, calc(100% - 4px) 100%, 0 100%); }
+.focus-cells i.on { background: var(--threshold-cyan); }
+.focus.tone-recover .focus-cells i.on { background: var(--threshold-violet-hi); }
 
 .focus-setup { display: flex; flex-direction: column; gap: 10px; }
 .focus-setup-how { margin: 0; font-size: 14px; color: var(--text-2); max-width: 46ch; }
 .focus-checks { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
 .focus-checks li { display: flex; align-items: center; gap: 10px; font-size: 14px; color: var(--text-2); }
 .focus-checks .ic {
-  width: 18px; height: 18px; flex: none; display: grid; place-items: center; border-radius: var(--r-xs);
-  border: 1.5px solid var(--line-2); color: var(--on-cobalt);
+  width: 18px; height: 18px; flex: none; display: grid; place-items: center;
+  border: 1.5px solid var(--threshold-line); color: var(--threshold-ink);
 }
-.focus-checks li.ok { color: var(--text); }
-.focus-checks li.ok .ic { background: var(--cobalt); border-color: var(--cobalt); }
+.focus-checks li.ok { color: var(--threshold-text); }
+.focus-checks li.ok .ic { background: var(--threshold-cyan); border-color: var(--threshold-cyan); }
 
 .focus-actions { margin-top: auto; display: flex; flex-wrap: wrap; gap: 10px; }
 .focus-actions .btn.lg { height: 52px; padding: 0 22px; font-size: 16px; }
+.focus-actions .btn.primary { border-color: var(--threshold-cyan); background: color-mix(in srgb, var(--threshold-cyan) 24%, var(--threshold-void)); color: var(--threshold-cyan-hi); }
+.focus-actions .btn.primary:hover { background: color-mix(in srgb, var(--threshold-cyan) 36%, var(--threshold-void)); }
+/* End set at STOP: white on stop red at large-text size (19px bold) to keep 3:1. */
+.focus.tone-break .focus-actions .btn.primary { border-color: var(--threshold-stop); background: var(--threshold-stop); color: var(--threshold-text); font-size: 19px; font-weight: 700; }
+/* The small Enter hint is not large text, so it takes dark ink on the red (about 5.6:1). */
+.focus.tone-break .focus-actions .btn.primary .kbd { border-color: color-mix(in srgb, var(--threshold-ink) 55%, transparent); color: var(--threshold-ink); }
+.focus.tone-recover .focus-actions .btn.primary { border-color: var(--threshold-violet-hi); background: color-mix(in srgb, var(--threshold-violet) 18%, var(--threshold-void)); color: var(--threshold-violet-hi); }
 .focus-actions .btn .kbd { margin-left: 4px; }
 .btn.primary .kbd { color: var(--on-cobalt); border-color: rgba(255, 255, 255, 0.5); }
 
@@ -65,26 +256,30 @@
 .lane-value { font-size: 18px; font-weight: 700; color: var(--text); font-variant-numeric: tabular-nums; }
 .lane-track { position: relative; height: 28px; background: var(--panel); clip-path: polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%); }
 .lane-fill {
-  position: absolute; inset: 0; background: var(--cobalt); transform-origin: left center;
+  position: absolute; inset: 0; background: var(--threshold-cyan); transform-origin: left center;
   transition: transform var(--t-slow) var(--ease), background-color var(--t-base);
 }
 /* Your own best: a marker the full height of the lane (28 px, over the 12 px minimum in READABILITY_3M.md). */
-.lane-mark { position: absolute; top: 0; bottom: 0; width: 4px; margin-left: -2px; background: var(--text); }
-.lane.past .lane-fill { background: var(--cobalt-hi); }
-.lane.frozen .lane-fill { background: var(--cobalt-deep); }
+.lane-mark { position: absolute; top: 0; bottom: 0; width: 6px; margin-left: -3px; background: var(--threshold-text); }
+.lane.past .lane-fill { background: var(--threshold-cyan-hi); }
+.lane.frozen .lane-fill { background: var(--threshold-amber); }
 .lane-foot { font-size: 13px; color: var(--muted); }
 .lane.past .lane-foot { color: var(--text); font-weight: 600; }
 
 /* ------------------------------------------------------------------ session options */
 .session-options { display: flex; flex-wrap: wrap; gap: 6px; }
 .session-options .opt {
-  display: inline-flex; align-items: center; gap: 8px; height: 34px; padding: 0 12px; border-radius: var(--r-sm);
-  background: var(--panel); border: 1px solid var(--line-2); color: var(--text-2); font-size: 13px; cursor: pointer;
+  display: inline-flex; align-items: center; gap: 8px; min-height: 44px; height: auto; padding: 0 14px;
+  border: 1px solid var(--threshold-line); border-radius: 0;
+  background: color-mix(in srgb, var(--threshold-void) 72%, transparent); color: var(--threshold-muted);
+  font-size: 14px; cursor: pointer;
+  clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
 }
-.session-options .opt:hover { color: var(--text); border-color: #34486b; }
-.session-options .opt-state { font-size: 12px; font-weight: 600; color: var(--muted); }
-.session-options .opt[aria-pressed='true'] { color: var(--text); border-color: rgba(107, 140, 255, 0.55); }
-.session-options .opt[aria-pressed='true'] .opt-state { color: var(--cobalt-hi); }
+.session-options .opt:hover { border-color: var(--threshold-cyan); color: var(--threshold-text); }
+.session-options .opt:focus-visible { outline: none; border-color: var(--threshold-text); box-shadow: inset 0 0 0 2px var(--threshold-text); }
+.session-options .opt-state { color: var(--threshold-muted); font-size: 13px; font-weight: 700; }
+.session-options .opt[aria-pressed='true'] { border-color: var(--threshold-cyan); box-shadow: inset 3px 0 var(--threshold-cyan); color: var(--threshold-text); }
+.session-options .opt[aria-pressed='true'] .opt-state { color: var(--threshold-cyan); }
 
 /* ------------------------------------------------------------------ detector evidence */
 .evidence { display: flex; flex-direction: column; gap: 12px; scroll-margin-top: calc(var(--header-h) + 12px); }
@@ -115,20 +310,127 @@
 @media (max-width: 1100px) {
   .focus { flex: none; }
   .evidence-grid { grid-template-columns: minmax(0, 1fr); }
+  /* The athlete view is below the camera here, so the camera carries the STOP cue and End set. */
+  .st-session .stage-cue {
+    display: block;
+    max-width: 24ch;
+    margin: 8px 0 0;
+    color: var(--threshold-text);
+    font-family: var(--threshold-font-display);
+    font-weight: 600;
+    font-size: clamp(20px, 2.4vw, 26px);
+    line-height: 1.05;
+  }
+  /* White on stop red at large-text size (19px bold) keeps 3:1. */
+  .st-session .stage .stage-end {
+    display: inline-flex;
+    justify-content: center;
+    width: 100%;
+    min-height: 52px;
+    height: 52px;
+    margin-top: 8px;
+    border-color: var(--threshold-stop);
+    background: var(--threshold-stop);
+    color: var(--threshold-text);
+    font-size: 19px;
+    font-weight: 700;
+  }
+  .st-session .stage .stage-end:hover { border-color: var(--threshold-text); background: var(--threshold-stop); }
+  .st-session .stage .stage-end:focus-visible { outline: 3px solid var(--threshold-text); outline-offset: 2px; }
+  /* Make's slash label ("DEMO / SYNTHETIC"), naming the running movement above the camera. */
+  .st-session .session-movement {
+    display: block;
+    margin: 0 0 -4px;
+    overflow: hidden;
+    color: var(--threshold-muted);
+    font: 400 12px/1.3 var(--threshold-font-code);
+    letter-spacing: 0.12em;
+    text-overflow: ellipsis;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .st-session .session-movement b { color: var(--threshold-violet-hi); font-weight: 400; }
 }
 @media (max-width: 760px) {
   /* The header wraps to two or three rows on a phone; sticky, it would cover a third of the screen. */
   .app-header { position: static; }
   .show-sm { display: block; }
-  .focus { padding: 18px 16px 18px 26px; gap: 14px; }
-  .focus::before { width: 10px; }
+  .focus { padding: 18px 16px; gap: 14px; }
+  .focus-num { font-size: clamp(72px, 18vw, 104px); }
+  /* Make's phone instruction sizes. */
+  .focus-instruction { font-size: clamp(25px, 7.5vw, 31px); line-height: 0.98; }
+  .focus.tone-break .focus-instruction { font-size: clamp(28px, 8vw, 34px); }
   .focus-actions .btn.lg { flex: 1 1 100%; }
+  .st-session .stage { border-bottom: 2px solid var(--threshold-cyan); }
+  .st-session .stage.tone-break { border-bottom-color: var(--threshold-stop); }
+  /* A short strip at the top of the camera, so the body stays in frame: state left, rep count right. */
+  .st-session .ov-tl {
+    top: 8px;
+    right: 8px;
+    bottom: auto;
+    left: 8px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 2px 10px;
+    max-width: none;
+    padding: 6px 10px 8px;
+    background: color-mix(in srgb, var(--threshold-void) 77%, transparent);
+  }
+  .st-session .stage-state { grid-column: 1; align-self: center; font-size: clamp(30px, 8.6vw, 40px); }
+  .st-session .rep-counter { grid-column: 2; align-items: flex-end; text-align: right; }
+  .st-session .rep-counter .val { font-size: clamp(48px, 13vw, 64px); }
+  .st-session .stage.tone-break .rep-counter .val { align-self: flex-end; }
+  .st-session .rep-counter .lbl,
+  .st-session .rep-counter .ctx,
+  .st-session .ov-tl .phase-pill { display: none; }
+  .st-session .stage-cue,
+  .st-session .stage .stage-end { grid-column: 1 / -1; }
+  /* Keep the STOP strip short: the athlete's body must stay in frame below it. */
+  .st-session .stage-cue { max-width: none; margin-top: 0; font-size: 20px; }
+  .st-session .stage .stage-end { margin-top: 4px; }
+  .st-session .ov-tr {
+    top: 72px;
+    right: 8px;
+    bottom: 56px;
+    left: auto;
+    justify-content: flex-end;
+  }
+  .st-session .stage.is-warning .ov-tr { top: 112px; }
+  .st-session .stage.breakpoint .ov-tr { top: 160px; }
+  .st-session .depth-gauge .track { height: 64px; }
+  .app:has(main.st-session) .app-header {
+    flex-wrap: nowrap;
+    height: auto;
+    min-height: 48px;
+    padding: 6px 10px;
+    gap: 6px;
+  }
+  .app:has(main.st-session) .header-center {
+    order: 0;
+    width: auto;
+    flex: 1 1 auto;
+    min-width: 0;
+    margin: 0;
+    justify-content: flex-start;
+  }
+  .app:has(main.st-session) .brand-name { display: none; }
+  /* The chip shrinks (movement name ellipsed) instead of running under the LIVE/DEMO badge. */
+  .app:has(main.st-session) .context-chip { flex: 0 1 auto; min-width: 0; max-width: 100%; height: 40px; padding: 0 14px; }
+  .app:has(main.st-session) .athlete-name { max-width: 5.5em; }
+  .app:has(main.st-session) .sample-banner { padding: 4px 10px; gap: 8px; font-size: 12.5px; }
 }
 @media (max-width: 480px) {
   /* The header's right-hand group must fit a 360 to 430px phone: shorter athlete name, Research as an icon. */
   .header-right { gap: 2px; min-width: 0; }
   .athlete-name { display: inline-block; max-width: 7.5em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; vertical-align: bottom; }
   .label-wide { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .st-session .rep-counter .val,
+  .st-session .stage-state,
+  .st-session .focus-num,
+  .focus::before { text-shadow: none; box-shadow: none; }
 }
 @media (pointer: coarse) {
   /* No physical Enter key to point at on a touch screen. */

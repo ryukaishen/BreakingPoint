@@ -150,6 +150,37 @@ describe('navigation guard: history', () => {
     expect(b.idx).toBe(1);
   });
 
+  it('Status and Athletes are history entries that Back and Forward move between', () => {
+    const { b, app, go, pending } = setup();
+    go('athletes');
+    go('status');
+    b.back();
+    b.flush();
+    expect(app.view).toBe('athletes');
+    b.back();
+    b.flush();
+    expect(app.view).toBe('landing');
+    b.forward();
+    b.flush();
+    expect(app.view).toBe('athletes');
+    expect(pending).toHaveLength(0);
+  });
+
+  it('Back from a protected session to the Athletes page asks first', () => {
+    const { b, app, go, pending } = setup();
+    go('athletes');
+    go('session');
+    app.protectedNow = true;
+    b.back();
+    b.flush();
+    expect(app.view).toBe('session');
+    expect(pending).toHaveLength(1);
+    app.protectedNow = false;
+    pending[0].proceed();
+    b.flush();
+    expect(app.view).toBe('athletes');
+  });
+
   it('leaving the session through the app replaces its entry instead of stacking', () => {
     const { b, go } = setup();
     go('sport');

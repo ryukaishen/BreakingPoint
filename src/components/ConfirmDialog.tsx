@@ -1,5 +1,5 @@
-import type { ReactNode } from 'react';
-import { useDialog } from '../utils/hooks';
+import { useRef, type ReactNode } from 'react';
+import { SystemNotification } from './system/SystemNotification';
 
 interface Props {
   title: string;
@@ -8,29 +8,41 @@ interface Props {
   cancelLabel?: string;
   /** 'danger' for actions that discard data or abandon a set. */
   tone?: 'danger' | 'default';
+  /** The window's title-bar label. */
+  bar?: string;
+  /** The system code line above the title. */
+  code?: string;
   onConfirm: () => void;
   onCancel: () => void;
 }
 
 /** Interrupts only for destructive or session-ending actions. Focus starts on the safe choice. */
-export function ConfirmDialog({ title, children, confirmLabel, cancelLabel = 'Cancel', tone = 'danger', onConfirm, onCancel }: Props) {
-  const cancelRef = useDialog<HTMLButtonElement>(onCancel);
+export function ConfirmDialog({ title, children, confirmLabel, cancelLabel = 'Cancel', tone = 'danger', bar, code, onConfirm, onCancel }: Props) {
+  const cancelRef = useRef<HTMLButtonElement>(null);
+  const danger = tone === 'danger';
   return (
-    <div className="modal-backdrop" onClick={onCancel}>
-      <div className="confirm sys-window" role="alertdialog" aria-modal="true" aria-labelledby="confirm-title" aria-describedby="confirm-body" onClick={(e) => e.stopPropagation()}>
-        <h2 id="confirm-title">{title}</h2>
-        <div id="confirm-body" className="confirm-body">
-          {children}
-        </div>
-        <div className="confirm-actions">
-          <button className="btn" ref={cancelRef} onClick={onCancel}>
+    <SystemNotification
+      tone={danger ? 'stop' : 'ready'}
+      role="alertdialog"
+      bar={bar ?? 'Confirm'}
+      code={code}
+      titleId="confirm-title"
+      title={title}
+      bodyId="confirm-body"
+      onClose={onCancel}
+      initialFocus={cancelRef}
+      actions={
+        <>
+          <button type="button" className="threshold-action notification-btn" ref={cancelRef} onClick={onCancel}>
             {cancelLabel}
           </button>
-          <button className={`btn ${tone === 'danger' ? 'danger' : 'primary'}`} onClick={onConfirm}>
+          <button type="button" className={`threshold-action notification-btn ${danger ? 'is-danger' : 'is-primary'}`} onClick={onConfirm}>
             {confirmLabel}
           </button>
-        </div>
-      </div>
-    </div>
+        </>
+      }
+    >
+      {children}
+    </SystemNotification>
   );
 }

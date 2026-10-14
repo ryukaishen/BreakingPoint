@@ -3,8 +3,8 @@ import { containRect, drawPose, drawStudio, segmentsForFeatures } from '../pose/
 import type { LaunchContext } from '../protocols/launch';
 import { LiveRunner, type Runner } from '../session/runners';
 import type { Snapshot } from '../session/engine';
-import { C } from '../ui/theme';
-import { STATE_COLOR } from '../utils/format';
+import type { MovementState } from '../detection/detector';
+import { C, ST } from '../ui/theme';
 import { Lock, Pause, Play, Skip } from './Icons';
 
 interface Props {
@@ -24,7 +24,15 @@ interface Props {
   onDemoSkip: () => void;
   onRetryLive: () => void;
   onSwitchToDemo: () => void;
+  /**
+   * Ends the monitored set through the engine. Pass it for live sets only: the demo athlete
+   * stops on its own, as in FocusPanel. Shown on the phone camera once the alert fires.
+   */
+  onEndSet?: () => void;
 }
+
+/** Pose colour in the monitored set, from the System Threshold palette (same values as the CSS tokens). */
+const POSE_STATE_COLOR: Record<MovementState, string> = { STABLE: ST.cyan, DRIFT: ST.amber, BREAKPOINT: ST.stop };
 
 const PHASE_TEXT: Record<string, string> = {
   standing: 'Standing', descending: 'Descending', bottom: 'Bottom', ascending: 'Ascending', dip: 'Countermovement',
@@ -64,14 +72,14 @@ export function CameraStage(p: Props) {
           const pose = p.runner?.pipeline.lastPose;
           const s = snapRef.current;
           if (pose) {
-            const inMonitor = s.phase === 'monitoring' || s.phase === 'summary';
-            const color = inMonitor ? STATE_COLOR[s.state] : s.phase === 'recovery' || s.phase === 'recoveryDone' ? C.violet : C.sys;
-            const top = s.state === 'BREAKPOINT' && s.breakpointContributors ? s.breakpointContributors.slice(0, 2).map((d) => d.key) : [];
+            const inMonitor = s.phase === 'monitoring';
+            const color = inMonitor ? POSE_STATE_COLOR[s.state] : s.phase === 'recovery' || s.phase === 'recoveryDone' ? ST.violetHi : ST.cyan;
+            const top = inMonitor && s.state === 'BREAKPOINT' && s.breakpointContributors ? s.breakpointContributors.slice(0, 2).map((d) => d.key) : [];
             drawPose(ctx, pose, rect, {
               mirror: p.runner?.kind === 'live',
               color,
               highlight: segmentsForFeatures(top),
-              highlightColor: C.break,
+              highlightColor: ST.stop,
             });
           }
         }
@@ -103,9 +111,30 @@ export function CameraStage(p: Props) {
   const phaseText = p.launch.primitive.phaseLabels[live.repPhase] ?? PHASE_TEXT[live.repPhase] ?? live.repPhase;
   const depthNow = Math.max(0, Math.min(gaugeMax, live.depth));
   const overlays = p.evidence !== false;
+  const stopped = s.phase === 'monitoring' && s.alarmRep !== null;
+  const warning = s.phase === 'monitoring' && s.state === 'DRIFT' && !stopped;
+  const tone =
+    stopped ? 'break' :
+    warning ? 'drift' :
+    s.phase === 'recovery' ? 'recover' :
+    s.phase === 'recoveryDone' ? (s.recovery?.status === 'recovered' ? 'stable' : s.recovery?.status === 'partial' ? 'drift' : 'break') :
+    s.phase === 'monitoring' || (s.phase === 'summary' && s.alarmRep === null) ? 'stable' :
+    s.phase === 'calibrating' || s.phase === 'baseline' || s.phase === 'summary' ? 'calm' :
+    'neutral';
+  const overlayState =
+    stopped ? 'Stop' :
+    warning ? 'Form changing' :
+    s.phase === 'monitoring' ? 'Stable' :
+    s.phase === 'calibrating' ? 'Calibrate' :
+    s.phase === 'baseline' ? 'Baseline locked' :
+    s.phase === 'recovery' ? 'Recovery check' :
+    s.phase === 'recoveryDone'
+      ? (s.recovery?.status === 'recovered' ? 'Usual form' : s.recovery?.status === 'partial' ? 'Partly back' : 'Still different') :
+    s.phase === 'summary' ? (s.alarmRep !== null ? 'Rest' : 'Set complete') :
+    'Set up';
 
   return (
-    <div className={`stage ${p.flash ? 'flash' : ''} ${s.state === 'BREAKPOINT' && s.phase === 'monitoring' ? 'breakpoint' : ''}`} ref={wrapRef}>
+    <div className={`stage phase-${s.phase} tone-${tone} ${p.flash ? 'flash' : ''} ${stopped ? 'breakpoint' : ''} ${warning ? 'is-warning' : ''}`} ref={wrapRef}>
       <video ref={p.videoRef} muted playsInline style={{ display: p.runner?.kind === 'live' ? 'block' : 'none' }} />
       <canvas ref={canvasRef} />
       <span className="vf tl" aria-hidden />
@@ -114,9 +143,10 @@ export function CameraStage(p: Props) {
       <span className="vf br" aria-hidden />
 
       <div className="ov ov-tl">
+        <span className="stage-state">{overlayState}</span>
         <div className="rep-counter">
           <span className="lbl code">Rep</span>
-          <span className="val" style={{ color: s.phase === 'monitoring' && s.monitorReps.length ? STATE_COLOR[s.state] : C.text }}>{repCount}</span>
+          <span className="val">{repCount}</span>
           <span className="ctx code">{ctxLabel}</span>
         </div>
         {overlays && (
@@ -124,6 +154,13 @@ export function CameraStage(p: Props) {
             <span className="qdot" style={{ background: live.repPhase === 'standing' ? C.muted : C.sys }} />
             {phaseText}
           </div>
+        )}
+        {stopped && <p className="stage-cue">End the set and rest.</p>}
+        {warning && <p className="stage-cue">Be ready to stop.</p>}
+        {stopped && p.onEndSet && (
+          <button className="btn lg primary stage-end" onClick={p.onEndSet}>
+            End set
+          </button>
         )}
       </div>
 
