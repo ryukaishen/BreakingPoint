@@ -25,6 +25,7 @@ import { useAthleteData } from './data/useAthleteData';
 import { DEFAULT_DETECTOR_CONFIG, loadDetectorConfig, type DetectorConfig } from './detection/config';
 import { LabelProvider, makeLabeler } from './protocols/labels';
 import { DEFAULT_LAUNCH, getSport, launchForExercise, resolveDemo, resolveLaunch, type LaunchContext } from './protocols/launch';
+import { PROTOCOLS } from './protocols/protocols';
 import { SessionEngine } from './session/engine';
 import { useNavGuard } from './session/useNavGuard';
 import type { NavView } from './session/navGuard';
@@ -55,7 +56,8 @@ export default function App() {
   const [view, setView] = useState<View>('landing');
   const [mode, setMode] = useState<Mode>('demo');
   const [launch, setLaunch] = useState<LaunchContext>(DEFAULT_LAUNCH);
-  const [sportView, setSportView] = useState<{ sportId: string; subSportId?: string }>({ sportId: 'soccer' });
+  // The sport page's context: sport, discipline and selected movement. The library opens on it too.
+  const [sportView, setSportView] = useState<{ sportId: string; subSportId?: string; protocolId?: string }>({ sportId: 'soccer' });
   const [sessionKey, setSessionKey] = useState(0);
   const [research, setResearch] = useState<ResearchTab | null>(null);
   const [library, setLibrary] = useState(false);
@@ -148,8 +150,8 @@ export default function App() {
     [data, launch],
   );
 
-  const openSport = useCallback((sportId: string, subSportId?: string) => {
-    setSportView({ sportId, subSportId });
+  const openSport = useCallback((sportId: string, subSportId?: string, protocolId?: string) => {
+    setSportView({ sportId, subSportId, protocolId });
     setLibrary(false);
     setView('sport');
   }, []);
@@ -177,7 +179,7 @@ export default function App() {
     if (sport && protocol) {
       const ctx = resolveLaunch(sport, protocol, q.get('sub') ?? undefined);
       if (ctx && (demo || q.get('live') === '1')) startSession(demo ? 'demo' : 'live', ctx);
-      else if (getSport(sport)) openSport(sport, q.get('sub') ?? undefined);
+      else if (getSport(sport)) openSport(sport, q.get('sub') ?? undefined, protocol);
     } else if (sport && getSport(sport)) openSport(sport, q.get('sub') ?? undefined);
     else if (demo && demo !== '1' && resolveDemo(demo)) startSession('demo', resolveDemo(demo)!);
     else if (demo === '1') startSession('demo', launchForExercise(q.get('exercise')));
@@ -472,6 +474,19 @@ export default function App() {
       );
   };
   const sportForPage = getSport(sportView.sportId);
+  const openSports = () => openSport(sportView.sportId, sportView.subSportId, sportView.protocolId);
+  // The current athlete's saved baselines (protocol id to save date), shown on the movement cards.
+  // Live sets offer to reuse them; the sample athlete has none of its own.
+  const savedBaselines = (): Record<string, string> => {
+    const athlete = data.scope === 'real' ? data.real.activeAthlete() : null;
+    if (!athlete) return {};
+    return Object.fromEntries(
+      Object.keys(PROTOCOLS).flatMap((id) => {
+        const b = data.real.baseline(athlete.id, id);
+        return b ? [[id, b.savedAt]] : [];
+      }),
+    );
+  };
 
   // Each view names itself for screen readers, tabs and history.
   useEffect(() => {
@@ -548,7 +563,7 @@ export default function App() {
         onHome={() => guardLeave(() => setView('landing'))}
         onStatus={() => guardLeave(() => setView('status'))}
         onAthletes={() => guardLeave(() => openAthletes())}
-        onChangeProtocol={() => guardLeave(() => openSport(launch.sport.id, launch.subSport?.id))}
+        onChangeProtocol={() => guardLeave(() => openSport(launch.sport.id, launch.subSport?.id, launch.protocol.id))}
         onLibrary={() => setLibrary(true)}
         onResearch={() => setResearch('method')}
         onLab={() => setResearch('lab')}
@@ -580,6 +595,8 @@ export default function App() {
           onDemo={(ctx) => guardLeave(() => startSession('demo', ctx))}
           onResearch={() => setResearch('method')}
           onAthletes={() => openAthletes()}
+          onSports={openSports}
+          onLibrary={() => setLibrary(true)}
         />
       )}
 
@@ -600,6 +617,7 @@ export default function App() {
           onResearch={() => setResearch('method')}
           onStatus={() => setView('status')}
           onAthletes={() => openAthletes()}
+          onSports={openSports}
         />
       )}
 
@@ -638,6 +656,8 @@ export default function App() {
           onEntry={() => setView('landing')}
           onStatus={() => setView('status')}
           onResearch={() => setResearch('method')}
+          onSports={openSports}
+          onLibrary={() => setLibrary(true)}
         />
       )}
 
@@ -645,11 +665,19 @@ export default function App() {
         <SportPage
           sport={sportForPage}
           subSportId={sportView.subSportId}
-          onSubSport={(id) => setSportView({ sportId: sportForPage.id, subSportId: id })}
-          onBack={() => setView('landing')}
+          protocolId={sportView.protocolId}
+          savedBaselines={savedBaselines()}
+          // A new sport or discipline opens on its first runnable movement, as in Make.
+          onSport={(id) => setSportView({ sportId: id })}
+          onSubSport={(id) => setSportView((v) => ({ sportId: v.sportId, subSportId: id }))}
+          onSelect={(protocolId) => setSportView((v) => (v.protocolId === protocolId ? v : { ...v, protocolId }))}
           onDemo={(ctx) => startSession('demo', ctx)}
           onLive={(ctx) => startSession('live', ctx)}
           onLibrary={() => setLibrary(true)}
+          onEntry={() => setView('landing')}
+          onStatus={() => setView('status')}
+          onAthletes={() => openAthletes()}
+          onResearch={() => setResearch('method')}
         />
       )}
 
@@ -753,7 +781,18 @@ export default function App() {
         </LabelProvider>
       )}
 
-      {library && <ProtocolLibrary onClose={() => setLibrary(false)} onOpenSport={(s, sub) => guardLeave(() => openSport(s, sub))} />}
+      {library && (
+        <ProtocolLibrary
+          sportId={sportView.sportId}
+          subSportId={sportView.subSportId}
+          protocolId={sportView.protocolId}
+          savedBaselines={savedBaselines()}
+          onClose={() => setLibrary(false)}
+          onOpenSport={(s, sub, protocol) => guardLeave(() => openSport(s, sub, protocol))}
+          onDemo={(ctx) => guardLeave(() => startSession('demo', ctx))}
+          onLive={(ctx) => guardLeave(() => startSession('live', ctx))}
+        />
+      )}
       {research && <ResearchModal config={config} initialTab={research} onClose={() => setResearch(null)} />}
 
       {dialog?.kind === 'add' && (

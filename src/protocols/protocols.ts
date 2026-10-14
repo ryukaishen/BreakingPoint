@@ -59,7 +59,7 @@ export const PROTOCOLS: Record<string, ProtocolDef> = {
   // ---------------------------------------------------------------- roadmap
   'hop-single-leg': {
     id: 'hop-single-leg', name: 'Single-Leg Hop', primitive: 'SINGLE_LEG_HOP', status: 'COMING_SOON',
-    camera: 'Side-on, whole body, separate baseline per leg', purpose: 'Unilateral take-off and landing consistency.',
+    camera: 'Side-on, whole body, separate baseline per leg', purpose: 'Take-off and landing consistency on one leg.',
     metrics: [], plannedMetrics: ['Hop height proxy', 'Landing knee flexion', 'Trunk control', 'Side-to-side difference'],
   },
   'cod-lateral': {
@@ -79,7 +79,7 @@ export const PROTOCOLS: Record<string, ProtocolDef> = {
   },
   'jump-approach': {
     id: 'jump-approach', name: 'Approach Jump', primitive: 'JUMP_AND_LAND', status: 'COMING_SOON',
-    camera: 'Side-on, wide frame for the run-up', purpose: 'Approach, take-off and landing consistency (needs run-up segmentation).',
+    camera: 'Side-on, wide frame for the run-up', purpose: 'Approach, take-off and landing consistency. Needs the run-up detected first.',
     metrics: [], plannedMetrics: ['Penultimate step', 'Take-off angle', 'Jump height proxy', 'Landing depth'],
   },
   'landing-screen': {
@@ -104,7 +104,7 @@ export const PROTOCOLS: Record<string, ProtocolDef> = {
   },
   deadlift: {
     id: 'deadlift', name: 'Deadlift', primitive: 'HIP_HINGE', status: 'COMING_SOON',
-    camera: 'Side-on, whole body and bar path', purpose: 'Hip-hinge pattern and back angle across a set (needs a hinge segmenter).',
+    camera: 'Side-on, whole body and bar path', purpose: 'Hip-hinge pattern and back angle across a set. Needs hinge rep detection first.',
     metrics: [], plannedMetrics: ['Back angle', 'Hip hinge ROM', 'Bar-path proxy', 'Tempo'],
   },
   fumikomi: {

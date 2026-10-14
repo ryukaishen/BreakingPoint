@@ -1,26 +1,43 @@
-export type SystemSection = 'landing' | 'status' | 'athletes';
+import { useLayoutEffect, useRef } from 'react';
+
+export type SystemSection = 'landing' | 'status' | 'sports' | 'athletes';
 
 interface Props {
   current: SystemSection;
   onEntry: () => void;
   onStatus: () => void;
+  onSports: () => void;
+  onProtocols: () => void;
   onAthletes: () => void;
   onResearch: () => void;
 }
 
 /**
- * Make's .threshold-nav: the numbered System sections at the left of the Entry, Status and
- * Athletes screens (a row under the header on narrow screens). Research opens the study panel.
+ * Make's .threshold-nav: the numbered System sections at the left of the Entry, Status, Sports and
+ * Athletes screens (a row under the header on narrow screens, which scrolls sideways on phones as
+ * Make's mobile nav does). Protocols opens the protocol library and Research the study panel.
  */
-export function SystemNav({ current, onEntry, onStatus, onAthletes, onResearch }: Props) {
-  const items: [SystemSection | 'research', string, () => void][] = [
+export function SystemNav({ current, onEntry, onStatus, onSports, onProtocols, onAthletes, onResearch }: Props) {
+  const items: [SystemSection | 'protocols' | 'research', string, () => void][] = [
     ['landing', 'Entry', onEntry],
     ['status', 'Status', onStatus],
+    ['sports', 'Sports', onSports],
+    ['protocols', 'Protocols', onProtocols],
     ['athletes', 'Athletes', onAthletes],
     ['research', 'Research', onResearch],
   ];
+  const nav = useRef<HTMLElement>(null);
+
+  // On a phone the row scrolls: start with the current section in view, without moving the page.
+  useLayoutEffect(() => {
+    const el = nav.current;
+    const here = el?.querySelector<HTMLElement>('[aria-current="page"]');
+    if (!el || !here || el.scrollWidth <= el.clientWidth) return;
+    el.scrollLeft = Math.max(0, here.offsetLeft - (el.clientWidth - here.offsetWidth) / 2);
+  }, [current]);
+
   return (
-    <nav className="threshold-nav" aria-label="Sections">
+    <nav className="threshold-nav" aria-label="Sections" ref={nav}>
       <span className="nav-spine" aria-hidden="true" />
       {items.map(([id, label, run], i) => {
         const here = id === current;

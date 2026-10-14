@@ -18,6 +18,7 @@ import './styles-session.css';
 // move it ahead of styles.css in the bundle).
 import './styles-system-threshold.css';
 import './styles-threshold-entry.css';
+import './styles-threshold-protocols.css';
 
 createRoot(document.getElementById('root') as HTMLElement).render(
   <StrictMode>

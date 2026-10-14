@@ -1,129 +1,199 @@
-import { allProtocolEntries } from '../protocols/launch';
-import { PRIMITIVES, type PrimitiveId } from '../protocols/primitives';
-import { canLaunch, STATUS_GLYPH, type ProtocolStatus } from '../protocols/protocols';
-import { SPORTS, type SportContextDef, type SportProfile } from '../protocols/sports';
-import { useDialog } from '../utils/hooks';
-import { Close, Lock } from './Icons';
-import { SportIcon } from './SportIcons';
+import { useCallback, useRef, useState } from 'react';
+import { defaultEntry, sharedContexts, sportEntries, sportPrimitives, sportReadiness, statusTone, type MovementEntry } from '../protocols/catalog';
+import { getSport, type LaunchContext } from '../protocols/launch';
+import type { PrimitiveId } from '../protocols/primitives';
+import { PROTOCOLS } from '../protocols/protocols';
+import { SPORTS } from '../protocols/sports';
+import { MovementDetail, ProtocolStatusTag } from './protocols/MovementDetail';
+import { useCarousel } from './protocols/useCarousel';
+import { TechnicalCorners } from './system/TechnicalCorners';
+import { useModalFocus } from './system/useModalFocus';
 
 interface Props {
+  /** Where the library opens: the sport (and discipline and protocol) last looked at. */
+  sportId: string;
+  subSportId?: string;
+  protocolId?: string;
+  savedBaselines: Record<string, string>;
   onClose: () => void;
-  onOpenSport: (sportId: string, subSportId?: string) => void;
+  onOpenSport: (sportId: string, subSportId?: string, protocolId?: string) => void;
+  onDemo: (ctx: LaunchContext) => void;
+  onLive: (ctx: LaunchContext) => void;
 }
 
-const GLYPH_CLASS: Record<ProtocolStatus, string> = { READY: 'ready', BETA: 'beta', COMING_SOON: 'soon', FUTURE: 'soon' };
-const PRIM_STATUS: Record<string, string> = { implemented: 'ready', beta: 'beta', roadmap: 'soon' };
+const pad = (n: number) => String(n).padStart(2, '0');
 
-export function ProtocolLibrary({ onClose, onOpenSport }: Props) {
-  const entries = allProtocolEntries();
-  // primitive → sport contexts using it today (ready/beta) vs planned (roadmap protocols)
-  const active = new Map<PrimitiveId, Set<string>>();
-  const planned = new Map<PrimitiveId, Set<string>>();
-  for (const e of entries) {
-    const target = canLaunch(e.protocol) ? active : planned;
-    const set = target.get(e.protocol.primitive) ?? new Set<string>();
-    set.add(e.sub?.name ?? e.sport.name);
-    target.set(e.protocol.primitive, set);
-  }
-  const usage = new Set<PrimitiveId>([...active.keys(), ...planned.keys()]);
-  const primitiveOrder: PrimitiveId[] = ['JUMP_AND_LAND', 'FORWARD_LUNGE', 'SQUAT', 'LATERAL_MOVEMENT', 'SINGLE_LEG_HOP', 'GAIT_CYCLE', 'HIP_HINGE', 'STRIKE_STEP', 'KICK'];
-  type Ctx = { sport: SportProfile; sub?: SportContextDef };
-  const dialogRef = useDialog<HTMLDivElement>(onClose);
-  const contexts = SPORTS.flatMap((sport): Ctx[] => (sport.subSports?.length ? sport.subSports.map((sub) => ({ sport, sub })) : [{ sport }]));
+/** The entry the library opens on: that protocol in that discipline, else that discipline's first runnable one. */
+function opening(entries: MovementEntry[], subSportId?: string, protocolId?: string): string {
+  const scope = entries.filter((e) => !subSportId || e.sub?.id === subSportId);
+  const list = scope.length ? scope : entries;
+  return list[defaultEntry(list, protocolId)].key;
+}
+
+/**
+ * The protocol library: Make's library (sport index, discipline and movement-type filters, the
+ * movement grid, the selected protocol and the baseline note) in a modal window. Escape, the close
+ * button or a click outside closes it; Tab stays inside; focus returns to the control that opened it.
+ */
+export function ProtocolLibrary(p: Props) {
+  const win = useRef<HTMLElement>(null);
+  useModalFocus(win, p.onClose);
+
+  const [sportId, setSportId] = useState(getSport(p.sportId) ? p.sportId : SPORTS[0].id);
+  const sport = getSport(sportId)!;
+  const all = sportEntries(sport);
+  const [discipline, setDiscipline] = useState('all');
+  const [category, setCategory] = useState<PrimitiveId | 'all'>('all');
+  const [selectedKey, setSelectedKey] = useState(() => opening(all, p.subSportId, p.protocolId));
+
+  const shown = all.filter((e) => (discipline === 'all' || e.sub?.id === discipline) && (category === 'all' || e.primitive.id === category));
+  const selected = shown.find((e) => e.key === selectedKey) ?? shown[defaultEntry(shown)] ?? all[0];
+  const selectedIndex = shown.indexOf(selected);
+
+  const grid = useRef<HTMLDivElement>(null);
+  const settle = useCallback((i: number) => shown[i] && setSelectedKey(shown[i].key), [shown]);
+  useCarousel(grid, selectedIndex, settle, '[data-card]', `${sport.id}/${discipline}/${category}`);
+
+  const chooseSport = (id: string) => {
+    const next = getSport(id)!;
+    setSportId(id);
+    setDiscipline('all');
+    setCategory('all');
+    setSelectedKey(opening(sportEntries(next)));
+  };
+  const chooseDiscipline = (d: string) => {
+    setDiscipline(d);
+    setCategory('all');
+    const list = all.filter((e) => d === 'all' || e.sub?.id === d);
+    if (list.length) setSelectedKey(list[defaultEntry(list)].key);
+  };
+  const chooseCategory = (c: PrimitiveId | 'all') => {
+    setCategory(c);
+    setDiscipline('all');
+    const list = all.filter((e) => c === 'all' || e.primitive.id === c);
+    if (list.length) setSelectedKey(list[defaultEntry(list)].key);
+  };
+
+  const disciplines = sport.subSports && sport.subSports.length > 1 ? sport.subSports : null;
+  const shared = sharedContexts(selected);
 
   return (
-    <div className="modal-backdrop" onClick={onClose}>
-      <div className="modal sys-window" onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true" aria-labelledby="library-title" tabIndex={-1} ref={dialogRef}>
-        <div className="modal-header">
+    <div className="st-modal library-modal">
+      <div className="st-scrim" aria-hidden="true" onClick={p.onClose} />
+      <section className="protocol-library library-window" role="dialog" aria-modal="true" aria-labelledby="library-title" tabIndex={-1} ref={win}>
+        <div className="library-scan-line" aria-hidden="true" />
+        <TechnicalCorners />
+        <header className="library-heading">
           <div>
-            <div className="eyebrow">Many sports, a few movement primitives, one detector</div>
-            <h2 id="library-title">Movement protocol library</h2>
-          </div>
-          <div className="row">
-            <span className="legend-glyphs">
-              <span className="glyph ready">✓</span> Ready <span className="glyph beta">△</span> Beta <span className="glyph soon">○</span> Roadmap
+            <span className="threshold-code">
+              Protocol library / {Object.keys(PROTOCOLS).length} protocols<span className="library-count-sports"> / {SPORTS.length} sports</span>
             </span>
-            <button className="btn ghost" onClick={onClose} aria-label="Close">
-              <Close />
+            <h2 id="library-title">Protocol library</h2>
+            <p>Browse every sport’s movements by discipline and movement type.</p>
+          </div>
+          <div className="library-heading-actions">
+            <button type="button" className="threshold-action library-enter" onClick={() => p.onOpenSport(sport.id, selected.sub?.id, selected.protocol.id)}>
+              Enter movement system <span aria-hidden="true">↗</span>
+            </button>
+            <button type="button" className="threshold-action library-close" aria-label="Close" onClick={p.onClose}>
+              ×
             </button>
           </div>
-        </div>
-        <div className="modal-body col" style={{ gap: 16 }}>
-          <div className="panel">
-            <div className="panel-title">Movement primitives → sports</div>
-            <div className="prim-map">
-              {primitiveOrder
-                .filter((id) => usage.has(id))
-                .map((id) => {
-                  const p = PRIMITIVES[id];
-                  const now = [...(active.get(id) ?? [])];
-                  const later = [...(planned.get(id) ?? [])].filter((x) => !now.includes(x));
-                  return (
-                    <div key={id} className="prim-row">
-                      <span className={`prim-pill ${PRIM_STATUS[p.status]}`} title={p.description}>
-                        {p.name}
-                      </span>
-                      <span className="prim-arrow">→</span>
-                      <span className="prim-sports">
-                        {now.join(', ')}
-                        {later.length > 0 && (
-                          <span className="dim">
-                            {now.length ? ' / ' : ''}planned: {later.join(', ')}
-                          </span>
-                        )}
-                      </span>
-                    </div>
-                  );
-                })}
-            </div>
-            <div className="muted" style={{ fontSize: 12.5, marginTop: 10 }}>
-              A new sport reuses one of these movements with its own names and featured measurements. Learning your usual form and the alert rules are the
-              same for every sport.
-            </div>
-          </div>
+        </header>
 
-          <div className="lib-grid">
-            {contexts.map(({ sport, sub }) => (
-              <button key={`${sport.id}-${sub?.id ?? ''}`} className="lib-sport" onClick={() => onOpenSport(sport.id, sub?.id)}>
-                <div className="row" style={{ gap: 8 }}>
-                  <SportIcon id={sport.icon} size={18} />
-                  <b>{sub?.name ?? sport.name}</b>
+        <div className="library-scroll">
+          <div className="library-layout">
+            <div className="library-sports" role="group" aria-labelledby="library-sports-label">
+              <span id="library-sports-label">Sport index / {pad(SPORTS.length)}</span>
+              {SPORTS.map((s, i) => (
+                <button
+                  key={s.id}
+                  type="button"
+                  className={`threshold-action ${s.id === sport.id ? 'is-active' : ''}`}
+                  aria-pressed={s.id === sport.id}
+                  onClick={() => s.id !== sport.id && chooseSport(s.id)}
+                >
+                  <span aria-hidden="true">{pad(i + 1)}</span>
+                  <strong>{s.name}</strong>
+                  <small aria-label={`${sportReadiness(s).total} movements`}>{sportReadiness(s).total}</small>
+                </button>
+              ))}
+            </div>
+
+            <div className="library-main">
+              <div className="library-filter-row">
+                {disciplines && (
+                  <div role="group" aria-labelledby="library-discipline-label">
+                    <span id="library-discipline-label">Discipline</span>
+                    {[{ id: 'all', name: 'All' }, ...disciplines].map((d) => (
+                      <button key={d.id} type="button" className={`threshold-action ${discipline === d.id ? 'is-active' : ''}`} aria-pressed={discipline === d.id} onClick={() => chooseDiscipline(d.id)}>
+                        {d.name}
+                      </button>
+                    ))}
+                  </div>
+                )}
+                <div role="group" aria-labelledby="library-category-label">
+                  <span id="library-category-label">Movement type</span>
+                  {[{ id: 'all' as const, name: 'All' }, ...sportPrimitives(sport)].map((c) => (
+                    <button key={c.id} type="button" className={`threshold-action ${category === c.id ? 'is-active' : ''}`} aria-pressed={category === c.id} onClick={() => chooseCategory(c.id)}>
+                      {c.name}
+                    </button>
+                  ))}
                 </div>
-                {(sub ?? sport).protocols.map((ref) => {
-                  const e = entries.find((x) => x.sport.id === sport.id && x.sub?.id === sub?.id && x.ref === ref)!;
-                  return (
-                    <div key={ref.protocolId} className="lib-item">
-                      <span className={`glyph ${GLYPH_CLASS[e.protocol.status]}`}>{STATUS_GLYPH[e.protocol.status]}</span>
-                      {ref.title && e.protocol.status !== 'COMING_SOON' && e.protocol.status !== 'FUTURE' ? ref.title : e.protocol.name}
-                    </div>
-                  );
-                })}
-              </button>
-            ))}
-          </div>
+              </div>
 
-          <div className="locked-card">
-            <div className="lc-head">
-              <span className="lc-title">
-                <Lock size={14} /> Create your own protocol
-              </span>
-              <span className="status-badge soon">Roadmap</span>
+              <div className="library-movement-grid" ref={grid} key={`${sport.id}-${discipline}-${category}`}>
+                {shown.map((e, i) => (
+                  <button
+                    key={e.key}
+                    type="button"
+                    data-card=""
+                    className={`threshold-action status-${statusTone(e.status)} ${e === selected ? 'is-selected' : ''} ${e.launch ? '' : 'is-locked'}`}
+                    aria-pressed={e === selected}
+                    aria-controls="library-detail"
+                    onClick={() => setSelectedKey(e.key)}
+                  >
+                    <span aria-hidden="true">{pad(i + 1)}</span>
+                    <ProtocolStatusTag status={e.status} />
+                    <strong>{e.title}</strong>
+                    <small>
+                      {e.context} / {e.primitive.name}
+                    </small>
+                    {!e.launch && <i aria-hidden="true">Locked</i>}
+                  </button>
+                ))}
+                <div className="custom-protocol-lock">
+                  <span>Roadmap / locked</span>
+                  <strong>Create your own protocol</strong>
+                  <p>Record a few clean reps of any repeatable movement and BreakingPoint learns that athlete’s usual form for it. Not built yet.</p>
+                </div>
+              </div>
+
+              <div id="library-detail">
+                <MovementDetail
+                  library
+                  headingLevel={3}
+                  entry={selected}
+                  savedAt={selected.launch ? p.savedBaselines[selected.protocol.id] : undefined}
+                  sharedWith={shared}
+                  onDemo={p.onDemo}
+                  onLive={p.onLive}
+                />
+              </div>
+
+              <div className="baseline-explainer">
+                <span className="threshold-code">Athlete-specific baselines</span>
+                <strong>Your baseline belongs to you and this protocol.</strong>
+                <p>BreakingPoint compares each monitored rep with the same athlete’s fresh calibration for the selected movement.</p>
+              </div>
+              <p className="library-disclaimer">
+                The detector settings come from a synthetic study of simulated squat-like sessions. They have not been tested on real athletes or for specific sports.
+                BreakingPoint gives training information, not a medical diagnosis.
+              </p>
             </div>
-            <p style={{ color: 'var(--text-2)' }}>Teach BreakingPoint a repeatable movement.</p>
-            <ol className="custom-steps">
-              <li>A coach records several clean repetitions of any repeatable movement.</li>
-              <li>BreakingPoint segments the repetitions.</li>
-              <li>It learns the athlete's usual form for that movement.</li>
-              <li>Later repetitions are compared with that usual form, with the same alert rules as every other protocol.</li>
-            </ol>
-            <p>Not implemented yet. Learning arbitrary movements is roadmap work.</p>
-          </div>
-          <div className="disclaimer">
-            The detector settings were chosen in a synthetic study of simulated squat-like sessions. They have not been tested on real athletes or for specific
-            sports. BreakingPoint provides training information and is not a medical diagnosis.
           </div>
         </div>
-      </div>
+      </section>
     </div>
   );
 }

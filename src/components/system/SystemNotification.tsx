@@ -1,5 +1,6 @@
-import { useEffect, useRef, type FormEvent, type ReactNode, type RefObject } from 'react';
+import { useRef, type FormEvent, type ReactNode, type RefObject } from 'react';
 import { TechnicalCorners } from './TechnicalCorners';
+import { useModalFocus } from './useModalFocus';
 
 export type NotificationTone = 'ready' | 'attention' | 'stop';
 
@@ -25,7 +26,6 @@ interface Props {
   className?: string;
 }
 
-const FOCUSABLE = 'button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])';
 const SYMBOL: Record<NotificationTone, string> = { ready: '+', attention: '!', stop: '!' };
 
 /**
@@ -35,40 +35,7 @@ const SYMBOL: Record<NotificationTone, string> = { ready: '+', attention: '!', s
  */
 export function SystemNotification(p: Props) {
   const ref = useRef<HTMLElement>(null);
-  const close = useRef(p.onClose);
-  close.current = p.onClose;
-
-  useEffect(() => {
-    const prev = document.activeElement as HTMLElement | null;
-    (p.initialFocus?.current ?? ref.current)?.focus();
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        e.stopPropagation();
-        close.current?.();
-        return;
-      }
-      if (e.key !== 'Tab' || !ref.current) return;
-      const items = [...ref.current.querySelectorAll<HTMLElement>(FOCUSABLE)].filter((el) => el.offsetParent !== null);
-      if (!items.length) return;
-      const first = items[0];
-      const last = items[items.length - 1];
-      const inside = ref.current.contains(document.activeElement);
-      if (e.shiftKey && (document.activeElement === first || !inside)) {
-        e.preventDefault();
-        last.focus();
-      } else if (!e.shiftKey && (document.activeElement === last || !inside)) {
-        e.preventDefault();
-        first.focus();
-      }
-    };
-    window.addEventListener('keydown', onKey);
-    return () => {
-      window.removeEventListener('keydown', onKey);
-      prev?.focus?.();
-    };
-    // Focus is placed once, when the window opens.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  useModalFocus(ref, p.onClose, p.initialFocus);
 
   const content = (
     <>

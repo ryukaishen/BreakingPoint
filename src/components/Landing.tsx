@@ -3,9 +3,9 @@ import type { DetectorConfig } from '../detection/config';
 import { DemoController } from '../demo/demoController';
 import { heldReps } from '../data/progress';
 import { makeLabeler } from '../protocols/labels';
-import { DEFAULT_LAUNCH, DEMO_CONTEXTS, protocolRefs, resolveDemo } from '../protocols/launch';
-import { PROTOCOLS, type ProtocolStatus } from '../protocols/protocols';
-import { SPORTS, type SportProfile } from '../protocols/sports';
+import { sportReadiness } from '../protocols/catalog';
+import { DEFAULT_LAUNCH, DEMO_CONTEXTS, resolveDemo } from '../protocols/launch';
+import { SPORTS } from '../protocols/sports';
 import { studyHeadline } from '../research/studyHeadline';
 import { SessionEngine, type Snapshot } from '../session/engine';
 import { DISCLAIMER } from '../session/summary';
@@ -28,20 +28,9 @@ interface Props {
   onResearch: () => void;
   onStatus: () => void;
   onAthletes: () => void;
+  onSports: () => void;
 }
 
-function readiness(sport: SportProfile): { ready: number; beta: number; roadmap: number } {
-  const ids = new Set<string>();
-  for (const sub of sport.subSports?.length ? sport.subSports : [undefined]) {
-    for (const r of protocolRefs(sport, sub?.id)) ids.add(r.protocolId);
-  }
-  const statuses = [...ids].map((id) => PROTOCOLS[id].status as ProtocolStatus);
-  return {
-    ready: statuses.filter((s) => s === 'READY').length,
-    beta: statuses.filter((s) => s === 'BETA').length,
-    roadmap: statuses.filter((s) => s === 'COMING_SOON' || s === 'FUTURE').length,
-  };
-}
 
 const STAGES = [
   ['Calibrate', 'Do five to eight controlled reps while you’re fresh. They set your usual form.'],
@@ -105,7 +94,7 @@ export function Landing(p: Props) {
         <i />
         <i />
       </div>
-      <SystemNav current="landing" onEntry={() => window.scrollTo({ top: 0 })} onStatus={p.onStatus} onAthletes={p.onAthletes} onResearch={p.onResearch} />
+      <SystemNav current="landing" onEntry={() => window.scrollTo({ top: 0 })} onStatus={p.onStatus} onSports={p.onSports} onProtocols={p.onLibrary} onAthletes={p.onAthletes} onResearch={p.onResearch} />
 
       <main className="threshold-canvas entry-canvas" id="main" tabIndex={-1}>
         <div className="entry-view">
@@ -262,7 +251,7 @@ export function Landing(p: Props) {
             </div>
             <ul className="entry-sports-grid">
               {SPORTS.map((s, i) => {
-                const r = readiness(s);
+                const r = sportReadiness(s);
                 const launchable = r.ready + r.beta > 0;
                 return (
                   <li key={s.id}>

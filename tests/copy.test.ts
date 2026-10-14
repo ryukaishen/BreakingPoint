@@ -37,6 +37,8 @@ const LIVE_COPY_FILES = [
   'src/components/system/stageTrack.ts',
   'src/components/SportPage.tsx',
   'src/components/ProtocolLibrary.tsx',
+  'src/components/protocols/MovementDetail.tsx',
+  'src/protocols/catalog.ts',
   'src/components/debrief/SplitsBand.tsx',
   'src/data/splits.ts',
   'src/data/progress.ts',

@@ -24,6 +24,8 @@ export interface StatusViewProps {
   onDemo: (ctx: LaunchContext) => void;
   onResearch: () => void;
   onAthletes: () => void;
+  onSports: () => void;
+  onLibrary: () => void;
 }
 
 const shortDate = new Intl.DateTimeFormat(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
@@ -85,7 +87,7 @@ export function StatusView(p: StatusViewProps) {
         <i />
         <i />
       </div>
-      <SystemNav current="status" onEntry={p.onBrowse} onStatus={() => {}} onAthletes={p.onAthletes} onResearch={p.onResearch} />
+      <SystemNav current="status" onEntry={p.onBrowse} onStatus={() => {}} onSports={p.onSports} onProtocols={p.onLibrary} onAthletes={p.onAthletes} onResearch={p.onResearch} />
 
       <main className="threshold-canvas" id="main" tabIndex={-1}>
         <section className="system-stage">
