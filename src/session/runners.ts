@@ -113,6 +113,8 @@ export class LiveRunner implements Runner {
   private stream: MediaStream | null = null;
   private raf = 0;
   private stopped = false;
+  /** The camera ended on its own: the pose loop stops, the session stays open. */
+  private ended = false;
   fps = 0;
   private frames = 0;
   private fpsT = 0;
@@ -124,7 +126,11 @@ export class LiveRunner implements Runner {
     this.pipeline = new PosePipeline(engine, this.aspect);
   }
 
-  async start(onStatus?: (s: string) => void) {
+  /**
+   * Starts the camera and the pose loop. `onEnded` fires if the camera stops on its own during the
+   * session (unplugged, taken by another app, permission revoked); stop() never triggers it.
+   */
+  async start(onStatus?: (s: string) => void, onEnded?: () => void) {
     // Browsers expose the camera only to secure pages (https or localhost).
     if (!window.isSecureContext || !navigator.mediaDevices?.getUserMedia) {
       throw new CameraError('insecure', 'Camera access needs a secure (https) page.');
@@ -145,6 +151,14 @@ export class LiveRunner implements Runner {
       return;
     }
     this.stream = stream;
+    for (const track of stream.getVideoTracks()) {
+      track.addEventListener('ended', () => {
+        if (this.stopped || this.ended) return;
+        this.ended = true;
+        cancelAnimationFrame(this.raf);
+        onEnded?.();
+      });
+    }
     this.video.srcObject = this.stream;
     this.video.muted = true;
     this.video.playsInline = true;
@@ -164,7 +178,7 @@ export class LiveRunner implements Runner {
     onStatus?.('');
     this.fpsT = performance.now();
     const loop = () => {
-      if (this.stopped) return;
+      if (this.stopped || this.ended) return;
       const now = performance.now();
       const pose = this.pose.detect(this.video, now);
       this.pipeline.push(pose, now / 1000);

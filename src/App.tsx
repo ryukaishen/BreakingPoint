@@ -29,7 +29,11 @@ import { PROTOCOLS } from './protocols/protocols';
 import { SessionEngine } from './session/engine';
 import { useNavGuard } from './session/useNavGuard';
 import type { NavView } from './session/navGuard';
-import { cameraErrorText, DemoRunner, LiveRunner, type Runner } from './session/runners';
+import { CameraError, cameraErrorText, DemoRunner, LiveRunner, type Runner } from './session/runners';
+import { useSustained } from './session/useSustained';
+import { workoutView, type CameraState } from './session/workoutView';
+import { DemoControls } from './components/session/DemoControls';
+import { TechnicalCorners } from './components/system/TechnicalCorners';
 import { useSessionRecorder } from './session/useSessionRecorder';
 import { useHandsFree } from './session/useHandsFree';
 import { usePref } from './session/usePref';
@@ -65,7 +69,7 @@ export default function App() {
   const [selectedRep, setSelectedRep] = useState<number | null>(null);
   const [runner, setRunner] = useState<Runner | null>(null);
   const [liveStatus, setLiveStatus] = useState('');
-  const [liveError, setLiveError] = useState<string | null>(null);
+  const [liveError, setLiveError] = useState<CameraState['error']>(null);
   const [flash, setFlash] = useState(false);
   const [toast, setToast] = useState<{ text: string; kind: string } | null>(null);
   const [demoSpeed, setDemoSpeed] = useState(2);
@@ -247,9 +251,12 @@ export default function App() {
     } else {
       const video = videoRef.current as HTMLVideoElement;
       const l = new LiveRunner(engine, video);
-      l.start((st) => current && setLiveStatus(st)).catch((e: unknown) => {
+      l.start(
+        (st) => current && setLiveStatus(st),
+        () => current && setLiveError({ problem: 'stopped', text: '' }),
+      ).catch((e: unknown) => {
         if (!current) return;
-        setLiveError(cameraErrorText(e));
+        setLiveError({ problem: e instanceof CameraError ? e.problem : 'other', text: cameraErrorText(e) });
         setLiveStatus('');
       });
       r = l;
@@ -465,6 +472,33 @@ export default function App() {
   );
   useVoiceCues(snap, view === 'session' && voiceOn);
   const canSpeak = voiceAvailable();
+  // The live workout screen (Make's M4) is a projection of the real session: see session/workoutView.ts.
+  // Tracking counts as lost only after a second without the athlete, so one dropped frame does not flash it.
+  const trackingLost = useSustained(
+    view === 'session' && mode === 'live' && !liveError && !liveStatus && !snap.live.present && (snap.phase === 'calibrating' || snap.phase === 'monitoring'),
+    1000,
+  );
+  // A stray pose from an empty room lasts a frame or two; the screen shows an athlete once presence holds.
+  const athleteInView = useSustained(view === 'session' && mode === 'live' && snap.live.present, 500);
+  const freshCalibration = useMemo(
+    () => (snap.baseline && snap.calibrationReps.length ? calibrationQuality(snap.baseline, config) : null),
+    [snap.baseline, snap.calibrationReps.length, config],
+  );
+  const workout = workoutView(snap, {
+    mode,
+    camera: { status: liveStatus, error: liveError },
+    trackingLost,
+    calibration: freshCalibration,
+    handsFree,
+    athleteInView: mode === 'live' ? athleteInView : undefined,
+  });
+  /** Make's DEMO / LIVE switch: the same movement, started again from the other source. */
+  const switchSource = (next: Mode) => {
+    if (next === mode) return;
+    if (next === 'live') startSession('live', launch);
+    else guardLeave(() => startSession('demo', launch));
+  };
+
   const toggleEvidence = () => {
     const next = !showEvidence;
     setShowEvidence(next);
@@ -683,85 +717,127 @@ export default function App() {
 
       {view === 'session' && (
         <LabelProvider value={labeler}>
-          <main className="dashboard st-session" id="main" tabIndex={-1}>
+          <main
+            className={`dashboard st-session workout-system workout-${workout.state} is-${mode}${mode === 'live' && snap.phase === 'monitoring' ? ' is-live-set' : ''}`}
+            id="main"
+            tabIndex={-1}
+          >
             <h1 className="visually-hidden">
               {launch.contextName}: {launch.title}, {mode === 'demo' ? 'demo' : 'live'} session
             </h1>
             <SessionAnnouncer snap={snap} />
-            <p className="session-movement" aria-hidden="true">
-              {launch.contextName} / <b>{launch.title}</b>
-            </p>
-            <div className="stage-col">
-              <CameraStage
-                snap={snap}
-                launch={launch}
-                runner={runner}
-                videoRef={videoRef}
-                liveStatus={liveStatus}
-                liveError={liveError}
-                flash={flash}
-                demoSpeed={demoSpeed}
-                demoPaused={demoPaused}
-                onDemoSpeed={(s) => {
-                  setDemoSpeed(s);
-                  if (runner instanceof DemoRunner) runner.speed = s;
-                }}
-                onDemoPause={() => {
-                  if (runner instanceof DemoRunner) {
-                    runner.paused = !runner.paused;
-                    setDemoPaused(runner.paused);
-                  }
-                }}
-                onDemoSkip={() => runner instanceof DemoRunner && runner.skipToEnd()}
-                onRetryLive={() => startSession('live')}
-                onSwitchToDemo={() => startSession('demo')}
-                onEndSet={mode === 'live' ? () => engine.endSet() : undefined}
-                evidence={showEvidence}
-              />
-              {toastEl}
-            </div>
-            <aside className="side-col" aria-label="Session">
-              <SignalSpine snapshot={snap} />
-              <FocusPanel
-                snap={snap}
-                mode={mode}
-                launch={launch}
-                bestHeld={recorder.bestBefore}
-                savedBaseline={savedBaseline}
-                countdown={countdown}
-                handsFree={handsFree}
-                onStartCalibration={() => engine.startCalibration()}
-                onFinishCalibration={() => engine.finishCalibration()}
-                onUseSaved={() => {
-                  if (savedBaseline) engine.useBaseline({ ...savedBaseline.baseline, athlete: athleteName });
-                }}
-                onStartMonitoring={() => engine.startMonitoring()}
-                onEndSet={() => engine.endSet()}
-                onStartRecovery={startRecovery}
-                onShowSummary={() => setShowSummary(true)}
-                onNewSet={newSet}
-              />
-              <div className="session-options" role="group" aria-label="Session options">
-                <button className="opt" aria-pressed={showEvidence} aria-controls="evidence" onClick={toggleEvidence}>
-                  Detector evidence <span className="opt-state">{showEvidence ? 'Shown' : 'Hidden'}</span>
-                </button>
-                {canSpeak && (
-                  <button className="opt" aria-pressed={voiceOn} onClick={() => setVoiceOn(!voiceOn)}>
-                    Voice cues <span className="opt-state">{voiceOn ? 'On' : 'Off'}</span>
-                  </button>
-                )}
-                {mode === 'live' && (
-                  <button
-                    className="opt"
-                    aria-pressed={handsFreeOn}
-                    onClick={() => setHandsFreeOn(!handsFreeOn)}
-                    title="Starts calibration and the set after a short countdown, and ends the set when you stand still. Every step can still be done by hand."
-                  >
-                    Hands-free <span className="opt-state">{handsFreeOn ? 'On' : 'Off'}</span>
-                  </button>
-                )}
+            <div className="workout-stage">
+              <div className="workout-backplane workout-backplane-a" aria-hidden="true" />
+              <div className="workout-backplane workout-backplane-b" aria-hidden="true" />
+              <div className="workout-shell">
+                <TechnicalCorners />
+                <header className="workout-header">
+                  <div>
+                    <span className="threshold-code">
+                      {mode === 'demo' ? 'Demo session' : 'Live session'} / {launch.contextName} / {launch.title}
+                    </span>
+                    <strong>
+                      Movement monitoring
+                      {/* Shown on narrow phones, where the header chip drops its beta badge. */}
+                      {launch.status === 'BETA' && <span className="status-badge beta workout-beta">beta</span>}
+                    </strong>
+                  </div>
+                  <div className="workout-toggles session-options" role="group" aria-label="Session options">
+                    <div className="workout-source" role="group" aria-label="Session source">
+                      <button type="button" className="threshold-action" aria-pressed={mode === 'demo'} onClick={() => switchSource('demo')}>
+                        Demo
+                      </button>
+                      <button type="button" className="threshold-action" aria-pressed={mode === 'live'} onClick={() => switchSource('live')}>
+                        Live
+                      </button>
+                    </div>
+                    {canSpeak && (
+                      <button type="button" className="threshold-action" aria-pressed={voiceOn} onClick={() => setVoiceOn(!voiceOn)}>
+                        Voice {voiceOn ? 'on' : 'off'}
+                      </button>
+                    )}
+                    {mode === 'live' && (
+                      <button
+                        type="button"
+                        className="threshold-action"
+                        aria-pressed={handsFreeOn}
+                        onClick={() => setHandsFreeOn(!handsFreeOn)}
+                        title="Starts calibration and the set after a short countdown, and ends the set when you stand still. Every step can still be done by hand."
+                      >
+                        Hands-free {handsFreeOn ? 'on' : 'off'}
+                      </button>
+                    )}
+                    <button type="button" className="threshold-action" aria-pressed={showEvidence} aria-controls="evidence" onClick={toggleEvidence}>
+                      Evidence {showEvidence ? 'on' : 'off'}
+                    </button>
+                    <button
+                      type="button"
+                      className="threshold-action workout-exit"
+                      aria-label="Exit session"
+                      onClick={() => guardLeave(() => openSport(launch.sport.id, launch.subSport?.id, launch.protocol.id))}
+                    >
+                      Exit
+                    </button>
+                  </div>
+                </header>
+                <div className="workout-layout">
+                  <div className="stage-col">
+                    <CameraStage
+                      snap={snap}
+                      launch={launch}
+                      runner={runner}
+                      videoRef={videoRef}
+                      view={workout}
+                      flash={flash}
+                      onRetryLive={() => guardLeave(() => startSession('live'))}
+                      onSwitchToDemo={() => startSession('demo')}
+                      onEndSet={mode === 'live' ? () => engine.endSet() : undefined}
+                      evidence={showEvidence}
+                    />
+                    {toastEl}
+                  </div>
+                  <aside className="side-col workout-command" aria-label="Session">
+                    <FocusPanel
+                      snap={snap}
+                      mode={mode}
+                      launch={launch}
+                      view={workout}
+                      bestHeld={recorder.bestBefore}
+                      savedBaseline={savedBaseline}
+                      countdown={countdown}
+                      onStartCalibration={() => engine.startCalibration()}
+                      onFinishCalibration={() => engine.finishCalibration()}
+                      onUseSaved={() => {
+                        if (savedBaseline) engine.useBaseline({ ...savedBaseline.baseline, athlete: athleteName });
+                      }}
+                      onStartMonitoring={() => engine.startMonitoring()}
+                      onEndSet={() => engine.endSet()}
+                      onStartRecovery={startRecovery}
+                      onShowSummary={() => setShowSummary(true)}
+                      onNewSet={newSet}
+                    />
+                    {mode === 'demo' && (
+                      <DemoControls
+                        speed={demoSpeed}
+                        paused={demoPaused}
+                        onSpeed={(sp) => {
+                          setDemoSpeed(sp);
+                          if (runner instanceof DemoRunner) runner.speed = sp;
+                        }}
+                        onPause={() => {
+                          if (runner instanceof DemoRunner) {
+                            runner.paused = !runner.paused;
+                            setDemoPaused(runner.paused);
+                          }
+                        }}
+                        onSkip={() => runner instanceof DemoRunner && runner.skipToEnd()}
+                      />
+                    )}
+                    <SignalSpine snapshot={snap} />
+                  </aside>
+                </div>
               </div>
-            </aside>
+            </div>
             {showEvidence && (
               <div className="evidence-row">
                 <Evidence snap={snap} launch={launch} athleteName={athleteName} selectedRep={selectedRep} onSelectRep={setSelectedRep} />

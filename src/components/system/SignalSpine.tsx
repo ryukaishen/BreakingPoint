@@ -11,9 +11,9 @@ const SPOKEN: Record<StageStatus, string> = {
 
 /**
  * The session stage track, Calibrate → Monitor → Detect → Recover, in the Figma Make
- * System Threshold style (Make's stage track under the phone camera). It heads the session
- * panel: beside the camera on wide screens, under it on narrow ones. Read-only: every stage
- * comes from the engine snapshot.
+ * System Threshold style (Make's workout stage track). It closes the workout command panel:
+ * beside the camera on wide screens, under it on narrow ones. Read-only: every stage comes
+ * from the engine snapshot.
  */
 export function SignalSpine({ snapshot }: { snapshot: Snapshot }) {
   const stages = stageTrack(snapshot);

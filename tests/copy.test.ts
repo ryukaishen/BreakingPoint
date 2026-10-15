@@ -14,6 +14,8 @@ import { STATE_LABEL } from '../src/utils/format';
 const LIVE_COPY_FILES = [
   'src/App.tsx',
   'src/components/session/FocusPanel.tsx',
+  'src/components/session/DemoControls.tsx',
+  'src/session/workoutView.ts',
   'src/components/session/RecordLane.tsx',
   'src/components/session/Evidence.tsx',
   'src/components/CameraStage.tsx',

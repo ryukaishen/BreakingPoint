@@ -19,6 +19,7 @@ import './styles-session.css';
 import './styles-system-threshold.css';
 import './styles-threshold-entry.css';
 import './styles-threshold-protocols.css';
+import './styles-threshold-workout.css';
 
 createRoot(document.getElementById('root') as HTMLElement).render(
   <StrictMode>

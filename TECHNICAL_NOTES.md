@@ -441,3 +441,21 @@ Nothing in §8 or §14 runs on camera footage. Before any accuracy claim about t
 through MediaPipe and be compared with a reference for rep segmentation, measurement agreement and alert behaviour,
 across lighting, clothing, occlusion, camera angle and distance. The hands-free thresholds and spoken cues also need
 testing with people at training distance.
+
+## 16. Open release risks
+
+Known and unresolved. Each needs a fix or an explicit decision before a production release.
+
+1. Empty-camera tracking anomaly. The live workout was tested in a browser with Chromium's fake camera (a moving
+   test pattern, no person). In 19 of 20 runs, Tracking lost appeared once the camera's empty frames reached the
+   engine. In one run the engine still reported an athlete 15 s later (57 frames processed), so Tracking lost never
+   showed. Six further 60 s runs on the empty camera did not reproduce it, and none produced a stray pose or counted
+   a rep. The cause is unconfirmed. One candidate is a low-confidence pose from the pattern that the pose model kept
+   tracking: other runs returned isolated stray poses (smoothed quality under 0.03, against the 0.65 needed to start
+   calibration), which the screen ignores until presence has held for 500 ms.
+2. Camera failure on a phone held sideways. When the screen is under 540px tall, the camera is taller than the
+   screen. The centred Camera stopped message, with its Try again and End set buttons, then starts below the fold and
+   needs a scroll. Portrait phones, tablets and desktop show it without scrolling.
+3. No physical webcam or real-athlete validation. Every live test so far used the fake camera, with the app's
+   synthetic athlete supplying the poses. Pose tracking, frame rate on phones and on machines without a usable GPU,
+   hands-free timing and the live screen's states have not been checked with a real camera and a real person (§15).

@@ -78,11 +78,27 @@ export async function connect(port) {
   await send('Page.enable');
   await send('Runtime.enable');
 
+  // Errors from the page itself go to `logs`. Browser extensions installed on the test machine run their
+  // content scripts in their own (isolated) contexts even in throwaway profiles; their errors are not the
+  // app's, so they go to `extensionLogs` instead. (A Norton Safe Web content script was found throwing
+  // "Cannot read properties of undefined (reading 'isInitialized')" this way.)
   const logs = [];
-  on('Runtime.consoleAPICalled', (p) => {
-    if (['error', 'warning'].includes(p.type)) logs.push(`${p.type}: ${p.args.map((a) => a.value ?? a.description ?? '').join(' ').slice(0, 300)}`);
+  const extensionLogs = [];
+  const extensionContexts = new Set();
+  on('Runtime.executionContextCreated', (p) => {
+    if (String(p.context.origin ?? '').startsWith('chrome-extension://')) extensionContexts.add(p.context.id);
   });
-  on('Runtime.exceptionThrown', (p) => logs.push(`EXCEPTION: ${(p.exceptionDetails.exception?.description ?? p.exceptionDetails.text).slice(0, 400)}`));
+  const fromExtension = (contextId, url = '') => extensionContexts.has(contextId) || String(url).startsWith('chrome-extension://');
+  on('Runtime.consoleAPICalled', (p) => {
+    if (!['error', 'warning'].includes(p.type)) return;
+    const line = `${p.type}: ${p.args.map((a) => a.value ?? a.description ?? '').join(' ').slice(0, 300)}`;
+    (fromExtension(p.executionContextId, p.stackTrace?.callFrames?.[0]?.url) ? extensionLogs : logs).push(line);
+  });
+  on('Runtime.exceptionThrown', (p) => {
+    const d = p.exceptionDetails;
+    const line = `EXCEPTION: ${(d.exception?.description ?? d.text).slice(0, 400)}`;
+    (fromExtension(d.executionContextId, d.url) ? extensionLogs : logs).push(line);
+  });
   const dialogs = [];
   const policy = { accept: true };
   on('Page.javascriptDialogOpening', (p) => {
@@ -138,5 +154,5 @@ export async function connect(port) {
     await send('Input.dispatchKeyEvent', { type: 'keyUp', key, code, windowsVirtualKeyCode: vk });
   };
 
-  return { send, on, evaluate, waitFor, goto, click, clickAt, type, press, dialogs, logs, policy, close: () => ws.close() };
+  return { send, on, evaluate, waitFor, goto, click, clickAt, type, press, dialogs, logs, extensionLogs, policy, close: () => ws.close() };
 }

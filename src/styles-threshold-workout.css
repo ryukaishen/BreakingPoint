@@ -1,0 +1,524 @@
+/* System Threshold, Milestone 4: the live workout (Figma Make's "WorkoutExperience", src/index.css
+   "M4 · Complete live workout"), on the tokens in styles-system-threshold.css. The state classes on
+   <main> (.workout-stable, .workout-stop, ...) come from src/session/workoutView.ts.
+
+   Deliberate departures from the Make stylesheet:
+   - Make's camera shows an illustrated pose figure. Here it is the real video with the MediaPipe
+     overlay; Make's training-space floor appears only under the synthetic demo athlete.
+   - Labels are 12px or larger (the app's floor). The state word, the rep count and STOP grow with
+     the viewport toward the 3 m sizes in docs/READABILITY_3M.md.
+   - No backdrop blur over the camera, and the scan line moves on the compositor (transform), so the
+     overlays cost the pose loop as little as possible.
+   - Make's state preview rail, prototype countdowns and "synthetic rep" buttons are not shipped.
+   Imported last in src/main.tsx. */
+
+/* ------------------------------------------------------------------ page and shell */
+.st-session.dashboard.workout-system { display: block; padding: 22px 2.4% 32px; }
+.workout-stage { position: relative; max-width: 1380px; margin: 0 auto; animation: stage-arrive 580ms var(--st-ease-arrive) both; }
+.workout-backplane { position: absolute; border: 1px solid rgb(84 228 255 / 14%); background: rgb(5 16 29 / 24%); pointer-events: none; }
+.workout-backplane-a { inset: 12px -12px -8px 18px; transform: rotate(0.28deg); }
+.workout-backplane-b { inset: -8px 17px 15px -10px; border-color: rgb(167 91 255 / 16%); transform: rotate(-0.34deg); }
+.workout-shell {
+  position: relative;
+  z-index: 2;
+  overflow: hidden;
+  border-top: 3px solid var(--threshold-cyan);
+  border-bottom: 3px solid var(--threshold-cyan);
+  background: rgb(5 12 22 / 94%);
+  box-shadow: inset 0 0 70px rgb(20 102 154 / 7%), 0 24px 60px rgb(0 0 0 / 32%);
+  clip-path: polygon(22px 0, calc(100% - 52px) 0, 100% 34px, 100% calc(100% - 24px), calc(100% - 24px) 100%, 40px 100%, 0 calc(100% - 32px), 0 22px);
+}
+.workout-stop .workout-shell { border-color: var(--threshold-stop); }
+
+.workout-header { display: flex; justify-content: space-between; align-items: center; gap: 20px; min-height: 72px; padding: 14px 24px; border-bottom: 1px solid var(--threshold-line); background: rgb(4 10 18 / 86%); }
+.workout-header > div:first-child { display: grid; gap: 6px; min-width: 0; }
+.workout-header > div:first-child .threshold-code { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.workout-header strong { color: var(--threshold-text); font: 700 30px/0.85 var(--threshold-font-display); text-transform: uppercase; }
+.workout-toggles { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 5px; }
+.workout-source { display: flex; gap: 0; }
+.workout-toggles .threshold-action {
+  min-height: 36px;
+  padding: 0 11px;
+  border: 1px solid var(--threshold-line);
+  color: var(--threshold-muted);
+  font: 400 12px var(--threshold-font-code);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  transition: border-color var(--st-dur-feedback) ease, background-color var(--st-dur-feedback) ease, color var(--st-dur-feedback) ease;
+}
+.workout-source .threshold-action + .threshold-action { border-left: 0; }
+.workout-toggles .threshold-action[aria-pressed='true'] { border-color: rgb(84 228 255 / 55%); background: rgb(22 66 88 / 55%); color: var(--threshold-cyan-hi); }
+.workout-toggles .threshold-action:hover { border-color: rgb(84 228 255 / 55%); color: var(--threshold-text); }
+.workout-toggles .threshold-action:focus-visible { outline-offset: -4px; }
+.is-demo .workout-source .threshold-action[aria-pressed='true'] { border-color: rgb(167 91 255 / 60%); background: rgb(76 36 117 / 50%); color: var(--threshold-violet-hi); }
+.workout-exit { margin-left: 6px; }
+
+/* Camera and command share the screen under the header; the camera is the larger part. */
+.workout-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.85fr) minmax(320px, 0.72fr);
+  height: max(600px, calc(100dvh - var(--header-h) - 150px));
+}
+.sample-banner ~ .workout-system .workout-layout { height: max(560px, calc(100dvh - var(--header-h) - 190px)); }
+.st-session .stage-col { position: relative; display: flex; min-width: 0; min-height: 0; }
+
+/* ------------------------------------------------------------------ camera */
+.st-session .stage.workout-camera {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  border: 0;
+  border-right: 1px solid var(--threshold-line);
+  border-radius: 0;
+  background: radial-gradient(circle at 50% 46%, rgb(48 119 150 / 28%), transparent 29%), linear-gradient(112deg, #101e2a, #06101a 52%, #172634);
+  box-shadow: none;
+  clip-path: none;
+}
+.workout-camera video { z-index: 1; opacity: 1; }
+.workout-camera canvas { z-index: 2; }
+.workout-camera::after {
+  position: absolute;
+  z-index: 3;
+  inset: 0;
+  background: linear-gradient(to bottom, rgb(2 8 15 / 25%), transparent 18% 74%, rgb(2 8 15 / 46%));
+  pointer-events: none;
+  content: '';
+}
+.workout-camera-grid {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  opacity: 0.35;
+  background: linear-gradient(rgb(84 228 255 / 10%) 1px, transparent 1px), linear-gradient(90deg, rgb(84 228 255 / 10%) 1px, transparent 1px);
+  background-size: 54px 54px;
+  mask-image: linear-gradient(to bottom, transparent, black 15%, black 80%, transparent);
+  pointer-events: none;
+}
+/* The scan line runs on the compositor: a full-height layer translated top to bottom. */
+.workout-scan { position: absolute; z-index: 4; inset: 0 5%; pointer-events: none; animation: workout-scan 5.5s linear infinite; }
+.workout-scan i { position: absolute; top: 0; right: 0; left: 0; height: 1px; background: linear-gradient(90deg, transparent, var(--threshold-cyan), transparent); box-shadow: 0 0 12px var(--threshold-cyan); opacity: 0.36; }
+.workout-perspective { position: absolute; z-index: 1; bottom: 15%; left: 50%; width: 270px; height: auto; transform: translateX(-50%) scale(1.3); pointer-events: none; }
+/* Make's framing brackets mark where the athlete should stand; they sit below the HUD rows. */
+.workout-brackets { position: absolute; z-index: 4; top: 17%; left: 50%; width: min(64%, 620px); height: auto; opacity: 0.7; transform: translateX(-50%); pointer-events: none; }
+.workout-tracking-lost .workout-camera canvas { opacity: 0.3; filter: grayscale(1); }
+
+.workout-feed-label,
+.workout-state-hud,
+.workout-quality-hud,
+.workout-rep-hud,
+.workout-evidence { position: absolute; z-index: 6; }
+.workout-feed-label { top: 18px; left: 18px; display: grid; gap: 4px; max-width: 46%; padding-left: 10px; border-left: 2px solid var(--threshold-cyan); }
+.is-demo .workout-feed-label { border-left-color: var(--threshold-violet); }
+.workout-feed-label span,
+.workout-feed-label small,
+.workout-state-hud > span,
+.workout-state-hud > small,
+.workout-quality-hud span,
+.workout-quality-hud small,
+.workout-rep-hud span { color: var(--threshold-muted); font: 400 12px/1.3 var(--threshold-font-code); letter-spacing: 0.08em; text-transform: uppercase; }
+.workout-feed-label span { color: var(--threshold-cyan-hi); }
+.is-demo .workout-feed-label span { color: var(--threshold-violet-hi); }
+.workout-feed-label .privacy-note { display: block; font-size: 12px; letter-spacing: 0.04em; text-transform: none; }
+
+.workout-quality-hud { top: 18px; right: 18px; display: grid; justify-items: end; gap: 4px; padding-right: 10px; border-right: 2px solid var(--threshold-cyan); text-align: right; }
+.workout-quality-hud strong { color: var(--threshold-cyan-hi); font: 600 20px/1 var(--threshold-font-display); text-transform: uppercase; }
+.workout-quality-hud strong.q-poor { color: var(--threshold-amber); }
+.workout-quality-hud strong.q-no-athlete,
+.workout-quality-hud strong.q-camera-off { color: var(--threshold-stop); }
+
+/* Coach overlays (Evidence on): rep phase, joint angles and depth, under capture quality. */
+.workout-evidence { top: 96px; right: 18px; display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
+.workout-evidence .phase-pill,
+.workout-evidence .chip { margin: 0; border: 1px solid var(--threshold-line); border-radius: 0; background: rgb(3 10 18 / 88%); color: var(--threshold-text); font-size: 12px; -webkit-backdrop-filter: none; backdrop-filter: none; }
+.workout-evidence .chip .k { color: var(--threshold-muted); font-size: 12px; }
+.workout-evidence .depth-gauge .lbl { font-size: 12px; }
+
+.workout-state-hud { bottom: 20px; left: 19px; display: grid; gap: 6px; min-width: 240px; max-width: calc(100% - 230px); padding: 15px 18px; border: 1px solid var(--threshold-line); background: rgb(3 10 18 / 88%); }
+.workout-state-hud > strong { color: var(--threshold-cyan-hi); font: 700 clamp(34px, 3.4vw, 52px)/0.86 var(--threshold-font-display); text-transform: uppercase; }
+.workout-state-hud > small { color: var(--threshold-cyan); }
+.workout-warning .workout-state-hud,
+.workout-sustained .workout-state-hud { border-color: rgb(255 189 102 / 58%); }
+.workout-warning .workout-state-hud > strong,
+.workout-sustained .workout-state-hud > strong { color: var(--threshold-amber); }
+.workout-stop .workout-state-hud { border-color: rgb(255 67 95 / 68%); }
+.workout-stop .workout-state-hud > strong { color: var(--threshold-text); }
+.workout-tracking-lost .workout-state-hud,
+.workout-calibration-issue .workout-state-hud { border-color: rgb(255 189 102 / 58%); }
+.workout-tracking-lost .workout-state-hud > strong,
+.workout-calibration-issue .workout-state-hud > strong { color: var(--threshold-amber); }
+.workout-recovery .workout-state-hud > strong,
+.workout-recovery-done .workout-state-hud > strong { color: var(--threshold-violet-hi); }
+
+.workout-rep-hud { right: 20px; bottom: 20px; display: grid; justify-items: end; gap: 4px; }
+.workout-rep-hud strong { color: var(--threshold-cyan-hi); font: 700 clamp(96px, 8.6vw, 150px)/0.7 var(--threshold-font-display); font-variant-numeric: tabular-nums; text-shadow: 0 0 18px rgb(84 228 255 / 24%); }
+.workout-warning .workout-rep-hud strong,
+.workout-sustained .workout-rep-hud strong { color: var(--threshold-amber); text-shadow: none; }
+.workout-stop .workout-rep-hud strong { color: var(--threshold-stop); text-shadow: none; }
+.workout-recovery .workout-rep-hud strong,
+.workout-recovery-done .workout-rep-hud strong { color: var(--threshold-violet-hi); text-shadow: none; }
+
+/* Camera messages: starting, refused, missing or stopped. The camera has nothing to show behind them. */
+/* Above the session toasts: a camera message is never covered. */
+.st-session .stage-center { position: absolute; z-index: 16; inset: 0; display: grid; place-items: center; padding: 24px; }
+.workout-center-message,
+.workout-baseline-lock {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  width: min(540px, 100%);
+  padding: 32px;
+  border: 1px solid var(--threshold-cyan);
+  background: rgb(5 16 29 / 95%);
+  box-shadow: 0 0 28px rgb(84 228 255 / 15%), 0 28px 70px rgb(0 0 0 / 48%);
+  text-align: center;
+  clip-path: polygon(14px 0, calc(100% - 28px) 0, 100% 22px, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%, 0 14px);
+}
+.workout-center-message { animation: detail-arrive var(--st-dur-detail) var(--st-ease-arrive) both; }
+.workout-center-symbol { display: grid; place-items: center; width: 44px; height: 44px; border: 1px solid var(--threshold-cyan); color: var(--threshold-cyan); font: 400 24px var(--threshold-font-code); }
+.workout-permission-denied .workout-center-message,
+.workout-camera-unavailable .workout-center-message,
+.workout-camera-failure .workout-center-message { border-color: var(--threshold-stop); box-shadow: 0 0 28px rgb(255 67 95 / 16%), 0 28px 70px rgb(0 0 0 / 48%); }
+.workout-permission-denied .workout-center-symbol,
+.workout-camera-unavailable .workout-center-symbol,
+.workout-camera-failure .workout-center-symbol { border-color: var(--threshold-stop); color: var(--threshold-stop); }
+.workout-center-message > strong,
+.workout-baseline-lock > strong { color: var(--threshold-text); font: 700 40px/0.9 var(--threshold-font-display); text-transform: uppercase; }
+.workout-center-message p,
+.workout-baseline-lock p { max-width: 420px; margin: 0; color: var(--threshold-muted); font-size: 15px; line-height: 1.5; }
+.workout-center-message > div { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 6px; }
+.workout-center-message .threshold-action { min-height: 46px; padding: 0 18px; border: 1px solid var(--threshold-cyan); color: var(--threshold-cyan-hi); font: 400 13px var(--threshold-font-code); letter-spacing: 0.06em; text-transform: uppercase; }
+.workout-center-message .threshold-action:hover { background: rgb(22 66 88 / 55%); }
+
+/* The baseline lock sits high on the camera so the athlete stays in view while it shows. */
+.workout-baseline-lock {
+  position: absolute;
+  z-index: 12;
+  top: 70px;
+  left: 50%;
+  width: min(460px, calc(100% - 60px));
+  padding: 22px 26px;
+  border-color: var(--threshold-violet);
+  box-shadow: 0 0 35px rgb(167 91 255 / 20%);
+  transform: translateX(-50%);
+  animation: lock-assemble 450ms var(--st-ease-arrive) both;
+}
+.workout-baseline-lock > span { color: var(--threshold-violet-hi); font: 400 12px var(--threshold-font-code); letter-spacing: 0.08em; text-transform: uppercase; }
+.workout-baseline-lock .tech-corner::before,
+.workout-baseline-lock .tech-corner::after { background: var(--threshold-violet); }
+
+/* STOP: Make's alert band across the camera, with End set in it. It arrives at once (200 ms). */
+.workout-stop-alert {
+  position: absolute;
+  z-index: 20;
+  top: 22%;
+  right: 8%;
+  left: 8%;
+  display: grid;
+  grid-template-columns: 66px minmax(0, 1fr) auto;
+  align-items: center;
+  min-height: 150px;
+  border: 2px solid var(--threshold-stop);
+  background: rgb(22 5 13 / 94%);
+  box-shadow: 0 0 35px rgb(255 67 95 / 26%), 0 26px 70px rgb(0 0 0 / 55%);
+  animation: detail-arrive 200ms ease both;
+  clip-path: polygon(14px 0, calc(100% - 28px) 0, 100% 22px, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%, 0 14px);
+}
+.workout-stop-alert > span { display: grid; place-items: center; align-self: stretch; background: var(--threshold-stop); color: var(--threshold-text); font: 700 38px var(--threshold-font-code); }
+.workout-stop-alert > div { display: grid; gap: 4px; padding: 18px 22px; }
+.workout-stop-alert small { color: var(--threshold-text); font: 400 12px var(--threshold-font-code); letter-spacing: 0.1em; text-transform: uppercase; }
+.workout-stop-alert strong { color: var(--threshold-text); font: 700 clamp(66px, 6.4vw, 104px)/0.74 var(--threshold-font-display); text-transform: uppercase; }
+.workout-stop-alert p { margin: 4px 0 0; color: var(--threshold-text); font-size: 16px; }
+/* White on stop red at large-text size keeps 3:1 (as before, in styles-session.css). */
+.workout-stop-alert .stage-end { min-width: 150px; min-height: 56px; margin-right: 18px; padding: 0 20px; background: var(--threshold-stop); color: var(--threshold-text); font: 700 19px var(--threshold-font-body); }
+.workout-stop-alert .stage-end:hover { filter: brightness(1.08); }
+.workout-stop-alert .stage-end:focus-visible { outline: 3px solid var(--threshold-text); outline-offset: -6px; }
+
+/* Session toasts: top centre of the camera, clear of the HUD corners. */
+.st-session .stage-col > .toast { position: absolute; z-index: 15; top: 72px; bottom: auto; left: 50%; max-width: min(480px, calc(100% - 420px)); }
+/* At STOP the band says it all (and the announcer has said it): the alert toast would only sit behind it. */
+.workout-stop .stage-col > .toast.tone-break { display: none; }
+
+/* ------------------------------------------------------------------ command panel */
+.st-session .side-col.workout-command {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  min-width: 0;
+  overflow: auto;
+  background: linear-gradient(rgb(49 122 165 / 4%) 1px, transparent 1px), linear-gradient(90deg, rgb(49 122 165 / 4%) 1px, transparent 1px), rgb(5 13 24 / 96%);
+  background-size: 34px 34px;
+  scrollbar-width: thin;
+}
+.st-session .focus.workout-focus { display: flex; flex: 1 0 auto; flex-direction: column; gap: 0; padding: 0; border: 0; background: none; box-shadow: none; }
+.st-session .focus.workout-focus::before { display: none; }
+.workout-command-state { display: grid; gap: 10px; padding: 24px 22px 20px; border-bottom: 1px solid var(--threshold-line); }
+.workout-command-state .threshold-code { color: var(--threshold-cyan); }
+.st-session .workout-command-state .plate {
+  display: block;
+  padding: 0;
+  background: none;
+  box-shadow: none;
+  color: var(--threshold-text);
+  font: 700 clamp(37px, 3.4vw, 56px)/0.88 var(--threshold-font-display);
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+}
+.st-session .workout-command-state .focus-instruction { margin: 0; color: var(--threshold-text); font: 600 clamp(19px, 1.5vw, 24px)/1.15 var(--threshold-font-display); }
+.workout-stop .workout-command-state { border-bottom-color: rgb(255 67 95 / 60%); background: linear-gradient(90deg, rgb(255 67 95 / 14%), transparent); }
+.workout-stop .workout-command-state .threshold-code { color: #ff8394; }
+.st-session.workout-stop .workout-command-state .plate { color: var(--threshold-stop); }
+.st-session.workout-warning .workout-command-state .plate,
+.st-session.workout-sustained .workout-command-state .plate,
+.st-session.workout-tracking-lost .workout-command-state .plate,
+.st-session.workout-calibration-issue .workout-command-state .plate { color: var(--threshold-amber); }
+.workout-warning .workout-command-state .threshold-code,
+.workout-sustained .workout-command-state .threshold-code,
+.workout-tracking-lost .workout-command-state .threshold-code,
+.workout-calibration-issue .workout-command-state .threshold-code { color: var(--threshold-amber); }
+.st-session.workout-recovery .workout-command-state .plate,
+.st-session.workout-recovery-done .workout-command-state .plate { color: var(--threshold-violet-hi); }
+
+.workout-countdown,
+.workout-setup,
+.workout-calibration-progress,
+.workout-issues,
+.workout-score-panel,
+.workout-change-list,
+.st-session .workout-focus .lane,
+.st-session .workout-focus .focus-big { margin: 14px 15px 0; border: 1px solid var(--threshold-line); background: rgb(4 11 20 / 78%); }
+
+.workout-countdown { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 12px 16px; border-color: rgb(84 228 255 / 50%); }
+.workout-countdown span { color: var(--threshold-cyan); font: 400 13px/1.3 var(--threshold-font-code); letter-spacing: 0.08em; text-transform: uppercase; }
+.workout-countdown strong { color: var(--threshold-cyan-hi); font-size: clamp(64px, 6vw, 96px); line-height: 0.8; }
+
+.workout-setup { display: grid; gap: 0; }
+.workout-setup-how { margin: 0; padding: 12px 14px; border-bottom: 1px solid var(--threshold-line); color: var(--threshold-muted); font-size: 14px; line-height: 1.45; }
+.workout-checklist { margin: 0; padding: 0; list-style: none; }
+.workout-checklist li { display: grid; grid-template-columns: 26px minmax(0, 1fr); gap: 8px; align-items: center; min-height: 46px; padding: 0 14px; border-bottom: 1px solid var(--threshold-line); color: var(--threshold-muted); font-size: 15px; }
+.workout-checklist li:last-child { border-bottom: 0; }
+.workout-checklist i { display: grid; place-items: center; width: 20px; height: 20px; border: 1px solid var(--threshold-line); color: var(--threshold-ink); font-style: normal; }
+.workout-checklist .is-ready { color: var(--threshold-text); }
+.workout-checklist .is-ready i { border-color: var(--threshold-cyan); background: var(--threshold-cyan); }
+
+.workout-calibration-progress { display: grid; gap: 10px; padding: 16px; }
+.workout-calibration-progress > span,
+.workout-change-list > span,
+.workout-score-panel span { color: var(--threshold-muted); font: 400 12px/1.3 var(--threshold-font-code); letter-spacing: 0.08em; text-transform: uppercase; }
+.workout-calibration-progress > div { display: grid; grid-auto-columns: minmax(0, 1fr); grid-auto-flow: column; gap: 5px; }
+.workout-calibration-progress i { height: 12px; border: 1px solid rgb(84 228 255 / 25%); }
+.workout-calibration-progress i.is-required { border-color: rgb(84 228 255 / 60%); }
+.workout-calibration-progress i.is-complete { border-color: var(--threshold-cyan); background: var(--threshold-cyan); box-shadow: 0 0 8px rgb(84 228 255 / 55%); }
+.workout-calibration-progress small { color: var(--threshold-cyan); font: 400 13px/1.3 var(--threshold-font-code); letter-spacing: 0.04em; }
+
+.workout-issues { display: grid; gap: 8px; margin-top: 14px; padding: 14px 14px 14px 32px; border-color: rgb(255 189 102 / 40%); color: var(--threshold-text); font-size: 14px; line-height: 1.4; }
+
+.workout-score-panel { padding: 15px; }
+.workout-score-panel > div:first-child { display: flex; justify-content: space-between; align-items: end; gap: 12px; }
+.workout-score-panel > div:first-child strong { color: var(--threshold-cyan-hi); font: 700 46px/0.8 var(--threshold-font-display); font-variant-numeric: tabular-nums; }
+.workout-warning .workout-score-panel > div:first-child strong,
+.workout-sustained .workout-score-panel > div:first-child strong { color: var(--threshold-amber); }
+.workout-stop .workout-score-panel > div:first-child strong { color: var(--threshold-stop); }
+.workout-score-track { position: relative; display: grid; grid-template-columns: 1fr 1fr 1fr; margin-top: 18px; padding-top: 11px; border-top: 3px solid var(--threshold-line); }
+.workout-score-track::before,
+.workout-score-track::after { position: absolute; top: -3px; width: 1px; height: 8px; content: ''; }
+.workout-score-track::before { left: 33%; background: var(--threshold-amber); box-shadow: 0 0 6px var(--threshold-amber); }
+.workout-score-track::after { left: 75%; background: var(--threshold-stop); box-shadow: 0 0 6px var(--threshold-stop); }
+.workout-score-track i { position: absolute; top: -7px; width: 8px; height: 12px; background: var(--threshold-cyan-hi); box-shadow: 0 0 9px var(--threshold-cyan); transform: translateX(-50%); transition: left var(--st-dur-detail) var(--st-ease-snap); }
+.workout-warning .workout-score-track i,
+.workout-sustained .workout-score-track i { background: var(--threshold-amber); box-shadow: 0 0 9px var(--threshold-amber); }
+.workout-stop .workout-score-track i { background: var(--threshold-stop); box-shadow: 0 0 9px var(--threshold-stop); }
+.workout-score-track span:nth-of-type(2) { text-align: center; }
+.workout-score-track span:nth-of-type(3) { text-align: right; }
+.workout-score-panel p { margin: 12px 0 0; color: var(--threshold-muted); font-size: 13px; line-height: 1.45; }
+
+.workout-change-list { display: grid; gap: 7px; padding: 14px; border-color: rgb(255 189 102 / 30%); }
+.workout-stop .workout-change-list { border-color: rgb(255 67 95 / 40%); }
+.workout-change-list strong { padding-left: 9px; border-left: 1px solid var(--threshold-amber); color: var(--threshold-text); font: 600 18px/1.1 var(--threshold-font-display); }
+
+/* Record lane and the rest / recovery numbers keep their working parts in Make's module frame. */
+.st-session .workout-focus .lane { padding: 14px; }
+.st-session .workout-focus .focus-big { display: flex; flex-direction: column; gap: 6px; padding: 14px 16px; }
+
+/* The actions stay in view at the foot of the panel however much the panel holds: End set is never scrolled away. */
+.st-session .workout-command-actions {
+  position: sticky;
+  z-index: 3;
+  bottom: 0;
+  display: grid;
+  gap: 8px;
+  margin-top: auto;
+  padding: 14px 16px 16px;
+  border-top: 1px solid var(--threshold-line);
+  background: rgb(5 13 24 / 97%);
+}
+.st-session .workout-command-actions .btn.lg {
+  justify-content: center;
+  width: 100%;
+  height: auto;
+  min-height: 50px;
+  padding: 0 16px;
+  border: 1px solid var(--threshold-line);
+  border-radius: 0;
+  background: none;
+  color: var(--threshold-text);
+  font: 600 15px var(--threshold-font-body);
+}
+.st-session .workout-command-actions .btn.lg:hover { border-color: var(--threshold-cyan); }
+.st-session .workout-command-actions .btn.workout-primary {
+  min-height: 54px;
+  border-color: var(--threshold-cyan);
+  background: rgb(22 91 119 / 48%);
+  color: var(--threshold-cyan-hi);
+  font-size: 16px;
+  font-weight: 700;
+  clip-path: polygon(9px 0, 100% 0, 100% calc(100% - 9px), calc(100% - 9px) 100%, 0 100%, 0 9px);
+}
+.st-session .workout-command-actions .btn.workout-end-action { min-height: 54px; border-color: rgb(255 67 95 / 65%); color: var(--threshold-text); font-size: 17px; font-weight: 700; }
+.st-session .workout-command-actions .btn.workout-end-action.is-stop { border-color: var(--threshold-stop); background: var(--threshold-stop); font-size: 19px; }
+.st-session .workout-command-actions .btn.workout-end-action.is-stop .kbd { border-color: color-mix(in srgb, var(--threshold-ink) 55%, transparent); color: var(--threshold-ink); }
+.st-session .workout-command-actions .btn:focus-visible { outline: 3px solid var(--threshold-text); outline-offset: -5px; }
+
+/* Demo playback, under the actions: the synthetic athlete's controls, apart from real-camera ones. */
+.workout-demo-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 0 15px 12px; padding: 10px 12px; border: 1px solid rgb(167 91 255 / 35%); background: rgb(20 12 36 / 70%); }
+.workout-demo-label { margin-right: auto; color: var(--threshold-violet-hi); font: 400 12px var(--threshold-font-code); letter-spacing: 0.08em; text-transform: uppercase; }
+.workout-demo-controls .threshold-action { display: inline-flex; align-items: center; gap: 6px; min-height: 40px; padding: 0 12px; border: 1px solid rgb(167 91 255 / 40%); color: var(--threshold-violet-hi); font: 400 13px var(--threshold-font-code); }
+.workout-demo-controls .seg { display: flex; gap: 0; border: 0; background: none; }
+.workout-demo-controls .seg .threshold-action + .threshold-action { border-left: 0; }
+.workout-demo-controls .threshold-action[aria-pressed='true'] { background: rgb(76 36 117 / 60%); color: var(--threshold-text); }
+
+/* The stage track closes the panel (Make's workout stage track). */
+.st-session .workout-command .signal-spine { margin: 0; border-top: 1px solid var(--threshold-line); }
+
+/* ------------------------------------------------------------------ motion */
+@keyframes workout-scan {
+  from { transform: translateY(8%); }
+  to { transform: translateY(92%); }
+}
+@keyframes lock-assemble {
+  0% { opacity: 0; transform: translateX(-50%) scaleX(0.82) scaleY(0.9); }
+  55% { opacity: 1; transform: translateX(-50%) scaleX(1.018) scaleY(1); }
+  100% { opacity: 1; transform: translateX(-50%) scale(1); }
+}
+
+/* ------------------------------------------------------------------ responsive */
+@media (max-width: 1120px) and (min-width: 761px) {
+  .workout-layout { grid-template-columns: minmax(0, 1.45fr) minmax(300px, 0.8fr); }
+  .workout-header { align-items: flex-start; }
+  .workout-stop-alert { right: 4%; left: 4%; grid-template-columns: 56px minmax(0, 1fr) auto; }
+  .workout-state-hud { min-width: 0; max-width: calc(100% - 190px); }
+}
+/* Below 1100px the camera and the panel stack (as the app's layout did before M4). */
+@media (max-width: 1100px) {
+  .workout-layout { display: block; height: auto; }
+  .st-session .stage-col { aspect-ratio: auto; height: min(70vh, 640px); min-height: 440px; }
+  .st-session .stage.workout-camera { border-right: 0; border-bottom: 2px solid var(--threshold-cyan); }
+  .workout-stop .stage.workout-camera { border-bottom-color: var(--threshold-stop); }
+  .st-session .side-col.workout-command { overflow: visible; }
+  .st-session .stage-col > .toast { max-width: calc(100% - 40px); }
+}
+@media (max-width: 760px) {
+  .st-session.dashboard.workout-system { padding: 0 0 24px; }
+  .workout-stage { animation: none; }
+  .workout-backplane { display: none; }
+  .workout-shell { border-top: 0; clip-path: none; }
+  .workout-header { display: grid; gap: 10px; min-height: 0; padding: 12px 13px 10px; }
+  .workout-header strong { font-size: 24px; }
+  .workout-toggles { flex-wrap: nowrap; justify-content: flex-start; overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: none; }
+  .workout-toggles::-webkit-scrollbar { display: none; }
+  .workout-toggles .threshold-action { flex: 0 0 auto; min-height: 44px; }
+  .st-session .stage-col { height: min(123vw, 520px); min-height: 0; }
+  .workout-perspective { bottom: 18%; width: 207px; transform: translateX(-50%); }
+  .workout-brackets { top: 16%; width: calc(100% - 34px); transform: translateX(-50%); }
+  .workout-feed-label { top: 12px; left: 13px; max-width: 52%; }
+  .workout-quality-hud { top: 12px; right: 13px; }
+  .workout-quality-hud small,
+  .workout-feed-label small,
+  .workout-feed-label .privacy-note { display: none; }
+  .workout-evidence { top: 84px; right: 13px; }
+  .workout-evidence .depth-gauge .track { height: 64px; }
+  .workout-state-hud { right: 14px; bottom: 14px; left: 14px; min-width: 0; max-width: none; padding: 12px 104px 12px 14px; }
+  .workout-state-hud > strong { font-size: clamp(30px, 8.6vw, 40px); }
+  .workout-rep-hud { right: 24px; bottom: 26px; }
+  .workout-rep-hud strong { font-size: clamp(64px, 18vw, 84px); }
+  .workout-rep-hud span { display: none; }
+  .workout-center-message { padding: 25px 18px; }
+  .workout-center-message > strong,
+  .workout-baseline-lock > strong { font-size: 34px; }
+  .workout-baseline-lock { top: 56px; width: calc(100% - 34px); padding: 18px; }
+  .workout-stop-alert { top: 18%; right: 13px; left: 13px; grid-template-columns: 46px minmax(0, 1fr); min-height: 0; }
+  .workout-stop-alert > div { padding: 14px; }
+  .workout-stop-alert strong { font-size: clamp(56px, 16vw, 72px); }
+  .workout-stop-alert .stage-end { grid-column: 1 / -1; width: 100%; min-height: 54px; margin: 0; }
+  .st-session .stage-col > .toast { top: 64px; }
+  .workout-command-state { padding: 20px 17px 16px; }
+  .st-session .workout-command-state .plate { font-size: clamp(34px, 10vw, 44px); }
+  .st-session .workout-command-state .focus-instruction { font-size: clamp(20px, 6vw, 24px); }
+  .workout-countdown,
+  .workout-setup,
+  .workout-calibration-progress,
+  .workout-issues,
+  .workout-score-panel,
+  .workout-change-list,
+  .st-session .workout-focus .lane,
+  .st-session .workout-focus .focus-big { margin-right: 13px; margin-left: 13px; }
+  .st-session .workout-command-actions { padding: 14px 13px; }
+  .st-session .workout-command-actions .btn.lg { min-height: 52px; }
+  .workout-demo-controls { margin: 0 13px 12px; }
+}
+@media (max-width: 360px) {
+  .workout-header strong { font-size: 22px; }
+  .st-session .stage-col { height: 455px; }
+  .workout-stop-alert { top: 16%; }
+}
+
+/* End set during a live set on stacked layouts. The panel sits under the camera there, so its actions
+   (End set) are pinned to the foot of the viewport: reachable without scrolling in every state of the set.
+   The camera is capped so camera and bar both fit the visible height (svh: with the browser's toolbars
+   showing); at 390x844 and 360x780 the cap does not bind. Viewports under 540px tall (phones held
+   sideways) cannot fit the camera at all, so the bar stays in the panel there and End set is on the
+   STOP band at the alert. */
+@media (max-width: 1100px) and (min-height: 540px) {
+  .st-session.is-live .stage-col { height: min(70vh, 640px, calc(100svh - 250px)); min-height: 280px; }
+  .st-session.is-live-set .workout-command-actions {
+    position: fixed;
+    z-index: 25;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    grid-template-columns: minmax(0, 520px);
+    justify-content: center;
+    padding: 12px max(13px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(13px, env(safe-area-inset-left));
+    background: rgb(5 13 24);
+    box-shadow: 0 -14px 30px rgb(0 0 0 / 45%);
+  }
+  .st-session.dashboard.workout-system.is-live-set { padding-bottom: 104px; }
+  /* A fixed element is held inside any transformed or clipped ancestor: the stage's arrival transform
+     (finished long before a set starts) and the shell's cut corners are dropped while the bar is pinned. */
+  .workout-system.is-live-set .workout-stage { animation: none; }
+  .workout-system.is-live-set .workout-shell { clip-path: none; }
+}
+@media (max-width: 1100px) and (max-height: 539px) {
+  /* A phone held sideways: the STOP band rides higher so its End set is on the first screen. */
+  .workout-stop-alert { top: 16%; }
+}
+@media (max-width: 760px) and (min-height: 540px) {
+  .st-session.is-live .stage-col { height: min(123vw, 520px, calc(100svh - 260px)); }
+}
+@media (max-width: 360px) and (min-height: 540px) {
+  .st-session.is-live .stage-col { height: min(455px, calc(100svh - 260px)); }
+}
+
+/* Reduced motion: nothing scans, assembles or slides; state still shows in words and colour. */
+@media (prefers-reduced-motion: reduce) {
+  .workout-stage,
+  .workout-scan,
+  .workout-center-message,
+  .workout-baseline-lock,
+  .workout-stop-alert { animation: none; }
+  .workout-scan { display: none; }
+  .workout-score-track i,
+  .workout-toggles .threshold-action { transition: none; }
+  .workout-rep-hud strong { text-shadow: none; }
+}
