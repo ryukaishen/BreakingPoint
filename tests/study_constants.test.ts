@@ -5,8 +5,8 @@
 import { describe, expect, it } from 'vitest';
 import { existsSync, readFileSync } from 'node:fs';
 import { HIPERGATOR_STUDY as S, PER_SCENARIO, RECOVERY_CHECK } from '../src/research/hipergatorStudy';
-import { REAL_WORLD_SCOPE, REAL_WORLD_STUDIES } from '../src/research/realWorldStudies';
-import { studyHeadline } from '../src/research/studyHeadline';
+import { REAL_WORLD_REPORT, REAL_WORLD_SCOPE, REAL_WORLD_STUDIES } from '../src/research/realWorldStudies';
+import { researchEvidence, studyHeadline } from '../src/research/studyHeadline';
 import { parseDetectorConfig } from '../src/detection/config';
 import { pct } from '../src/utils/format';
 
@@ -147,7 +147,56 @@ describe('the landing page figures are the frozen study results', () => {
   });
 });
 
+describe('the research Overview figures are the frozen study results', () => {
+  const figures = researchEvidence(parseDetectorConfig(config).validation)!;
+  // The report's per-scenario rows: "| A · No change | 6,200 | 1.9% |  |  |". A row with a detection rate is a change scenario.
+  const rows = [...report.matchAll(/^\| ([A-H]) · [^|]+\| ([\d,]+) \| ([^|]*)\| ([^|]*)\|/gm)].map((m) => ({
+    id: m[1],
+    n: Number(m[2].replace(/,/g, '')),
+    changed: m[4].trim() !== '',
+  }));
+  const sum = (changed: boolean) => rows.filter((r) => r.changed === changed).reduce((a, r) => a + r.n, 0);
+
+  it('shows the five held-out headline values, as the report prints them', () => {
+    expect(figures.map((f) => f.value)).toEqual(['100,000', '50,000', '89.6%', '2.2%', '4 reps']);
+    expect(report).toContain(`Simulated sessions: **${figures[0].value}** (${n(S.selectionSessions)} selection split / ${figures[1].value} held-out split)`);
+    expect(report).toContain(`| True-positive rate (drift sessions C,D,H) | ${figures[2].value} |`);
+    expect(report).toContain(`| False-positive rate (no-change sessions A,B,E,F,G) | ${figures[3].value} |`);
+    expect(report).toContain(`| Median detection delay (reps) | ${figures[4].value.replace(' reps', '.0')} |`);
+  });
+
+  it('counts the change and no-change sessions as the report scenario rows add up', () => {
+    expect(rows.map((r) => r.id).join('')).toBe('ABCDEFGH');
+    expect(rows.filter((r) => r.changed).map((r) => r.id).join('')).toBe('CDH');
+    expect(sum(true)).toBe(v.num_drift_sessions_holdout);
+    expect(sum(false)).toBe(v.num_no_change_sessions_holdout);
+    expect(sum(true) + sum(false)).toBe(S.heldOutSessions);
+    expect(figures[2].detail).toContain(`Of the ${n(sum(true))} held-out sessions with a change`);
+    expect(figures[3].detail).toContain(`Of the ${n(sum(false))} held-out sessions with no change`);
+  });
+
+  it('gives the report confidence intervals', () => {
+    const [t0, t1] = v.true_positive_rate_ci95;
+    const [f0, f1] = v.false_positive_rate_ci95;
+    expect(figures[2].detail).toContain(`95% CI ${pct(t0)} to ${pct(t1)}`);
+    expect(figures[3].detail).toContain(`95% CI ${pct(f0)} to ${pct(f1)}`);
+    expect(report).toContain(`| ${figures[2].value} | ${pct(t0)} – ${pct(t1)} |`);
+    expect(report).toContain(`| ${figures[3].value} | ${pct(f0)} – ${pct(f1)} |`);
+  });
+
+  it('shows nothing until a config with the study has loaded', () => {
+    expect(researchEvidence(undefined)).toBeNull();
+    expect(researchEvidence({ numSessions: 100_000 })).toBeNull();
+  });
+});
+
 describe('real-world evaluation shows no results yet', () => {
+  it('links its exploratory report at a pinned commit, and the report exists', () => {
+    expect(REAL_WORLD_REPORT).toMatch(/^https:\/\/github\.com\/ryukaishen\/BreakingPoint\/blob\/[0-9a-f]{40}\/research\/results\/phase4b\/README\.md$/);
+    expect(existsSync(REAL_WORLD_REPORT.split(/\/blob\/[0-9a-f]{40}\//)[1])).toBe(true);
+    for (const s of REAL_WORLD_STUDIES) expect(s.status).toBe('exploratory');
+  });
+
   it('has no results, and no study is marked complete', () => {
     for (const s of REAL_WORLD_STUDIES) {
       expect(s.results).toBeNull();

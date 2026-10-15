@@ -138,7 +138,7 @@ The full results, with the order confound, missing data, all intervals and the t
 
 ### 3. Webcam and MediaPipe validation: not done yet
 
-None of the above uses real camera footage. That needs recorded sessions run through MediaPipe and compared with a reference for rep segmentation, measurement agreement and alert behaviour, under real lighting, clothing, occlusion and camera placement. Until that's done, the live camera mode is a working prototype.
+None of the above uses real camera footage. That needs recorded sessions run through MediaPipe and compared with a reference for rep segmentation, measurement agreement and alert behaviour, under real lighting, clothing, occlusion and camera placement. Until that's done, the live camera mode is a working prototype. It has been tried by hand with a physical webcam and real movements in an earlier version, and it worked, but that was a manual check, not a measured result. The redesigned live screens have since been checked only with the browser's fake camera, so they need a fresh real-webcam test.
 
 ## Running it locally
 

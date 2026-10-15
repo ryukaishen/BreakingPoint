@@ -1,13 +1,25 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from 'react';
+import { createPortal } from 'react-dom';
 import { exerciseLabel, featureSpecs } from '../biomechanics/catalog';
 import type { DetectorConfig } from '../detection/config';
 import { HIPERGATOR_STUDY, PER_SCENARIO, RECOVERY_CHECK } from '../research/hipergatorStudy';
-import { REAL_WORLD_SCOPE, REAL_WORLD_STUDIES } from '../research/realWorldStudies';
+import { REAL_WORLD_REPORT, REAL_WORLD_SCOPE, REAL_WORLD_STUDIES } from '../research/realWorldStudies';
+import { researchEvidence } from '../research/studyHeadline';
 import { fmt, pct } from '../utils/format';
-import { useDialog } from '../utils/hooks';
-import { Close } from './Icons';
+import { TechnicalCorners } from './system/TechnicalCorners';
+import { useModalFocus } from './system/useModalFocus';
+import '../styles-threshold-research.css';
 
-export type ResearchTab = 'method' | 'lab' | 'realworld' | 'science' | 'privacy';
+export type ResearchTab = 'overview' | 'method' | 'lab' | 'realworld' | 'science' | 'privacy';
+
+const TABS: [ResearchTab, string][] = [
+  ['overview', 'Overview'],
+  ['method', 'How it works'],
+  ['lab', 'HiPerGator study (synthetic)'],
+  ['realworld', 'Recorded movement (exploratory)'],
+  ['science', 'Limits & sources'],
+  ['privacy', 'Privacy'],
+];
 
 interface Props {
   config: DetectorConfig;
@@ -39,6 +51,144 @@ const ExternalLink = ({ href, children }: { href: string; children: string }) =>
     {children}
   </a>
 );
+
+/**
+ * The first view: the synthetic study's held-out results with what each number counts, what has and
+ * has not been tested, and how the system is built. Every figure comes from the shipped config or the
+ * study constants checked against the report.
+ */
+function Overview({ c, go }: { c: DetectorConfig; go: (t: ResearchTab) => void }) {
+  const figures = researchEvidence(c.validation);
+  const S = HIPERGATOR_STUDY;
+  const pvp = S.personalVsPopulation;
+  return (
+    <div className="research-overview">
+      <section className="research-block" aria-labelledby="research-evidence-h">
+        <header className="research-block-heading">
+          <span className="threshold-code">Evidence / synthetic validation / {S.cluster}</span>
+          <h3 id="research-evidence-h">Detector results on simulated sessions</h3>
+          <p>
+            The change detector was tested on {S.simulatedSessions.toLocaleString('en-US')} simulated athlete sessions, not on real people. The study chose
+            its settings on one half of the sessions and measured them on the other half.
+          </p>
+        </header>
+        {figures ? (
+          <dl className="research-matrix">
+            {figures.map((f) => (
+              <div key={f.label}>
+                <dt>{f.label}</dt>
+                <dd>
+                  <strong>{f.value}</strong>
+                  <span>{f.detail}</span>
+                </dd>
+              </div>
+            ))}
+          </dl>
+        ) : (
+          <p className="research-note">The study's results are not attached to the active detector settings. They are unchanged in the validation report.</p>
+        )}
+        <p className="research-note">Synthetic results only. They are not live-camera accuracy, and they say nothing about fatigue, injury or health.</p>
+        <button type="button" className="threshold-action research-link" onClick={() => go('lab')}>
+          Open the study: figures, scenarios and provenance
+        </button>
+      </section>
+
+      <section className="research-block" aria-labelledby="research-tiers-h">
+        <header className="research-block-heading">
+          <span className="threshold-code">Evidence status</span>
+          <h3 id="research-tiers-h">What has been tested, and what has not</h3>
+        </header>
+        <ol className="research-tiers">
+          <li className="is-done">
+            <span className="research-tag">Done / {S.label.split(' | ').pop()}</span>
+            <h4>Synthetic detector evaluation</h4>
+            <p>
+              Simulated squat-like sessions with known change points, run on {S.cluster}. The source of every number above and of the settings the app
+              uses.
+            </p>
+            <button type="button" className="threshold-action research-link" onClick={() => go('lab')}>
+              HiPerGator study
+            </button>
+          </li>
+          <li className="is-exploratory">
+            <span className="research-tag">Exploratory</span>
+            <h4>Recorded human movement</h4>
+            <p>
+              BreakingPoint's measurement and scoring code ran once on two public motion-capture datasets. Markers are cleaner than a webcam, so this is a best
+              case for the measurements and does not test MediaPipe. Its outcomes stay in the report, out of this app's claims.
+            </p>
+            <button type="button" className="threshold-action research-link" onClick={() => go('realworld')}>
+              The two datasets
+            </button>
+          </li>
+          <li className="is-untested">
+            <span className="research-tag">Not measured yet</span>
+            <h4>Live webcam performance</h4>
+            <p>
+              An earlier version was tried by hand with a physical webcam and real movements, and it worked. That was not a measured test, and the redesigned
+              live screens still need a fresh real-webcam check. The synthetic results have not been shown on camera footage, so no accuracy figure applies to
+              live use.
+            </p>
+          </li>
+          <li className="is-future">
+            <span className="research-tag">Future research</span>
+            <h4>A trained change detector</h4>
+            <p>
+              MediaPipe's pose model, a pretrained neural network, finds the body landmarks. Everything after it, from the measurements to the alert, is fixed
+              statistics, not a trained model. Learning from recorded movement is a possible research direction, not part of this app.
+            </p>
+          </li>
+        </ol>
+      </section>
+
+      <section className="research-block" aria-labelledby="research-build-h">
+        <header className="research-block-heading">
+          <span className="threshold-code">System design</span>
+          <h3 id="research-build-h">How it is built</h3>
+        </header>
+        <ul className="research-build">
+          <li>
+            <strong>Athlete-specific baselines</strong>
+            <p>
+              Each athlete's fresh reps set their own usual form: a robust centre and spread for every measurement, and a leave-one-out estimate of how much
+              fresh reps vary. In the simulation, a personal baseline gave {pct(pvp.personal.falsePositiveRate)} false alerts against{' '}
+              {pct(pvp.population.falsePositiveRate)} for one shared norm (a separate {pvp.evaluationSessions.toLocaleString('en-US')}-session set).
+            </p>
+          </li>
+          <li>
+            <strong>MediaPipe Pose, on the device</strong>
+            <p>33 body landmarks per video frame, found in the browser and smoothed with a One Euro filter. No video is uploaded or stored.</p>
+          </li>
+          <li>
+            <strong>Statistical change detection</strong>
+            <p>
+              Each rep's Form Change Score is standardized against the athlete's fresh reps and tracked with EWMA and CUSUM statistics.
+              {c.mode === 'ewma' ? ' With the shipped settings the alert follows the EWMA trend, and the CUSUM estimates when the change began.' : ''}
+            </p>
+          </li>
+          <li>
+            <strong>Controlled synthetic evaluation</strong>
+            <p>
+              Eight scenarios with known ground truth, including no change, an isolated bad rep, gradual and sudden change, camera noise and missing
+              landmarks. {S.configurations.toLocaleString('en-US')} configurations were compared. A fixed rule, which first required at most 5% false alerts in
+              every no-change scenario, chose one on the selection half, and it was then measured on the held-out half.
+            </p>
+          </li>
+          <li>
+            <strong>{S.cluster} HPC</strong>
+            <p>
+              The sweep ran as a {S.sweepJob.tasks}-task Slurm array (job {S.sweepJob.id}, {S.sweepJob.cpusPerTask} CPUs per task), and job {S.finalizeJob.id}{' '}
+              merged the shards' counts exactly. The app ships the chosen settings and runs entirely in the browser.
+            </p>
+          </li>
+        </ul>
+        <button type="button" className="threshold-action research-link" onClick={() => go('method')}>
+          How it works, step by step
+        </button>
+      </section>
+    </div>
+  );
+}
 
 const MOVEMENTS = ['squat', 'cmj', 'lunge'] as const;
 
@@ -423,11 +573,14 @@ function Lab({ c }: { c: DetectorConfig }) {
         </div>
       </details>
 
-      {zoom && (
-        <div className="modal-backdrop" onClick={() => setZoom(null)} style={{ zIndex: 70 }}>
-          <img src={`/lab/figures/${zoom}.png`} alt={zoom} style={{ maxWidth: '96vw', maxHeight: '92vh', borderRadius: 6, background: '#fff' }} />
-        </div>
-      )}
+      {/* Outside the window: its arrival transform would otherwise hold a fixed overlay inside the frame. */}
+      {zoom &&
+        createPortal(
+          <div className="research-zoom" onClick={() => setZoom(null)}>
+            <img src={`/lab/figures/${zoom}.png`} alt={[...MAIN_FIGURES, ...TECHNICAL_FIGURES].find(([f]) => f === zoom)?.[1] ?? zoom} />
+          </div>,
+          document.body,
+        )}
     </div>
   );
 }
@@ -436,23 +589,23 @@ function RealWorld() {
   return (
     <div className="col" style={{ gap: 14 }}>
       <div className="prose" style={{ marginTop: 6 }}>
-        <div className="eyebrow" style={{ marginBottom: 6 }}>
-          Real-world evaluation · in progress
-        </div>
-        <p style={{ marginTop: 0 }}>
-          The study in the previous tab used simulated athletes. This work moves to recorded human movement from public research datasets. It is separate from
-          the HiPerGator study: its results will be reported on their own, never combined with the synthetic numbers.
+        <span className="threshold-code">Recorded human movement / exploratory</span>
+        <p style={{ marginTop: 6 }}>
+          The HiPerGator study used simulated athletes. This work runs BreakingPoint's measurement and scoring code on recorded human movement from two public
+          research datasets. It is separate from the HiPerGator study and never combined with the synthetic numbers.
         </p>
         <p>
-          <b>No results yet.</b> Numbers will appear here only once an analysis is complete and has been reviewed, each with its dataset, sample size, method and
-          limits.
+          <b>Exploratory, run once.</b> The protocols and analysis code were frozen before the real labels were used, and the analysis ran a single time. The
+          datasets had been inspected first, so it is not a blinded study. The outcomes are written up in the{' '}
+          <ExternalLink href={REAL_WORLD_REPORT}>exploratory report on GitHub</ExternalLink>, kept exactly as it was written after the run, so its header
+          still shows the status it had that day. This app does not quote its outcomes or base any claim on them.
         </p>
       </div>
       {REAL_WORLD_STUDIES.map((s) => (
         <div key={s.id} className="panel prose" style={{ fontSize: 13.5, maxWidth: 'none' }}>
           <div className="row" style={{ justifyContent: 'space-between', gap: 10, flexWrap: 'wrap' }}>
             <b style={{ fontSize: 15 }}>{s.name}</b>
-            <span className="status-badge beta">{s.status}</span>
+            <span className="research-tag">{s.status}</span>
           </div>
           <p style={{ margin: '6px 0' }}>
             {s.contents} <span className="dim">Source: {s.source}. Licence: {s.licence}.</span>{' '}
@@ -500,44 +653,73 @@ function Privacy() {
   );
 }
 
-export function ResearchModal({ config, initialTab = 'method', onClose }: Props) {
+/**
+ * The research window, in the System Threshold frame the protocol library uses. Opens on the Overview
+ * unless a link asks for a section. The sections are a tab list (arrow keys, Home and End).
+ */
+export function ResearchModal({ config, initialTab = 'overview', onClose }: Props) {
   const [tab, setTab] = useState<ResearchTab>(initialTab);
-  const dialogRef = useDialog<HTMLDivElement>(onClose);
+  const win = useRef<HTMLElement>(null);
+  const scroll = useRef<HTMLDivElement>(null);
+  const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  useModalFocus(win, onClose);
+  const go = (t: ResearchTab, focusTab = false) => {
+    setTab(t);
+    scroll.current?.scrollTo({ top: 0 });
+    if (focusTab) tabRefs.current[TABS.findIndex(([k]) => k === t)]?.focus();
+  };
+  const onKey = (e: ReactKeyboardEvent, i: number) => {
+    const last = TABS.length - 1;
+    const next = e.key === 'ArrowRight' ? (i === last ? 0 : i + 1) : e.key === 'ArrowLeft' ? (i === 0 ? last : i - 1) : e.key === 'Home' ? 0 : e.key === 'End' ? last : null;
+    if (next === null) return;
+    e.preventDefault();
+    go(TABS[next][0], true);
+  };
   return (
-    <div className="modal-backdrop" onClick={onClose}>
-      <div className="modal sys-window" onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true" aria-labelledby="research-title" tabIndex={-1} ref={dialogRef}>
-        <div className="modal-header">
+    <div className="st-modal research-modal">
+      <div className="st-scrim" aria-hidden="true" onClick={onClose} />
+      <section className="protocol-library library-window research-window" role="dialog" aria-modal="true" aria-labelledby="research-title" tabIndex={-1} ref={win}>
+        <TechnicalCorners />
+        <header className="library-heading research-heading">
           <div>
-            <div className="eyebrow">Research, evidence and limits</div>
-            <h2 id="research-title">How BreakingPoint works, and what it doesn't claim</h2>
+            <span className="threshold-code">Research / evidence and limits</span>
+            <h2 id="research-title">Research evidence</h2>
+            <p>How BreakingPoint works, what has been tested, and what it does not claim.</p>
           </div>
-          <button className="btn ghost" onClick={onClose} aria-label="Close">
-            <Close />
+          <button type="button" className="threshold-action library-close" aria-label="Close" onClick={onClose}>
+            ×
           </button>
-        </div>
-        <div className="tabs" role="tablist" aria-label="Research sections">
-          {(
-            [
-              ['method', 'How it works'],
-              ['lab', 'HiPerGator study (synthetic)'],
-              ['realworld', 'Real-world evaluation'],
-              ['science', 'Limits & sources'],
-              ['privacy', 'Privacy'],
-            ] as [ResearchTab, string][]
-          ).map(([k, l]) => (
-            <button key={k} role="tab" aria-selected={tab === k} className={tab === k ? 'active' : ''} onClick={() => setTab(k)}>
+        </header>
+        <div className="research-tabs" role="tablist" aria-label="Research sections">
+          {TABS.map(([k, l], i) => (
+            <button
+              key={k}
+              ref={(el) => (tabRefs.current[i] = el)}
+              type="button"
+              role="tab"
+              id={`research-tab-${k}`}
+              aria-selected={tab === k}
+              aria-controls="research-panel"
+              tabIndex={tab === k ? 0 : -1}
+              className={`threshold-action ${tab === k ? 'is-active' : ''}`}
+              onClick={() => go(k)}
+              onKeyDown={(e) => onKey(e, i)}
+            >
               {l}
             </button>
           ))}
         </div>
-        <div className="modal-body" style={{ paddingTop: 14 }}>
-          {tab === 'method' && <Method c={config} />}
-          {tab === 'lab' && <Lab c={config} />}
-          {tab === 'realworld' && <RealWorld />}
-          {tab === 'science' && <Science />}
-          {tab === 'privacy' && <Privacy />}
+        <div className="library-scroll research-scroll" ref={scroll}>
+          <div className="research-body" role="tabpanel" id="research-panel" aria-labelledby={`research-tab-${tab}`} key={tab}>
+            {tab === 'overview' && <Overview c={config} go={go} />}
+            {tab === 'method' && <Method c={config} />}
+            {tab === 'lab' && <Lab c={config} />}
+            {tab === 'realworld' && <RealWorld />}
+            {tab === 'science' && <Science />}
+            {tab === 'privacy' && <Privacy />}
+          </div>
         </div>
-      </div>
+      </section>
     </div>
   );
 }

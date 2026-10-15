@@ -438,12 +438,16 @@ All prespecified outcomes, intervals, limitations and the two outputs the frozen
 `research/results/phase4b/README.md`. These numbers are kept apart from the synthetic study in §8 and are not shown in
 the app.
 
-## 15. Not yet tested: webcam and MediaPipe
+## 15. Not yet measured: webcam and MediaPipe
 
-Nothing in §8 or §14 runs on camera footage. Before any accuracy claim about the live app, recorded sessions need to go
-through MediaPipe and be compared with a reference for rep segmentation, measurement agreement and alert behaviour,
-across lighting, clothing, occlusion, camera angle and distance. The hands-free thresholds and spoken cues also need
-testing with people at training distance.
+Nothing in §8 or §14 runs on camera footage. The live camera path itself has been used: an earlier version was tried by
+hand with a physical webcam and real movements, and it worked. That was a manual check, not a controlled study, and it
+produced no accuracy figures. The redesigned live screens (M4 and M5) have been checked only with Chromium's fake camera
+and the synthetic athlete, so they need a fresh real-webcam regression test. Real-world detector accuracy has not been
+established. Before any accuracy claim about the live app, recorded sessions need to go through MediaPipe and be
+compared with a reference for rep segmentation, measurement agreement and alert behaviour, across lighting, clothing,
+occlusion, camera angle and distance. The hands-free thresholds and spoken cues also need testing with people at
+training distance.
 
 ## 16. Open release risks
 
@@ -460,13 +464,16 @@ Known and unresolved. Each needs a fix or an explicit decision before a producti
    camera's frames continue the engine's clock, as they do in a real session (one monotonic camera clock; switching
    between demo and live starts a new engine), Tracking lost appeared after 1.2 to 2.3 s in each of the 16 M4
    browser runs since. That fits the explanation but does not prove it: the delay was not reproduced on demand and
-   then removed, and no real camera has been tried (risk 3). Close it only after a check with a real webcam and an
-   empty room. Separately, the pose model returns occasional isolated stray poses from the empty pattern (smoothed
-   quality under 0.03, against the 0.65 needed to start calibration), which the screen ignores until presence has
-   held for 500 ms.
+   then removed, and the redesigned live screens have not been retried with a real camera (risk 3). Close it only
+   after a check with a real webcam and an empty room. Separately, the pose model returns occasional isolated stray
+   poses from the empty pattern (smoothed quality under 0.03, against the 0.65 needed to start calibration), which the
+   screen ignores until presence has held for 500 ms.
 2. Camera failure on a phone held sideways. When the screen is under 540px tall, the camera is taller than the
    screen. The centred Camera stopped message, with its Try again and End set buttons, then starts below the fold and
    needs a scroll. Portrait phones, tablets and desktop show it without scrolling.
-3. No physical webcam or real-athlete validation. Every live test so far used the fake camera, with the app's
-   synthetic athlete supplying the poses. Pose tracking, frame rate on phones and on machines without a usable GPU,
-   hands-free timing and the live screen's states have not been checked with a real camera and a real person (§15).
+3. No controlled real-webcam validation. An earlier version was tried by hand with a physical webcam and real
+   movements, and it worked, but that was not a measured test. Since the M4 and M5 redesign every live check has used
+   the fake camera, with the app's synthetic athlete supplying the poses, so the redesigned live experience needs a
+   fresh real-webcam regression test. Pose tracking, frame rate on phones and on machines without a usable GPU,
+   hands-free timing and the live screen's states have not been measured with a real camera and a real person, and
+   real-world detector accuracy has not been established (§15).

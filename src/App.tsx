@@ -205,7 +205,7 @@ export default function App() {
       setView(q.get('history') === '1' ? 'history' : 'status');
     }
     const panel = q.get('panel');
-    if (panel === 'lab' || panel === 'method' || panel === 'realworld' || panel === 'science' || panel === 'privacy') setResearch(panel);
+    if (panel === 'overview' || panel === 'lab' || panel === 'method' || panel === 'realworld' || panel === 'science' || panel === 'privacy') setResearch(panel);
     if (panel === 'library') setLibrary(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [configReady]);
@@ -672,7 +672,7 @@ export default function App() {
         onAthletes={() => guardLeave(() => openAthletes())}
         onChangeProtocol={() => guardLeave(() => openSport(launch.sport.id, launch.subSport?.id, launch.protocol.id))}
         onLibrary={() => setLibrary(true)}
-        onResearch={() => setResearch('method')}
+        onResearch={() => setResearch('overview')}
         onLab={() => setResearch('lab')}
         onHistory={() => guardLeave(openHistory)}
         onResetBaseline={resetBaseline}
@@ -701,7 +701,7 @@ export default function App() {
           onOpenSport={(sportId, subSportId) => guardLeave(() => openSport(sportId, subSportId))}
           onLive={(ctx) => guardLeave(() => startSession('live', ctx))}
           onDemo={(ctx) => guardLeave(() => startSession('demo', ctx))}
-          onResearch={() => setResearch('method')}
+          onResearch={() => setResearch('overview')}
           onAthletes={() => openAthletes()}
           onSports={openSports}
           onLibrary={() => setLibrary(true)}
@@ -724,7 +724,8 @@ export default function App() {
           onLibrary={() => setLibrary(true)}
           onHistory={openHistory}
           onLab={() => setResearch('lab')}
-          onResearch={() => setResearch('method')}
+          onResearch={() => setResearch('overview')}
+          onMethod={() => setResearch('method')}
           onStatus={() => setView('status')}
           onAthletes={() => openAthletes()}
           onSports={openSports}
@@ -765,7 +766,7 @@ export default function App() {
           }}
           onEntry={() => setView('landing')}
           onStatus={() => setView('status')}
-          onResearch={() => setResearch('method')}
+          onResearch={() => setResearch('overview')}
           onSports={openSports}
           onLibrary={() => setLibrary(true)}
           onHistory={openHistory}
@@ -789,7 +790,7 @@ export default function App() {
           onEntry={() => setView('landing')}
           onStatus={() => setView('status')}
           onAthletes={() => openAthletes()}
-          onResearch={() => setResearch('method')}
+          onResearch={() => setResearch('overview')}
         />
       )}
 
@@ -809,7 +810,7 @@ export default function App() {
             onProtocols={() => setLibrary(true)}
             onHistory={() => setHistorySection('history')}
             onAthletes={() => openAthletes()}
-            onResearch={() => setResearch('method')}
+            onResearch={() => setResearch('overview')}
           />
           <main className="threshold-canvas" id="main" tabIndex={-1}>
             <h1 className="visually-hidden">Session history</h1>

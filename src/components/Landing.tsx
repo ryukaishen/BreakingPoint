@@ -28,6 +28,8 @@ interface Props {
   onHistory: () => void;
   onLab: () => void;
   onResearch: () => void;
+  /** Opens the research window on How it works. */
+  onMethod: () => void;
   onStatus: () => void;
   onAthletes: () => void;
   onSports: () => void;
@@ -305,7 +307,7 @@ export function Landing(p: Props) {
             <div className="entry-section-heading">
               <span className="threshold-code">System specification</span>
               <h2 id="built-h">Built with</h2>
-              <button type="button" className="threshold-action entry-quiet-action" onClick={p.onResearch}>
+              <button type="button" className="threshold-action entry-quiet-action" onClick={p.onMethod}>
                 How it works
               </button>
             </div>

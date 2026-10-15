@@ -50,7 +50,7 @@ BreakingPoint learns how an athlete moves when fresh (a personal baseline from a
 
 - Validation numbers only from `results/VALIDATION_REPORT.md` (100,000 simulated sessions on UF HiPerGator; held-out false-positive rate 2.2%, detection 89.6%, median delay 4 reps). Synthetic-session validation, not clinical.
 - No real athlete data, testimonials, users or benchmarks exist. None may be invented.
-- Live webcam mode has not yet been tested on a real camera; forward lunge reliability on real recordings is unestablished (beta).
+- Live webcam mode worked when an earlier version was tried by hand with a physical webcam and real movements. That was not a measured test: real-world detector accuracy is not established, and the redesigned live screens need a fresh real-webcam test. Forward lunge reliability on real recordings is unestablished (beta).
 
 ## Product Principles
 

@@ -1,10 +1,14 @@
 // Real-world evaluation: external human-movement datasets, kept separate from the
-// synthetic HiPerGator study. This file describes what is being evaluated. It holds no
-// results: numbers appear here only after an analysis is complete and has been reviewed,
-// and they are never combined with the synthetic study's numbers.
-// tests/study_constants.test.ts enforces that.
+// synthetic HiPerGator study. This file describes what was evaluated. It holds no
+// results: the exploratory analysis has run once (research/results/phase4b), and its
+// outcomes stay in that report, out of the app and its claims. They are never combined
+// with the synthetic study's numbers. tests/study_constants.test.ts enforces that.
 
-export type StudyStatus = 'planned' | 'in progress' | 'complete';
+export type StudyStatus = 'planned' | 'in progress' | 'exploratory' | 'complete';
+
+/** The exploratory run's write-up, pinned to the commit that added it. */
+export const REAL_WORLD_REPORT =
+  'https://github.com/ryukaishen/BreakingPoint/blob/ffec84e232e31de934520c0a4c77705559d0de10/research/results/phase4b/README.md';
 
 export interface RealWorldStudy {
   id: string;
@@ -36,9 +40,9 @@ export const REAL_WORLD_STUDIES: readonly RealWorldStudy[] = [
     question:
       "Scored against each person's own fresh jumps, do BreakingPoint's jump measurements separate the same person's fatigued jumps from their fresh ones?",
     limits:
-      'Each person has only 3 fresh jumps, fewer than the 4 the app needs to learn your usual form, so the app’s alert cannot be tested here. Fresh jumps were always recorded first, so fatigue and the order of the jumps cannot be told apart. The analysis is exploratory.',
-    status: 'in progress',
-    statusNote: 'Data downloaded and its file structure inspected. Analysis not run yet.',
+      'Each person has only 3 fresh jumps, fewer than the 4 a baseline needs (the app asks for at least 5), so the app’s alert cannot be tested here. Fresh jumps were always recorded first, so fatigue and the order of the jumps cannot be told apart. The analysis is exploratory.',
+    status: 'exploratory',
+    statusNote: 'Analysis run once, with its protocol frozen before the labels were used. Outcomes are in the report, not in this app.',
     results: null,
   },
   {
@@ -52,8 +56,8 @@ export const REAL_WORLD_STUDIES: readonly RealWorldStudy[] = [
     question:
       "How well does BreakingPoint's rep counting find the annotated reps, and do incorrect reps score further from a person's usual form than their correct ones?",
     limits: 'Incorrect reps were performed on purpose with technique errors. They are not fatigue, and the results say nothing about fatigue.',
-    status: 'in progress',
-    statusNote: 'Data downloaded and its file structure inspected. Analysis not run yet.',
+    status: 'exploratory',
+    statusNote: 'Analysis run once, with its protocol frozen before the labels were used. Outcomes are in the report, not in this app.',
     results: null,
   },
 ];

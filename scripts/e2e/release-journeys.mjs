@@ -30,6 +30,9 @@ const KEYS = {
   Escape: ['Escape', 'Escape', 27],
   Space: [' ', 'Space', 32, ' '],
   4: ['4', 'Digit4', 52, '4'],
+  ArrowRight: ['ArrowRight', 'ArrowRight', 39],
+  Home: ['Home', 'Home', 36],
+  End: ['End', 'End', 35],
 };
 const key = (p, k) => p.press(...KEYS[k]);
 
@@ -177,12 +180,42 @@ async function startLive(p, E) {
     const tucked = await E(`Promise.all([...document.querySelectorAll('[role=dialog] details img')].map((i) => fetch(i.getAttribute('src')).then((r) => r.ok && (r.headers.get('content-type') ?? '').includes('image/png'))))`);
     check('5.7b the technical figures behind "show more" are served', tucked.length > 0 && tucked.every(Boolean), `${tucked.filter(Boolean).length}/${tucked.length}`);
     await shot(p, 'desktop-research-lab');
-    await p.click('[role=tab]', 'Real-world evaluation');
-    const rw = await E(text('[role=dialog] .modal-body'));
-    check('5.8 the real-world tab is status-only (no result numbers)', !/\d+(\.\d+)?\s*%|AUC|\b0\.\d{2}\b/.test(rw), rw.slice(0, 100));
+    await p.click('[role=tab]', 'Recorded movement');
+    const rw = await E(text('[role=dialog] [role=tabpanel]'));
+    check('5.8 the recorded-movement tab is status-only (no result numbers) and says it is exploratory', !/\d+(\.\d+)?\s*%|AUC|\b0\.\d{2}\b/.test(rw) && /exploratory/i.test(rw), rw.slice(0, 100));
     await key(p, 'Escape');
     await p.waitFor(`!document.querySelector('[aria-labelledby=research-title]')`, { label: 'research panel closes' });
     check('5.9 Escape closes the panel', true);
+
+    // M6: Research opens on the Overview: the held-out numbers with what each counts, and what has not been tested.
+    await p.click('.threshold-nav .threshold-action', 'Research');
+    await p.waitFor(`document.querySelector('[role=dialog][aria-labelledby=research-title] [role=tabpanel]')`, { label: 'research overview' });
+    const selectedTab = `document.querySelector('[role=dialog] [role=tab][aria-selected=true]')?.textContent`;
+    const ov = await E(text('[role=dialog] [role=tabpanel]'));
+    const figs = await E(`[...document.querySelectorAll('[role=dialog] .research-matrix strong')].map((e) => e.textContent)`);
+    check('5.10 Research opens on the Overview with the held-out results', (await E(selectedTab)) === 'Overview' && JSON.stringify(figs) === JSON.stringify(['100,000', '50,000', '89.6%', '2.2%', '4 reps']), JSON.stringify(figs));
+    check(
+      '5.11 the Overview separates the synthetic study, the exploratory work, the untested webcam and future research',
+      /Synthetic detector evaluation/.test(ov) && /Recorded human movement/.test(ov) && /Exploratory/.test(ov) && /Live webcam performance/.test(ov) && /Not measured yet/.test(ov) && /tried by hand/.test(ov) && /not a trained model/.test(ov),
+      ov.slice(0, 80),
+    );
+    check('5.12 the Overview claims no injury prediction, fatigue diagnosis or webcam accuracy', !/predicts? (an )?injur|diagnos\w* fatigue|detects? fatigue|accura\w* (on|with) (real|webcam|camera)/i.test(ov));
+    const fitsDialog = `(() => { const b = document.querySelector('[role=dialog] .research-scroll'); return !!b && b.scrollWidth <= b.clientWidth; })()`;
+    check('5.13 the research window does not scroll sideways', (await E(fitsDialog)) && (await E(noOverflow)));
+    await E(`document.querySelector('[role=dialog] [role=tab][aria-selected=true]').focus()`);
+    const tabState = `[document.activeElement?.textContent, ${selectedTab}]`;
+    await key(p, 'ArrowRight');
+    const k1 = await E(tabState);
+    await key(p, 'End');
+    const k2 = await E(tabState);
+    await key(p, 'Home');
+    const k3 = await E(tabState);
+    check('5.14 arrow keys, End and Home move between research sections', JSON.stringify([k1, k2, k3]) === JSON.stringify([['How it works', 'How it works'], ['Privacy', 'Privacy'], ['Overview', 'Overview']]), JSON.stringify([k1, k2, k3]));
+    await p.click('[role=dialog] .research-link', 'Open the study');
+    check('5.15 the Overview links into the study', (await E(selectedTab)) === 'HiPerGator study (synthetic)');
+    await shot(p, 'desktop-research-overview');
+    await key(p, 'Escape');
+    await p.waitFor(`!document.querySelector('[aria-labelledby=research-title]')`, { label: 'research panel closes again' });
 
     section('7. Keyboard and reduced motion');
     await p.goto(BASE);
@@ -320,6 +353,12 @@ section('6. Phone-sized screens (390 x 844)');
     await p.click('.more-list button', 'Lab study');
     await p.waitFor(`document.querySelector('[aria-labelledby=research-title]')`, { label: 'Lab opens from the menu' });
     check('6.6 Lab study opens the evidence panel', true);
+    await p.click('[role=dialog] [role=tab]', 'Overview');
+    // Measure once the window has arrived: its arrival tilt briefly widens the box by about a pixel.
+    await p.waitFor(`document.querySelector('[role=dialog]').getAnimations().every((a) => a.playState !== 'running')`, { label: 'research window settles' });
+    const phoneResearch = await E(`(() => { const w = document.querySelector('[role=dialog]').getBoundingClientRect(); const b = document.querySelector('[role=dialog] .research-scroll'); return { inside: w.left >= 0 && w.right <= innerWidth + 1, fits: b.scrollWidth <= b.clientWidth, figs: document.querySelectorAll('[role=dialog] .research-matrix strong').length }; })()`);
+    check('6.6b the research Overview fits the phone, with all five figures', phoneResearch.inside && phoneResearch.fits && phoneResearch.figs === 5, JSON.stringify(phoneResearch));
+    await shot(p, 'phone-research-overview');
     await key(p, 'Escape');
     await runDemo(p, 'strength');
     check('6.7 the session fits the phone width', await E(fitsPhone), await E(`document.documentElement.scrollWidth`));
