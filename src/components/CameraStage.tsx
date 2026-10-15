@@ -27,6 +27,8 @@ interface Props {
    * Offered on the STOP alert and when the camera stops during a set.
    */
   onEndSet?: () => void;
+  /** True while the post-workout system covers the camera: the overlay stops redrawing (the pose loop runs on). */
+  hidden?: boolean;
 }
 
 /** Pose colour in the monitored set, from the System Threshold palette (same values as the CSS tokens). */
@@ -50,6 +52,8 @@ export function CameraStage(p: Props) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const snapRef = useRef(p.snap);
   snapRef.current = p.snap;
+  const hiddenRef = useRef(p.hidden);
+  hiddenRef.current = p.hidden;
   const [, force] = useState(0);
 
   // Imperative draw loop: reads the latest smoothed pose; React is not involved per frame.
@@ -58,7 +62,7 @@ export function CameraStage(p: Props) {
     const draw = () => {
       const c = canvasRef.current;
       const wrap = wrapRef.current;
-      if (c && wrap) {
+      if (c && wrap && !hiddenRef.current) {
         const dpr = Math.min(2, window.devicePixelRatio || 1);
         const w = wrap.clientWidth;
         const h = wrap.clientHeight;

@@ -15,7 +15,8 @@ import { FocusPanel } from './components/session/FocusPanel';
 import { SportPage } from './components/SportPage';
 import { StatusView } from './components/status/StatusView';
 import { SignalSpine } from './components/system/SignalSpine';
-import { SummaryModal } from './components/SummaryModal';
+import { SystemNav } from './components/system/SystemNav';
+import { PostWorkout } from './components/post/PostWorkout';
 import { clearDraft, draftAthleteId, interruptedRecord, listDrafts, type SetDraft } from './data/draft';
 import { browserStore } from './data/kv';
 import { claimLegacyBaseline } from './data/migrate';
@@ -27,6 +28,8 @@ import { LabelProvider, makeLabeler } from './protocols/labels';
 import { DEFAULT_LAUNCH, getSport, launchForExercise, resolveDemo, resolveLaunch, type LaunchContext } from './protocols/launch';
 import { PROTOCOLS } from './protocols/protocols';
 import { SessionEngine } from './session/engine';
+import { exportCsv, exportJson } from './session/export';
+import { postSetFromSession, type PostSection } from './session/postWorkout';
 import { useNavGuard } from './session/useNavGuard';
 import type { NavView } from './session/navGuard';
 import { CameraError, cameraErrorText, DemoRunner, LiveRunner, type Runner } from './session/runners';
@@ -65,7 +68,14 @@ export default function App() {
   const [sessionKey, setSessionKey] = useState(0);
   const [research, setResearch] = useState<ResearchTab | null>(null);
   const [library, setLibrary] = useState(false);
-  const [showSummary, setShowSummary] = useState(false);
+  /** Figma Make's post-workout system over the workout, once a set has ended (M5). */
+  const [post, setPost] = useState<{ open: boolean; section: PostSection }>({ open: false, section: 'summary' });
+  /** When the last set ended, for the rest timer before the recovery check. */
+  const [restSince, setRestSince] = useState<number | null>(null);
+  /** The History page's section (outside a session). */
+  const [historySection, setHistorySection] = useState<PostSection>('history');
+  const [exportNotice, setExportNotice] = useState<string | null>(null);
+  const postHeading = useRef<HTMLHeadingElement>(null);
   const [selectedRep, setSelectedRep] = useState<number | null>(null);
   const [runner, setRunner] = useState<Runner | null>(null);
   const [liveStatus, setLiveStatus] = useState('');
@@ -146,7 +156,8 @@ export default function App() {
       setMode(m);
       setShowEvidence(m === 'demo');
       setSelectedRep(null);
-      setShowSummary(false);
+      setPost({ open: false, section: 'summary' });
+      setRestSince(null);
       setLibrary(false);
       setSessionKey((k) => k + 1);
       setView('session');
@@ -170,6 +181,7 @@ export default function App() {
   //   ?demo=soccer|volleyball|strength|pickleball      featured demo contexts
   //   ?sport=<id>[&sub=<id>][&protocol=<id>&demo=1]     sport page, or launch a protocol demo
   //   ?demo=1[&exercise=squat|cmj|lunge] · ?live=1      legacy links
+  //   ?status=1 · ?history=1 [&sample=1]                status or session history (sample athlete)
   //   &speed=1|2|4 · &skip=1 · ?panel=lab|method|science|privacy|library
   const deepLink = useRef(new URLSearchParams(window.location.search));
   useEffect(() => {
@@ -188,9 +200,9 @@ export default function App() {
     else if (demo && demo !== '1' && resolveDemo(demo)) startSession('demo', resolveDemo(demo)!);
     else if (demo === '1') startSession('demo', launchForExercise(q.get('exercise')));
     else if (q.get('live') === '1') startSession('live', launchForExercise(q.get('exercise')));
-    else if (q.get('status') === '1') {
+    else if (q.get('status') === '1' || q.get('history') === '1') {
       if (q.get('sample') === '1') data.setScope('sample');
-      setView('status');
+      setView(q.get('history') === '1' ? 'history' : 'status');
     }
     const panel = q.get('panel');
     if (panel === 'lab' || panel === 'method' || panel === 'realworld' || panel === 'science' || panel === 'privacy') setResearch(panel);
@@ -313,7 +325,14 @@ export default function App() {
 
   const prevPhase = useRef(snap.phase);
   useEffect(() => {
-    if (snap.phase === 'summary' && prevPhase.current === 'monitoring') setShowSummary(true);
+    const prev = prevPhase.current;
+    // A set ended: the post-workout system opens on the next step, the recovery check after an alert.
+    if (snap.phase === 'summary' && prev !== 'summary' && prev !== 'recovery' && prev !== 'recoveryDone') {
+      setRestSince(Date.now());
+      setPost({ open: true, section: snap.alarmRep !== null ? 'recovery' : 'summary' });
+    }
+    if (snap.phase === 'recoveryDone' && prev === 'recovery') setPost({ open: true, section: 'recovery' });
+    if (snap.phase !== 'summary' && snap.phase !== 'recovery' && snap.phase !== 'recoveryDone') setPost((x) => (x.open ? { ...x, open: false } : x));
     prevPhase.current = snap.phase;
   }, [snap.phase]);
 
@@ -356,7 +375,6 @@ export default function App() {
       confirmLabel: p === 'monitoring' ? 'End set and leave' : 'Leave',
       onConfirm: () => {
         if (p === 'monitoring' && snap.monitorReps.length) engine.endSet();
-        setShowSummary(false);
         action();
       },
     });
@@ -365,15 +383,22 @@ export default function App() {
   // Browser Back/Forward, refresh and close get the same protection as the in-app buttons (session/navGuard.ts).
   useNavGuard({ view, setView, isProtected: liveActive, requestLeave: guardLeave, persist: draft.flush });
 
+  /** Closes the post-workout system; focus goes to the session (the button that had it is gone). */
+  const showWorkout = () => {
+    setPost((x) => ({ ...x, open: false }));
+    requestAnimationFrame(() => document.getElementById('main')?.focus());
+  };
+
   const newSet = () => {
-    setShowSummary(false);
+    showWorkout();
     setSelectedRep(null);
     if (mode === 'demo') setSessionKey((k) => k + 1);
     else engine.startMonitoring();
   };
 
+  /** Starts the three-rep recovery check; its progress shows in the post-workout Recovery section. */
   const startRecovery = () => {
-    setShowSummary(false);
+    setPost({ open: true, section: 'recovery' });
     if (runner instanceof DemoRunner) runner.demo.startRecovery();
     else engine.startRecovery();
   };
@@ -468,7 +493,7 @@ export default function App() {
   const countdown = useHandsFree(
     engine,
     snap,
-    view === 'session' && handsFree && runner instanceof LiveRunner && !liveError && !confirm && !dialog && !showSummary && !recoveryQueue.length,
+    view === 'session' && handsFree && runner instanceof LiveRunner && !liveError && !confirm && !dialog && !post.open && !recoveryQueue.length,
   );
   useVoiceCues(snap, view === 'session' && voiceOn);
   const canSpeak = voiceAvailable();
@@ -492,6 +517,54 @@ export default function App() {
     handsFree,
     athleteInView: mode === 'live' ? athleteInView : undefined,
   });
+
+  // ---------------------------------------------------------------- post-workout system (M5)
+  // The set this session just finished, as Recovery and Summary show it (session/postWorkout.ts).
+  const postSet = useMemo(
+    () => postSetFromSession(snap, launch, recorder),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [snap.summary, snap.recovery, snap.recoveryReps, snap.thresholds, recorder.record, recorder.outcome, launch],
+  );
+  const recoveryScores = useMemo(() => snap.recoveryReps.map((r) => r.drift?.score ?? null), [snap.recoveryReps]);
+  // During a live recovery check the camera sits under the post-workout system: say when it loses the athlete.
+  const recoveryLost = useSustained(view === 'session' && mode === 'live' && !liveError && !liveStatus && !snap.live.present && snap.phase === 'recovery', 1000);
+  const recoveryCapture =
+    mode === 'live'
+      ? {
+          label: workout.quality.label,
+          problem: liveError
+            ? 'The camera stopped. Open the camera to try again.'
+            : recoveryLost
+              ? 'Tracking lost. Step back into the frame with your whole body visible. Reps without a clear view are not scored.'
+              : null,
+        }
+      : null;
+  const sessionRecords = useMemo(
+    () => (sessionAthlete ? sessionRepo.sessions(sessionAthlete.id) : []),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [sessionRepo, sessionAthlete?.id, data.version, recorder.record],
+  );
+  const historyRecords = useMemo(
+    () => (data.athlete ? data.repo.sessions(data.athlete.id) : []),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [data.repo, data.athlete?.id, data.version],
+  );
+  const notifyExport = (name: string) => setExportNotice(`Export saved to your downloads: ${name}`);
+  useEffect(() => {
+    if (!exportNotice) return;
+    const id = setTimeout(() => setExportNotice(null), 6000);
+    return () => clearTimeout(id);
+  }, [exportNotice]);
+  // Keyboard and screen-reader users land on the post-workout system when it opens.
+  useEffect(() => {
+    if (post.open && view === 'session') postHeading.current?.focus();
+  }, [post.open, view]);
+
+  const openHistory = useCallback(() => {
+    setLibrary(false);
+    setHistorySection('history');
+    setView('history');
+  }, []);
   /** Make's DEMO / LIVE switch: the same movement, started again from the other source. */
   const switchSource = (next: Mode) => {
     if (next === mode) return;
@@ -601,6 +674,7 @@ export default function App() {
         onLibrary={() => setLibrary(true)}
         onResearch={() => setResearch('method')}
         onLab={() => setResearch('lab')}
+        onHistory={() => guardLeave(openHistory)}
         onResetBaseline={resetBaseline}
       />
 
@@ -631,6 +705,7 @@ export default function App() {
           onAthletes={() => openAthletes()}
           onSports={openSports}
           onLibrary={() => setLibrary(true)}
+          onHistory={openHistory}
         />
       )}
 
@@ -647,6 +722,7 @@ export default function App() {
           onSample={exploreSample}
           onCamera={() => startSession('live', DEFAULT_LAUNCH)}
           onLibrary={() => setLibrary(true)}
+          onHistory={openHistory}
           onLab={() => setResearch('lab')}
           onResearch={() => setResearch('method')}
           onStatus={() => setView('status')}
@@ -692,6 +768,7 @@ export default function App() {
           onResearch={() => setResearch('method')}
           onSports={openSports}
           onLibrary={() => setLibrary(true)}
+          onHistory={openHistory}
         />
       )}
 
@@ -708,6 +785,7 @@ export default function App() {
           onDemo={(ctx) => startSession('demo', ctx)}
           onLive={(ctx) => startSession('live', ctx)}
           onLibrary={() => setLibrary(true)}
+          onHistory={openHistory}
           onEntry={() => setView('landing')}
           onStatus={() => setView('status')}
           onAthletes={() => openAthletes()}
@@ -715,10 +793,95 @@ export default function App() {
         />
       )}
 
+      {view === 'history' && (
+        <div className="st-page post-page">
+          <div className="threshold-environment" aria-hidden="true">
+            <i />
+            <i />
+            <i />
+            <i />
+          </div>
+          <SystemNav
+            current="history"
+            onEntry={() => setView('landing')}
+            onStatus={() => setView('status')}
+            onSports={openSports}
+            onProtocols={() => setLibrary(true)}
+            onHistory={() => setHistorySection('history')}
+            onAthletes={() => openAthletes()}
+            onResearch={() => setResearch('method')}
+          />
+          <main className="threshold-canvas" id="main" tabIndex={-1}>
+            <h1 className="visually-hidden">Session history</h1>
+            <PostWorkout
+              code={`Session telemetry / ${data.scope === 'sample' ? 'Synthetic sample athlete' : (data.athlete?.name ?? 'No athlete yet')}`}
+              section={historySection}
+              onSection={setHistorySection}
+              onExit={() => setView('status')}
+              current={null}
+              recoveryActions={() => (
+                <>
+                  <button type="button" className="threshold-action post-primary" onClick={() => setHistorySection('summary')}>
+                    Session summary
+                  </button>
+                  <button type="button" className="threshold-action post-action" onClick={() => setHistorySection('history')}>
+                    Back to history
+                  </button>
+                </>
+              )}
+              summaryActions={
+                <div className="post-actions">
+                  <button type="button" className="threshold-action post-action" onClick={() => setHistorySection('history')}>
+                    Open session history
+                  </button>
+                </div>
+              }
+              history={{
+                scope: data.scope,
+                onScope: (sc) => data.setScope(sc),
+                athleteName: data.athlete?.name ?? null,
+                records: historyRecords,
+                config,
+                preferredId: null,
+                empty:
+                  data.scope === 'real' && !data.athlete
+                    ? {
+                        code: 'No athlete on this device',
+                        title: 'No stored history yet',
+                        text: 'Add an athlete to record sets. Baselines and history stay on this device.',
+                        actions: (
+                          <>
+                            <button type="button" className="threshold-action post-primary" onClick={() => setDialog({ kind: 'add', intro: NEEDS_PROFILE })}>
+                              Add athlete
+                            </button>
+                            <button type="button" className="threshold-action post-action" onClick={() => data.setScope('sample')}>
+                              Explore the sample athlete
+                            </button>
+                          </>
+                        ),
+                      }
+                    : !historyRecords.length
+                      ? {
+                          code: `First session / ${data.athlete?.name ?? 'Athlete'}`,
+                          title: 'Your first counted set starts the record line',
+                          text: 'Sets you finish with the live camera appear here. A set must pass the calibration and capture-quality floors before it counts toward comparisons.',
+                          actions: (
+                            <button type="button" className="threshold-action post-primary" onClick={openSports}>
+                              Choose a movement
+                            </button>
+                          ),
+                        }
+                      : null,
+              }}
+            />
+          </main>
+        </div>
+      )}
+
       {view === 'session' && (
         <LabelProvider value={labeler}>
           <main
-            className={`dashboard st-session workout-system workout-${workout.state} is-${mode}${mode === 'live' && snap.phase === 'monitoring' ? ' is-live-set' : ''}`}
+            className={`dashboard st-session workout-system workout-${workout.state} is-${mode}${mode === 'live' && snap.phase === 'monitoring' ? ' is-live-set' : ''}${post.open && postSet ? ' has-post' : ''}`}
             id="main"
             tabIndex={-1}
           >
@@ -726,6 +889,97 @@ export default function App() {
               {launch.contextName}: {launch.title}, {mode === 'demo' ? 'demo' : 'live'} session
             </h1>
             <SessionAnnouncer snap={snap} />
+            {post.open && postSet && (
+              <PostWorkout
+                code={`Session telemetry / ${mode === 'demo' ? 'Synthetic sample athlete' : athleteName}`}
+                section={post.section}
+                onSection={(section) => setPost({ open: true, section })}
+                headingRef={postHeading}
+                headerActions={
+                  mode === 'live' && snap.phase === 'recovery' ? (
+                    <button type="button" className="threshold-action post-camera" onClick={showWorkout}>
+                      View camera
+                    </button>
+                  ) : null
+                }
+                onExit={() => guardLeave(() => openSport(launch.sport.id, launch.subSport?.id, launch.protocol.id))}
+                current={{
+                  set: postSet,
+                  phase: snap.phase,
+                  liveScores: recoveryScores,
+                  restSince,
+                  labels: labeler,
+                  exports: { onJson: () => notifyExport(exportJson(snap, launch)), onCsv: () => notifyExport(exportCsv(snap)) },
+                }}
+                capture={recoveryCapture}
+                recoveryActions={(state) =>
+                  state === 'rest' ? (
+                    <>
+                      <button type="button" className="threshold-action post-primary" onClick={startRecovery}>
+                        Start recovery check (3 reps)
+                      </button>
+                      <button type="button" className="threshold-action post-action" onClick={() => setPost({ open: true, section: 'summary' })}>
+                        Session summary
+                      </button>
+                    </>
+                  ) : state === 'active' ? (
+                    <button type="button" className="threshold-action post-action" onClick={() => setPost({ open: true, section: 'summary' })}>
+                      Session summary
+                    </button>
+                  ) : state === 'insufficient' ? (
+                    <>
+                      <button type="button" className="threshold-action post-primary" onClick={startRecovery}>
+                        Start the check again
+                      </button>
+                      {mode === 'live' && (
+                        <button type="button" className="threshold-action post-action" onClick={showWorkout}>
+                          View camera
+                        </button>
+                      )}
+                    </>
+                  ) : (
+                    <>
+                      <button type="button" className="threshold-action post-primary" onClick={() => setPost({ open: true, section: 'summary' })}>
+                        Session summary
+                      </button>
+                      <button type="button" className="threshold-action post-action" onClick={newSet}>
+                        New set
+                      </button>
+                    </>
+                  )
+                }
+                summaryActions={
+                  <div className="post-actions">
+                    {snap.phase === 'summary' && snap.alarmRep !== null && !snap.recovery && (
+                      <button type="button" className="threshold-action post-primary" onClick={() => setPost({ open: true, section: 'recovery' })}>
+                        Continue to recovery
+                      </button>
+                    )}
+                    <button type="button" className="threshold-action post-action" onClick={() => setPost({ open: true, section: 'history' })}>
+                      Open session history
+                    </button>
+                    <button type="button" className="threshold-action post-action" onClick={newSet}>
+                      New set
+                    </button>
+                  </div>
+                }
+                history={{
+                  scope: mode === 'demo' ? 'sample' : 'real',
+                  onScope: null,
+                  athleteName: sessionAthlete?.name ?? athleteName,
+                  records: sessionRecords,
+                  config,
+                  preferredId: recorder.record?.id ?? null,
+                  empty: sessionRecords.length
+                    ? null
+                    : {
+                        code: 'Nothing stored',
+                        title: 'This set was not saved',
+                        text: 'Browser storage was full or unavailable, so the set could not be added to the history. Summary still shows it for this visit.',
+                      },
+                }}
+              />
+            )}
             <div className="workout-stage">
               <div className="workout-backplane workout-backplane-a" aria-hidden="true" />
               <div className="workout-backplane workout-backplane-b" aria-hidden="true" />
@@ -793,6 +1047,7 @@ export default function App() {
                       onSwitchToDemo={() => startSession('demo')}
                       onEndSet={mode === 'live' ? () => engine.endSet() : undefined}
                       evidence={showEvidence}
+                      hidden={post.open && !!postSet}
                     />
                     {toastEl}
                   </div>
@@ -812,9 +1067,10 @@ export default function App() {
                       }}
                       onStartMonitoring={() => engine.startMonitoring()}
                       onEndSet={() => engine.endSet()}
-                      onStartRecovery={startRecovery}
-                      onShowSummary={() => setShowSummary(true)}
+                      onOpenRecovery={() => setPost({ open: true, section: 'recovery' })}
+                      onShowSummary={() => setPost({ open: true, section: 'summary' })}
                       onNewSet={newSet}
+                      inactive={post.open}
                     />
                     {mode === 'demo' && (
                       <DemoControls
@@ -844,16 +1100,6 @@ export default function App() {
               </div>
             )}
           </main>
-          {showSummary && snap.summary && (
-            <SummaryModal
-              snap={snap}
-              launch={launch}
-              outcome={recorder.outcome}
-              onClose={() => setShowSummary(false)}
-              onRecovery={startRecovery}
-              onNewSet={newSet}
-            />
-          )}
         </LabelProvider>
       )}
 
@@ -938,6 +1184,14 @@ export default function App() {
       )}
 
       {view !== 'session' && toastEl}
+      {exportNotice && (
+        <div className="post-export-notice" role="status">
+          {exportNotice}
+          <button type="button" className="threshold-action" onClick={() => setExportNotice(null)}>
+            Dismiss
+          </button>
+        </div>
+      )}
     </div>
   );
 }

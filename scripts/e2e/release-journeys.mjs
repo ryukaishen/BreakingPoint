@@ -56,12 +56,21 @@ const noOverflow = `document.documentElement.scrollWidth <= window.innerWidth + 
 const PHONE_W = 390;
 const fitsPhone = `document.documentElement.scrollWidth <= ${PHONE_W} + 1`;
 
-/** Run a demo until the set ends and the summary dialog is open. */
+/** Run a demo until the set ends and the post-workout system (M5) opens over the workout. */
 async function runDemo(p, id) {
   await p.goto(`${BASE}?demo=${id}&speed=4`);
   await ready(p);
-  await p.waitFor(`document.querySelector('[role=dialog][aria-labelledby=summary-title]')`, { timeout: 90000, label: `${id} summary dialog` });
+  await p.waitFor(`document.querySelector('.post-system [role=tablist]')`, { timeout: 90000, label: `${id} post-workout system` });
 }
+
+/** Open one of the post-workout sections (Recovery, Summary, History). */
+async function postSection(p, E, label) {
+  await E(`(() => { [...document.querySelectorAll('.post-system [role=tab]')].find((t) => t.textContent.trim() === ${JSON.stringify(label)}).click(); return true; })()`);
+  await p.waitFor(`document.querySelector('.post-system [role=tab][aria-selected=true]')?.textContent.trim() === ${JSON.stringify(label)}`, { label: `${label} section` });
+  await sleep(400);
+}
+
+const SUMMARY = '.post-system .summary-system';
 
 /** Open a live session for the squat protocol (creates the athlete on first use). */
 async function startLive(p, E) {
@@ -99,34 +108,34 @@ async function startLive(p, E) {
 
     section('2. Squat demo to the alert and the summary');
     await runDemo(p, 'strength');
-    const summary = await E(text('[role=dialog][aria-labelledby=summary-title]'));
+    // After an alert the post-workout system opens on the recovery step, over the (hidden) workout.
+    const opened = await E(text('.post-system [role=tab][aria-selected=true]'));
+    check('2.5 after an alert the set opens on the recovery step', opened === 'Recovery', opened);
+    const restTitle = await E(text('.post-system .recovery-title'));
+    check('2.6 the recovery step says to rest first', /Rest, then check your recovery/.test(restTitle), restTitle);
+    check('2.6b the recovery step uses no statistics symbols', !/σ|EWMA|CUSUM/.test(await E(text('.post-system .recovery-system'))));
+    check('2.7 the next step is the primary action', /Start recovery check/.test(await E(text('.post-system .recovery-actions .post-primary'))));
+    check('2.8 detector evidence is kept for demos (under the workout)', await E(`!!document.querySelector('#evidence')`));
+    await shot(p, 'desktop-squat-rest');
+    await postSection(p, E, 'Summary');
+    const summary = await E(text(SUMMARY));
     check('2.1 the summary names the alert rep', /alert triggered at rep \d+/i.test(summary) || /Rep \d+/.test(summary), summary.slice(0, 120));
     check('2.2 a squat is never labelled with the jump pattern', !/EXPLOSIVE/i.test(summary));
     check('2.3 the summary explains what changed in plain words', /leaned forward|drive|bend|depth/i.test(summary));
-    // The chart keeps its technical axis labels; everything else in the summary is plain words.
-    const plain = await E(`(() => { const d = document.querySelector('[role=dialog][aria-labelledby=summary-title]').cloneNode(true); d.querySelectorAll('svg').forEach((x) => x.remove()); return d.textContent; })()`);
-    check('2.3b outside the chart, the summary shows no statistics symbols (σ, EWMA, CUSUM)', !/σ|EWMA|CUSUM/.test(plain), plain.match(/.{0,30}(σ|EWMA|CUSUM).{0,20}/)?.[0] ?? '');
-    const ticks = await E(`[...document.querySelectorAll('[role=dialog] svg text')].map((t) => Number(t.textContent)).filter((n) => Number.isInteger(n) && n > 0)`);
-    const reps = await E(`(() => { const m = document.querySelector('[role=dialog]').textContent.match(/(\\d+)\\s*reps? scored|Reps\\s*(\\d+)/); return m ? Number(m[1] ?? m[2]) : null; })()`);
-    check('2.4 the chart axis ends at the last rep of the set', ticks.length > 0 && Math.max(...ticks) <= 12, `max tick ${Math.max(...ticks)}, reps ${reps}`);
+    // Statistics stay in hover titles; everything a reader sees in the summary is plain words.
+    check('2.3b the summary shows no statistics symbols (σ, EWMA, CUSUM)', !/σ|EWMA|CUSUM/.test(summary), summary.match(/.{0,30}(σ|EWMA|CUSUM).{0,20}/)?.[0] ?? '');
+    const ticks = await E(`[...document.querySelectorAll('${SUMMARY} .post-chart-axis span')].map((t) => Number(t.textContent)).filter((n) => Number.isInteger(n) && n > 0)`);
+    // The set's rep count as the summary reads it out (the production build has no dev handle on the engine).
+    const reps = await E(`Number(document.querySelector('${SUMMARY} .summary-readout > div:first-child strong')?.textContent)`);
+    const bars = await E(`document.querySelectorAll('${SUMMARY} .post-chart-bars > i').length`);
+    check('2.4 the chart has one bar per rep and its axis ends at the last rep of the set', ticks.length > 0 && Math.max(...ticks) === reps && bars === reps && reps <= 12, `max tick ${Math.max(...ticks)}, bars ${bars}, reps ${reps}`);
     await shot(p, 'desktop-squat-summary');
-    await key(p, 'Escape');
-    await p.waitFor(`!document.querySelector('[aria-labelledby=summary-title]')`, { label: 'summary closes on Escape' });
-    check('2.5 Escape closes the summary', true);
-    const plate = await E(text('.focus .plate'));
-    check('2.6 the athlete view says to rest', plate === 'Rest', plate);
-    check('2.6b the athlete view uses no statistics symbols', !/σ|EWMA|CUSUM/.test(await E(text('.focus'))));
-    check('2.7 the next step is the primary action', /Start recovery check/.test(await E(text('.focus-actions .btn.primary'))));
-    check('2.8 detector evidence is shown below in demos', await E(`!!document.querySelector('#evidence')`));
-    await shot(p, 'desktop-squat-rest');
-    await p.click('.focus-actions .btn.primary', 'Start recovery check');
-    await p.waitFor(`/of the change gone/.test(document.querySelector('.focus')?.textContent ?? '')`, { timeout: 60000, label: 'recovery result' });
-    const rec = await E(text('.focus .plate'));
+    await postSection(p, E, 'Recovery');
+    await p.click('.post-system .recovery-actions button', 'Start recovery check');
+    await p.waitFor(`/of the change gone/.test(document.querySelector('.post-system .recovery-system')?.textContent ?? '')`, { timeout: 60000, label: 'recovery result' });
+    const rec = await E(text('.post-system .recovery-title'));
     check('2.9 the recovery check finishes with a result', /usual form|Partly back|Still different/.test(rec), rec);
-    await E(`document.querySelector('#evidence')?.scrollIntoView()`);
-    await sleep(300);
-    await shot(p, 'desktop-squat-evidence');
-    await E(`window.scrollTo(0, 0)`);
+    await shot(p, 'desktop-squat-recovery');
 
     section('3. Jump and lunge demos');
     for (const [id, name, pattern] of [
@@ -134,7 +143,8 @@ async function startLive(p, E) {
       ['pickleball', 'lunge (beta)', /RECOVERY SLOWING|RANGE OF MOTION|TECHNIQUE/],
     ]) {
       await runDemo(p, id);
-      const s = await E(text('[role=dialog][aria-labelledby=summary-title]'));
+      await postSection(p, E, 'Summary');
+      const s = await E(text(SUMMARY));
       check(`3.${id === 'soccer' ? 1 : 2} the ${name} demo reaches the alert and the summary`, /rep \d+/i.test(s) && pattern.test(s), s.match(/[A-Z][A-Z –-]{8,}[A-Z]/)?.[0] ?? '');
     }
 
@@ -313,17 +323,19 @@ section('6. Phone-sized screens (390 x 844)');
     await key(p, 'Escape');
     await runDemo(p, 'strength');
     check('6.7 the session fits the phone width', await E(fitsPhone), await E(`document.documentElement.scrollWidth`));
-    const modalFits = await E(`(() => { const m = document.querySelector('[role=dialog] .modal, .modal'); const r = m.getBoundingClientRect(); return r.left >= 0 && r.right <= innerWidth + 1; })()`);
-    check('6.8 the summary fits the screen', modalFits);
+    await postSection(p, E, 'Summary');
+    const postFits = await E(`(() => { const m = document.querySelector('.post-system'); const r = m.getBoundingClientRect(); return r.left >= 0 && r.right <= innerWidth + 1; })()`);
+    check('6.8 the summary fits the screen', postFits && (await E(fitsPhone)));
     await shot(p, 'phone-squat-summary');
-    await key(p, 'Escape');
-    await sleep(300);
+    // The workout keeps its layout under the post-workout system (it is hidden, not unmounted).
     const focusTop = await E(`document.querySelector('.focus').getBoundingClientRect().top + scrollY`);
     const stageTop = await E(`document.querySelector('.stage').getBoundingClientRect().top + scrollY`);
     check('6.9 the athlete view sits under the camera stage', focusTop > stageTop);
     const btn = await E(`document.querySelector('.focus-actions .btn').getBoundingClientRect().height`);
-    check('6.10 touch targets are at least 44px tall', btn >= 44, `${btn}px`);
-    await E(`document.querySelector('.focus').scrollIntoView()`);
+    const postBtns = await E(`[...document.querySelectorAll('.post-system button')].map((b) => Math.round(b.getBoundingClientRect().height))`);
+    check('6.10 touch targets are at least 44px tall', btn >= 44 && postBtns.length > 0 && Math.min(...postBtns) >= 44, `${btn}px; post-workout ${Math.min(...postBtns)}px`);
+    await postSection(p, E, 'Recovery');
+    await E(`window.scrollTo(0, 0)`);
     await sleep(200);
     await shot(p, 'phone-squat-rest');
     check('6.11 Back returns to the landing page', (await (async () => {

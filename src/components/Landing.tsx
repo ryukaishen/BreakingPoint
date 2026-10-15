@@ -24,6 +24,8 @@ interface Props {
   /** The live camera flow for DEFAULT_LAUNCH: athlete profile if needed, then camera set-up and calibration. */
   onCamera: () => void;
   onLibrary: () => void;
+  /** Opens the session history (M5). */
+  onHistory: () => void;
   onLab: () => void;
   onResearch: () => void;
   onStatus: () => void;
@@ -94,7 +96,7 @@ export function Landing(p: Props) {
         <i />
         <i />
       </div>
-      <SystemNav current="landing" onEntry={() => window.scrollTo({ top: 0 })} onStatus={p.onStatus} onSports={p.onSports} onProtocols={p.onLibrary} onAthletes={p.onAthletes} onResearch={p.onResearch} />
+      <SystemNav current="landing" onEntry={() => window.scrollTo({ top: 0 })} onStatus={p.onStatus} onSports={p.onSports} onProtocols={p.onLibrary} onHistory={p.onHistory} onAthletes={p.onAthletes} onResearch={p.onResearch} />
 
       <main className="threshold-canvas entry-canvas" id="main" tabIndex={-1}>
         <div className="entry-view">

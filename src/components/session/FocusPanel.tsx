@@ -31,9 +31,12 @@ interface Props {
   onUseSaved: () => void;
   onStartMonitoring: () => void;
   onEndSet: () => void;
-  onStartRecovery: () => void;
+  /** Opens the post-workout system's Recovery section (where the recovery check starts). */
+  onOpenRecovery: () => void;
   onShowSummary: () => void;
   onNewSet: () => void;
+  /** True while the post-workout system covers the workout: the Enter shortcut is off. */
+  inactive?: boolean;
 }
 
 interface Action {
@@ -119,10 +122,10 @@ export function FocusPanel(p: Props) {
         return s.state === 'DRIFT' || n ? { primary: { label: 'End set', run: p.onEndSet, kind: 'end' } } : {};
       case 'summary':
         return s.alarmRep !== null
-          ? { primary: { label: `Start recovery check (${RECOVERY_REPS} reps)`, run: p.onStartRecovery }, secondary: [{ label: 'Session summary', run: p.onShowSummary }] }
+          ? { primary: { label: 'Continue to recovery', run: p.onOpenRecovery }, secondary: [{ label: 'Session summary', run: p.onShowSummary }] }
           : { primary: { label: 'Session summary', run: p.onShowSummary }, secondary: [{ label: 'New set', run: p.onNewSet }] };
       case 'recovery':
-        return {};
+        return { secondary: [{ label: 'Recovery status', run: p.onOpenRecovery }] };
       case 'recoveryDone':
         return { primary: { label: 'Session summary', run: p.onShowSummary }, secondary: [{ label: 'New set', run: p.onNewSet }] };
     }
@@ -130,7 +133,7 @@ export function FocusPanel(p: Props) {
 
   // Enter runs the primary action when nothing else has focus (handy when walking back to the laptop).
   const primaryRef = useRef(actions.primary);
-  primaryRef.current = actions.primary;
+  primaryRef.current = p.inactive ? undefined : actions.primary;
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       const el = e.target as HTMLElement | null;

@@ -1,6 +1,6 @@
 import { useLayoutEffect, useRef } from 'react';
 
-export type SystemSection = 'landing' | 'status' | 'sports' | 'athletes';
+export type SystemSection = 'landing' | 'status' | 'sports' | 'athletes' | 'history';
 
 interface Props {
   current: SystemSection;
@@ -8,21 +8,23 @@ interface Props {
   onStatus: () => void;
   onSports: () => void;
   onProtocols: () => void;
+  onHistory: () => void;
   onAthletes: () => void;
   onResearch: () => void;
 }
 
 /**
- * Make's .threshold-nav: the numbered System sections at the left of the Entry, Status, Sports and
- * Athletes screens (a row under the header on narrow screens, which scrolls sideways on phones as
+ * Make's .threshold-nav: the numbered System sections at the left of the Entry, Status, Sports,
+ * History and Athletes screens (a row under the header on narrow screens, which scrolls sideways on phones as
  * Make's mobile nav does). Protocols opens the protocol library and Research the study panel.
  */
-export function SystemNav({ current, onEntry, onStatus, onSports, onProtocols, onAthletes, onResearch }: Props) {
+export function SystemNav({ current, onEntry, onStatus, onSports, onProtocols, onHistory, onAthletes, onResearch }: Props) {
   const items: [SystemSection | 'protocols' | 'research', string, () => void][] = [
     ['landing', 'Entry', onEntry],
     ['status', 'Status', onStatus],
     ['sports', 'Sports', onSports],
     ['protocols', 'Protocols', onProtocols],
+    ['history', 'History', onHistory],
     ['athletes', 'Athletes', onAthletes],
     ['research', 'Research', onResearch],
   ];

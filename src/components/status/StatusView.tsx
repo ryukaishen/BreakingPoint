@@ -26,6 +26,8 @@ export interface StatusViewProps {
   onAthletes: () => void;
   onSports: () => void;
   onLibrary: () => void;
+  /** Opens the session history (M5). */
+  onHistory: () => void;
 }
 
 const shortDate = new Intl.DateTimeFormat(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
@@ -87,7 +89,7 @@ export function StatusView(p: StatusViewProps) {
         <i />
         <i />
       </div>
-      <SystemNav current="status" onEntry={p.onBrowse} onStatus={() => {}} onSports={p.onSports} onProtocols={p.onLibrary} onAthletes={p.onAthletes} onResearch={p.onResearch} />
+      <SystemNav current="status" onEntry={p.onBrowse} onStatus={() => {}} onSports={p.onSports} onProtocols={p.onLibrary} onHistory={p.onHistory} onAthletes={p.onAthletes} onResearch={p.onResearch} />
 
       <main className="threshold-canvas" id="main" tabIndex={-1}>
         <section className="system-stage">

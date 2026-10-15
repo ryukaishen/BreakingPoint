@@ -12,7 +12,7 @@
 // The controller takes its window and handlers as arguments so it can be tested
 // without a browser.
 
-export type NavView = 'landing' | 'sport' | 'session' | 'status' | 'athletes';
+export type NavView = 'landing' | 'sport' | 'session' | 'status' | 'athletes' | 'history';
 
 interface Entry {
   view: NavView;
@@ -61,7 +61,7 @@ export interface NavGuard {
   dispose(): void;
 }
 
-const VIEWS: readonly string[] = ['landing', 'sport', 'session', 'status', 'athletes'];
+const VIEWS: readonly string[] = ['landing', 'sport', 'session', 'status', 'athletes', 'history'];
 
 function parse(state: unknown): Entry | null {
   const bp = (state as { bp?: { view?: unknown; pos?: unknown } } | null)?.bp;

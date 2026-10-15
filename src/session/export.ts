@@ -50,8 +50,11 @@ export function sessionToJson(s: Snapshot, launch?: LaunchContext) {
   };
 }
 
-export function exportJson(s: Snapshot, launch?: LaunchContext) {
-  download(`breakingpoint-${s.exercise}-${stamp()}.json`, JSON.stringify(sessionToJson(s, launch), null, 2), 'application/json');
+/** Downloads the set as JSON; returns the file name. */
+export function exportJson(s: Snapshot, launch?: LaunchContext): string {
+  const name = `breakingpoint-${s.exercise}-${stamp()}.json`;
+  download(name, JSON.stringify(sessionToJson(s, launch), null, 2), 'application/json');
+  return name;
 }
 
 export function sessionToCsv(s: Snapshot): string {
@@ -65,6 +68,9 @@ export function sessionToCsv(s: Snapshot): string {
   return [head.join(','), ...rows].join('\n');
 }
 
-export function exportCsv(s: Snapshot) {
-  download(`breakingpoint-${s.exercise}-${stamp()}.csv`, sessionToCsv(s), 'text/csv');
+/** Downloads the set's reps as CSV; returns the file name. */
+export function exportCsv(s: Snapshot): string {
+  const name = `breakingpoint-${s.exercise}-${stamp()}.csv`;
+  download(name, sessionToCsv(s), 'text/csv');
+  return name;
 }

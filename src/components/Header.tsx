@@ -80,13 +80,14 @@ interface Props {
   onLibrary: () => void;
   onResearch: () => void;
   onLab: () => void;
+  onHistory: () => void;
   onResetBaseline: () => void;
 }
 
 export function Header(p: Props) {
   const locked = p.view === 'session' && p.snap !== null && (p.snap.phase === 'monitoring' || p.snap.phase === 'calibrating');
   // Entry, Status, Sports and Athletes carry the section nav (Entry, Status, Sports, Protocols, Athletes, Research), so the header keeps only what it lacks.
-  const systemPage = p.view === 'landing' || p.view === 'status' || p.view === 'sport' || p.view === 'athletes';
+  const systemPage = p.view === 'landing' || p.view === 'status' || p.view === 'sport' || p.view === 'athletes' || p.view === 'history';
   return (
     <header className="app-header">
       <button className="brand" onClick={p.onHome} title="Home" aria-label="BreakingPoint home">
@@ -155,6 +156,7 @@ export function Header(p: Props) {
             { label: 'Status', run: p.onStatus },
             { label: 'Athletes', run: p.onAthletes },
             { label: 'Protocols', run: p.onLibrary },
+            { label: 'History', run: p.onHistory },
             { label: 'Lab study', icon: <Flask size={15} />, run: p.onLab },
             { label: 'Research', icon: <Book size={15} />, run: p.onResearch },
             ...(p.view === 'session' ? [{ label: 'Reset baseline', icon: <Reset size={15} />, run: p.onResetBaseline }] : []),

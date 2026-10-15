@@ -191,7 +191,10 @@ that has been building), one capped rep can cross 2.0. In the HiPerGator held-ou
 problem was an isolated bad rep raised a false alert 3.9 % of the time.
 
 On the Form Changes Over Time chart (`FormDrawdown.tsx`) the thresholds are drawn in score units, `μ0 + threshold·σ0`,
-and apply to the white EWMA line. Bars are the per-rep Form Change Score.
+and apply to the white EWMA line. Bars are the per-rep Form Change Score. The post-workout Summary and History charts
+(`TelemetryChart.tsx`) draw the same bars and levels without the EWMA line, so a line under them says how this
+detector mode alerts (`alertRule` in `src/session/postWorkout.ts`): with the shipped EWMA mode, single bars can cross
+the alert level before the alert.
 
 ## 7. Recovery check (`src/detection/recovery.ts`)
 
@@ -446,13 +449,21 @@ testing with people at training distance.
 
 Known and unresolved. Each needs a fix or an explicit decision before a production release.
 
-1. Empty-camera tracking anomaly. The live workout was tested in a browser with Chromium's fake camera (a moving
-   test pattern, no person). In 19 of 20 runs, Tracking lost appeared once the camera's empty frames reached the
-   engine. In one run the engine still reported an athlete 15 s later (57 frames processed), so Tracking lost never
-   showed. Six further 60 s runs on the empty camera did not reproduce it, and none produced a stray pose or counted
-   a rep. The cause is unconfirmed. One candidate is a low-confidence pose from the pattern that the pose model kept
-   tracking: other runs returned isolated stray poses (smoothed quality under 0.03, against the 0.65 needed to start
-   calibration), which the screen ignores until presence has held for 500 ms.
+1. Empty-camera tracking anomaly (probable cause found during M5; not conclusively resolved, open for M7). The live
+   workout was tested in a browser with Chromium's fake camera (a moving test pattern, no person) and the app's
+   synthetic athlete pushed into the live engine. In one of 20 runs the engine still reported an athlete 15 s after
+   the camera's empty frames resumed, so Tracking lost never showed; in the others it took 2 to 6 s. Six further
+   60 s runs on the empty camera did not reproduce it, and none produced a stray pose or counted a rep. Probable
+   cause: the test harness. The synthetic athlete runs on its own clock, which the harness advanced ahead of the
+   page's clock, and the engine publishes live status only for a frame later than the last one it published, so
+   the camera's frames would read as older until real time caught up. After the harness was changed so the
+   camera's frames continue the engine's clock, as they do in a real session (one monotonic camera clock; switching
+   between demo and live starts a new engine), Tracking lost appeared after 1.2 to 2.3 s in each of the 16 M4
+   browser runs since. That fits the explanation but does not prove it: the delay was not reproduced on demand and
+   then removed, and no real camera has been tried (risk 3). Close it only after a check with a real webcam and an
+   empty room. Separately, the pose model returns occasional isolated stray poses from the empty pattern (smoothed
+   quality under 0.03, against the 0.65 needed to start calibration), which the screen ignores until presence has
+   held for 500 ms.
 2. Camera failure on a phone held sideways. When the screen is under 540px tall, the camera is taller than the
    screen. The centred Camera stopped message, with its Try again and End set buttons, then starts below the fold and
    needs a scroll. Portrait phones, tablets and desktop show it without scrolling.

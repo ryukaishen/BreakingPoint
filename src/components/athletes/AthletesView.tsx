@@ -35,6 +35,8 @@ interface Props {
   onResearch: () => void;
   onSports: () => void;
   onLibrary: () => void;
+  /** Opens the session history (M5). */
+  onHistory: () => void;
 }
 
 export type Panel = 'list' | 'add' | 'rename' | 'migration';
@@ -71,7 +73,7 @@ export function AthletesView(p: Props) {
         <i />
         <i />
       </div>
-      <SystemNav current="athletes" onEntry={p.onEntry} onStatus={p.onStatus} onSports={p.onSports} onProtocols={p.onLibrary} onAthletes={() => setPanel('list')} onResearch={p.onResearch} />
+      <SystemNav current="athletes" onEntry={p.onEntry} onStatus={p.onStatus} onSports={p.onSports} onProtocols={p.onLibrary} onHistory={p.onHistory} onAthletes={() => setPanel('list')} onResearch={p.onResearch} />
 
       <main className="threshold-canvas" id="main" tabIndex={-1}>
         <section className="athletes-stage">

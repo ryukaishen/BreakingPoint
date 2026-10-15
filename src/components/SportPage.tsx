@@ -21,6 +21,8 @@ interface Props {
   onDemo: (ctx: LaunchContext) => void;
   onLive: (ctx: LaunchContext) => void;
   onLibrary: () => void;
+  /** Opens the session history (M5). */
+  onHistory: () => void;
   onEntry: () => void;
   onStatus: () => void;
   onAthletes: () => void;
@@ -78,7 +80,7 @@ export function SportPage(p: Props) {
         <i />
         <i />
       </div>
-      <SystemNav current="sports" onEntry={p.onEntry} onStatus={p.onStatus} onSports={() => window.scrollTo({ top: 0 })} onProtocols={p.onLibrary} onAthletes={p.onAthletes} onResearch={p.onResearch} />
+      <SystemNav current="sports" onEntry={p.onEntry} onStatus={p.onStatus} onSports={() => window.scrollTo({ top: 0 })} onProtocols={p.onLibrary} onHistory={p.onHistory} onAthletes={p.onAthletes} onResearch={p.onResearch} />
 
       <main className="landing threshold-canvas sports-canvas" id="main" tabIndex={-1}>
         <section className="arsenal-stage sport-arsenal" aria-labelledby="sport-title">
