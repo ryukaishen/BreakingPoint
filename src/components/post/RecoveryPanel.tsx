@@ -41,9 +41,12 @@ export function RecoveryPanel({ input, restSince, code, capture, actions }: Prop
         <div className="recovery-orbit recovery-orbit-a" aria-hidden="true" />
         <div className="recovery-orbit recovery-orbit-b" aria-hidden="true" />
         <div className="recovery-core">
-          <span>Recovery status</span>
-          <strong>{m.value}</strong>
-          <small>{m.valueLabel}</small>
+          {/* One stack turned upright as a whole, so all three lines share the diamond's vertical axis. */}
+          <div className="recovery-core-text">
+            <span>Recovery status</span>
+            <strong>{m.value}</strong>
+            <small>{m.valueLabel}</small>
+          </div>
         </div>
         <div className="recovery-rep-nodes" aria-hidden="true">
           {m.nodes.map((n) => (

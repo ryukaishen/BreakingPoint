@@ -94,7 +94,6 @@
   display: grid;
   place-items: center;
   align-content: center;
-  gap: 22px;
   width: 235px;
   height: 235px;
   border: 2px solid var(--threshold-violet);
@@ -103,13 +102,16 @@
   text-align: center;
   transform: rotate(45deg);
 }
+/* The diamond is a square turned 45deg. Its text is one stack turned back upright as a whole: lines turned back one
+   by one would stay on the square's own axis, which is diagonal on screen. */
 .recovery-core > * { transform: rotate(-45deg); }
-.recovery-core > span,
-.recovery-core > small { max-width: 150px; color: var(--threshold-muted); font: 400 12px/1.25 var(--threshold-font-code); letter-spacing: 0.08em; text-transform: uppercase; }
-.recovery-core > strong { color: var(--threshold-violet-hi); font: 700 82px/0.8 var(--threshold-font-display); font-variant-numeric: tabular-nums; text-shadow: 0 0 20px rgb(167 91 255 / 30%); }
-.recovery-rest .recovery-core > strong { font-size: 64px; }
+.recovery-core-text { display: grid; justify-items: center; gap: 22px; }
+.recovery-core-text > span,
+.recovery-core-text > small { max-width: 150px; color: var(--threshold-muted); font: 400 12px/1.25 var(--threshold-font-code); letter-spacing: 0.08em; text-transform: uppercase; }
+.recovery-core-text > strong { color: var(--threshold-violet-hi); font: 700 82px/0.8 var(--threshold-font-display); font-variant-numeric: tabular-nums; text-shadow: 0 0 20px rgb(167 91 255 / 30%); }
+.recovery-rest .recovery-core-text > strong { font-size: 64px; }
 .recovery-recovered .recovery-core { border-color: var(--threshold-cyan); box-shadow: 0 0 40px rgb(84 228 255 / 18%), inset 0 0 40px rgb(84 228 255 / 9%); }
-.recovery-recovered .recovery-core > strong { color: var(--threshold-cyan-hi); }
+.recovery-recovered .recovery-core-text > strong { color: var(--threshold-cyan-hi); }
 .recovery-persistent .recovery-core,
 .recovery-insufficient .recovery-core { border-color: var(--threshold-stop); box-shadow: 0 0 35px rgb(255 67 95 / 16%); }
 .recovery-not-needed .recovery-core,
@@ -412,7 +414,7 @@
   .recovery-orbit-a { width: 330px; height: 330px; }
   .recovery-orbit-b { width: 245px; height: 245px; }
   .recovery-core { width: 200px; height: 200px; }
-  .recovery-core > strong { font-size: 70px; }
+  .recovery-core-text > strong { font-size: 70px; }
   .summary-system,
   .history-system { padding-right: 21px; padding-left: 21px; }
   .history-layout { grid-template-columns: 225px minmax(0, 1fr); }
@@ -442,11 +444,12 @@
   .recovery-visual { min-height: 400px; border-right: 0; border-bottom: 1px solid rgb(167 91 255 / 24%); }
   .recovery-orbit-a { width: 285px; height: 285px; }
   .recovery-orbit-b { width: 215px; height: 215px; }
-  .recovery-core { width: 174px; height: 174px; gap: 14px; }
-  .recovery-core > strong { font-size: 65px; }
-  .recovery-rest .recovery-core > strong { font-size: 48px; }
-  .recovery-core > span,
-  .recovery-core > small { max-width: 150px; }
+  .recovery-core { width: 174px; height: 174px; }
+  .recovery-core-text { gap: 14px; }
+  .recovery-core-text > strong { font-size: 65px; }
+  .recovery-rest .recovery-core-text > strong { font-size: 48px; }
+  .recovery-core-text > span,
+  .recovery-core-text > small { max-width: 150px; }
   .recovery-rep-nodes { bottom: 7%; gap: 18px; }
   .recovery-rep-nodes i { width: 36px; height: 36px; }
   .recovery-command { min-height: 0; padding: 26px 17px 24px; }
@@ -528,7 +531,7 @@
   .recovery-visual { min-height: 380px; }
   .recovery-orbit-a { width: 260px; height: 260px; }
   .recovery-core { width: 160px; height: 160px; }
-  .recovery-core > strong { font-size: 58px; }
+  .recovery-core-text > strong { font-size: 58px; }
   .summary-record-rail { grid-template-columns: 1fr; }
   .summary-readout { grid-template-columns: 1fr; }
   .summary-readout > div { border-right: 0; }
