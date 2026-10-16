@@ -1,7 +1,7 @@
 // Recovery drafts: validation of untrusted storage, and the guarantee that an
 // interrupted set can never become a record.
 import { describe, expect, it } from 'vitest';
-import { clearDraft, draftKey, interruptedRecord, INTERRUPTED_REASON, listDrafts, loadDraft, parseDraft, saveDraft, type SetDraft } from '../src/data/draft';
+import { clearDraft, clearSetDraft, draftKey, finishedRecord, interruptedRecord, INTERRUPTED_REASON, listDrafts, loadDraft, parseDraft, saveDraft, type SetDraft } from '../src/data/draft';
 import { MemoryStore } from '../src/data/kv';
 import { heldOutcome, personalRecords, recordSteps, trainingWeeks } from '../src/data/progress';
 import { AthleteRepository } from '../src/data/repository';
@@ -158,5 +158,43 @@ describe('an interrupted set can never become a record', () => {
   it('is refused for an athlete that no longer exists', () => {
     const repo = new AthleteRepository(new MemoryStore(), 'real');
     expect(repo.saveSession(interruptedRecord(setDraft(rec('deleted_athlete', 5))))).toBe(false);
+  });
+});
+
+// A set that finished but could not be written to the history (audit round 2): kept as an ended draft that
+// stands for exactly one history record.
+describe('an ended set that storage refused', () => {
+  it('keeps its ended marker through validation, and only a literal true counts', () => {
+    const r = rec('ath_1', 3);
+    expect(parseDraft({ ...setDraft(r), ended: true })).toMatchObject({ ended: true });
+    expect(parseDraft(setDraft(r))).not.toHaveProperty('ended');
+    expect(parseDraft({ ...setDraft(r), ended: 'yes' })).not.toHaveProperty('ended');
+  });
+
+  it('is stored exactly as it finished: its own quality, its own end, no interrupted mark, unknown fields dropped', () => {
+    const r = rec('ath_1', 4);
+    const out = finishedRecord({ ...setDraft({ ...r, injected: 'x' } as SessionRecord), ended: true });
+    expect(out).toEqual(r);
+    expect(out.quality.reasons).not.toContain(INTERRUPTED_REASON);
+  });
+
+  it('is cleared only by its own set: another set’s draft is left alone', () => {
+    const kv = new MemoryStore();
+    const r = rec('ath_1', 3);
+    saveDraft(kv, { ...setDraft(r), ended: true });
+    clearSetDraft(kv, 'ath_1', 'some_other_set');
+    expect(loadDraft(kv, 'ath_1')).not.toBeNull();
+    clearSetDraft(kv, 'ath_1', r.id);
+    expect(loadDraft(kv, 'ath_1')).toBeNull();
+  });
+
+  it('saving it twice keeps one record: the history is keyed by the set’s id', () => {
+    const kv = new MemoryStore();
+    const repo = new AthleteRepository(kv, 'real');
+    const a = repo.createAthlete('A');
+    const d: SetDraft = { ...setDraft(rec(a.id, 3)), ended: true };
+    expect(repo.saveSession(finishedRecord(d))).toBe(true);
+    expect(repo.saveSession(finishedRecord(d))).toBe(true);
+    expect(repo.sessions(a.id).filter((s) => s.id === d.record.id)).toHaveLength(1);
   });
 });

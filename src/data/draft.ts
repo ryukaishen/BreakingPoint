@@ -3,7 +3,14 @@
 // Browser unload handlers are not reliable, so a live set is checkpointed after
 // every rep. If the page disappears, the next visit offers the reps that really
 // were measured. Nothing is estimated: a draft is a SessionRecord built from the
-// engine's own output at the last checkpoint.
+// engine's own output at the last checkpoint. A draft carries the id of the
+// history record it stands for, so saving the set (or its recovery) clears it
+// and the same set can never be stored twice.
+//
+// A set that finished but could not be written to the history (storage full) is
+// kept as an `ended` draft: its record is the one the history refused. While it
+// waits, that athlete cannot start another set (see App), because this device
+// keeps one draft per athlete.
 //
 // Integrity rules:
 //  - Live sets only. Demo and sample data never get a draft.
@@ -11,6 +18,7 @@
 //    marked not eligible, so it can never set a record, raise a milestone's record
 //    count, or be used as a comparison. (It is real training, so it still shows in
 //    history and counts as a training day.)
+//  - An ended set is saved exactly as it finished: it was complete, only the write failed.
 //  - Drafts are untrusted input: localStorage can be edited or corrupted, so every
 //    field is validated and unknown fields are dropped before anything is saved.
 
@@ -23,12 +31,14 @@ export const draftKey = (athleteId: string): string => DRAFT_PREFIX + athleteId;
 export const INTERRUPTED_REASON = 'Interrupted before the set ended';
 const MAX_REPS = 500;
 
-/** A monitored set that was in progress. */
+/** A monitored set that was in progress, or that finished but could not be saved (`ended`). */
 export interface SetDraft {
   v: 1;
   kind: 'set';
   savedAt: string;
   record: SessionRecord;
+  /** The set finished normally; only writing it to the history failed. Absent for a checkpoint of a set in progress. */
+  ended?: true;
 }
 
 /** A calibration that was in progress. Nothing to restore (the baseline never locked); kept only so the athlete is told. */
@@ -86,7 +96,10 @@ function validRecord(rec: unknown): rec is SessionRecord {
 /** Validate untrusted JSON as a draft; null when anything is off. */
 export function parseDraft(raw: unknown): Draft | null {
   if (!isObj(raw) || raw.v !== 1 || !iso(raw.savedAt)) return null;
-  if (raw.kind === 'set') return validRecord(raw.record) ? { v: 1, kind: 'set', savedAt: raw.savedAt, record: raw.record } : null;
+  if (raw.kind === 'set') {
+    if (!validRecord(raw.record)) return null;
+    return raw.ended === true ? { v: 1, kind: 'set', savedAt: raw.savedAt, record: raw.record, ended: true } : { v: 1, kind: 'set', savedAt: raw.savedAt, record: raw.record };
+  }
   if (raw.kind === 'calibration' && str(raw.athleteId) && str(raw.protocolId) && int(raw.reps)) {
     return { v: 1, kind: 'calibration', savedAt: raw.savedAt, athleteId: raw.athleteId, protocolId: raw.protocolId, reps: raw.reps };
   }
@@ -121,6 +134,12 @@ export function clearDraft(kv: KeyValueStore, athleteId: string): void {
   kv.remove(draftKey(athleteId));
 }
 
+/** Clears the athlete's draft only if it stands for this set; another set's draft is left alone. */
+export function clearSetDraft(kv: KeyValueStore, athleteId: string, setId: string): void {
+  const d = loadDraft(kv, athleteId);
+  if (d?.kind === 'set' && d.record.id === setId) clearDraft(kv, athleteId);
+}
+
 /** Every valid draft on this device (one per athlete), oldest first. */
 export function listDrafts(kv: KeyValueStore): Draft[] {
   const out: Draft[] = [];
@@ -139,15 +158,24 @@ const RECORD_KEYS: (keyof SessionRecord)[] = [
   'patternId', 'recovery', 'quality',
 ];
 
+function knownFields(d: SetDraft): SessionRecord {
+  const src = d.record as unknown as Record<string, unknown>;
+  const clean: Record<string, unknown> = {};
+  for (const k of RECORD_KEYS) if (src[k] !== undefined) clean[k] = src[k];
+  return clean as unknown as SessionRecord;
+}
+
+/** The record to store for an ended draft: the set as it finished (unknown fields dropped). */
+export function finishedRecord(d: SetDraft): SessionRecord {
+  return knownFields(d);
+}
+
 /**
  * The record to store when the athlete chooses to keep an interrupted set.
  * Ends at the last checkpoint, carries no recovery check, and is never eligible for records.
  */
 export function interruptedRecord(d: SetDraft): SessionRecord {
-  const src = d.record as unknown as Record<string, unknown>;
-  const clean: Record<string, unknown> = {};
-  for (const k of RECORD_KEYS) if (src[k] !== undefined) clean[k] = src[k];
-  const rec = clean as unknown as SessionRecord;
+  const rec = knownFields(d);
   return {
     ...rec,
     endedAt: d.savedAt,

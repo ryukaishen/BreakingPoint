@@ -5,6 +5,7 @@
 
 import type { KeyValueStore } from './kv';
 import { readJson, writeJson } from './kv';
+import { storedHeldReps } from './progress';
 import { SCHEMA_VERSION, type AthleteProfile, type LegacyBaseline, type SessionRecord, type SessionSource, type StoreMeta, type StoredBaseline } from './types';
 
 export type RepositoryKind = 'real' | 'sample';
@@ -143,11 +144,16 @@ export class AthleteRepository {
   }
 
   // ---------------------------------------------------------------- session history
+  /**
+   * The athlete's sets, oldest first. Reps held at usual form are recounted from each set's stored reps
+   * on every read: sets saved before this was fixed counted unscored reps as held. Storage is not rewritten.
+   */
   sessions(athleteId: string, protocolId?: string): SessionRecord[] {
     const list = readJson<SessionRecord[]>(this.kv, this.key('sessions', athleteId));
     if (!Array.isArray(list)) return [];
     return list
       .filter((s) => s && s.athleteId === athleteId && s.source === this.acceptedSource && (!protocolId || s.protocolId === protocolId))
+      .map((s) => (Array.isArray(s.reps) ? { ...s, heldReps: storedHeldReps(s.reps) } : s))
       .sort((a, b) => a.startedAt.localeCompare(b.startedAt));
   }
 

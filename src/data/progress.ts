@@ -7,17 +7,24 @@
 // volume, or short rests.
 
 import type { MovementState } from '../detection/detector';
-import type { AthleteProfile, SessionRecord } from './types';
+import type { AthleteProfile, SessionRecord, SessionRep } from './types';
 
 // ---------------------------------------------------------------- reps held at baseline
-type StepLike = { step?: { state: MovementState } | null };
+type StepLike = { step?: { state: MovementState; scored?: boolean } | null };
+
+/**
+ * An unscored rep: no detector step at all, or a step the detector marked `scored: false`. The detector
+ * still returns a step for a rep it could not score, carrying the previous state, so the state alone
+ * says nothing about that rep.
+ */
+const unscored = (r: StepLike) => !r.step || r.step.scored === false;
 
 /** Consecutive STABLE reps from the start of a set, stopping at the first DRIFT/BREAKPOINT rep. Unscored reps neither count nor break the run. */
 export function heldReps(reps: readonly StepLike[]): number {
   let n = 0;
   for (const r of reps) {
-    if (!r.step) continue;
-    if (r.step.state !== 'STABLE') break;
+    if (unscored(r)) continue;
+    if (r.step!.state !== 'STABLE') break;
     n++;
   }
   return n;
@@ -25,7 +32,24 @@ export function heldReps(reps: readonly StepLike[]): number {
 
 /** True while every scored rep so far has been STABLE. */
 export function stillHolding(reps: readonly StepLike[]): boolean {
-  return reps.every((r) => !r.step || r.step.state === 'STABLE');
+  return reps.every((r) => unscored(r) || r.step!.state === 'STABLE');
+}
+
+const STATES: readonly MovementState[] = ['STABLE', 'DRIFT', 'BREAKPOINT'];
+
+/**
+ * Held reps recounted from a stored set's reps. Stored history is untrusted and may be partial: a rep
+ * counts as scored only with a finite numeric score and a known state. A missing, null or invalid score,
+ * or a malformed entry, is an unscored rep (it neither counts nor breaks the run); nothing is invented.
+ */
+export function storedHeldReps(reps: readonly SessionRep[]): number {
+  return heldReps(
+    reps.map((r) => {
+      const x = (r ?? {}) as Partial<SessionRep>;
+      const state = STATES.includes(x.state as MovementState) ? (x.state as MovementState) : null;
+      return { step: state ? { state, scored: typeof x.score === 'number' && Number.isFinite(x.score) } : null };
+    }),
+  );
 }
 
 // ---------------------------------------------------------------- comparability

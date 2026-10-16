@@ -36,7 +36,8 @@ export type WorkoutState =
 export interface CameraState {
   /** Progress while the camera starts ("Requesting camera…", "Loading pose model…"); empty once running. */
   status: string;
-  error: { problem: CameraProblem | 'stopped'; text: string } | null;
+  /** 'stopped': the camera ended on its own. 'tracking': pose tracking failed while running and the camera was turned off. */
+  error: { problem: CameraProblem | 'stopped' | 'tracking'; text: string } | null;
 }
 
 export const CAMERA_OK: CameraState = { status: '', error: null };
@@ -82,7 +83,7 @@ export function continuingReps(s: Snapshot): number {
 export function workoutState(s: Snapshot, o: WorkoutInputs): WorkoutState {
   const live = o.mode === 'live';
   if (live && o.camera.error) {
-    if (o.camera.error.problem === 'stopped') return 'camera-failure';
+    if (o.camera.error.problem === 'stopped' || o.camera.error.problem === 'tracking') return 'camera-failure';
     return o.camera.error.problem === 'denied' ? 'permission-denied' : 'camera-unavailable';
   }
   if (live && o.camera.status) return o.camera.status === REQUESTING_CAMERA ? 'permission-pending' : 'starting';
@@ -176,10 +177,18 @@ export function workoutView(s: Snapshot, o: WorkoutInputs): WorkoutView {
       case 'camera-unavailable':
         return { plate: 'Camera unavailable', instruction: o.camera.error?.text ?? '' };
       case 'camera-failure':
-        return {
-          plate: 'Camera stopped',
-          instruction: s.phase === 'monitoring' ? 'The camera stopped during the set. End the set to keep the reps so far, or try the camera again.' : 'The camera stopped during this session. Try the camera again.',
-        };
+        return o.camera.error?.problem === 'tracking'
+          ? {
+              plate: 'Tracking stopped',
+              instruction:
+                s.phase === 'monitoring'
+                  ? 'Pose tracking hit an error, so the camera was turned off. End the set to keep the reps so far, or try again.'
+                  : 'Pose tracking hit an error, so the camera was turned off. Try again.',
+            }
+          : {
+              plate: 'Camera stopped',
+              instruction: s.phase === 'monitoring' ? 'The camera stopped during the set. End the set to keep the reps so far, or try the camera again.' : 'The camera stopped during this session. Try the camera again.',
+            };
       case 'pose-ready':
         return { plate: 'Ready', instruction: o.handsFree ? 'Stand still. Calibration starts automatically.' : 'Ready when you are.' };
       case 'calibrating':

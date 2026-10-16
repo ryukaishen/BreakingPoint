@@ -4,9 +4,10 @@ import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 import type { Baseline } from '../src/baseline/baseline';
 import { parseDetectorConfig } from '../src/detection/config';
+import { runDetector } from '../src/detection/detector';
 import { MemoryStore } from '../src/data/kv';
 import { claimLegacyBaseline, migrateV1, V1_KEYS } from '../src/data/migrate';
-import { goalStreak, heldOutcome, heldReps, milestones, personalRecords, recordSteps, stillHolding, trainingWeeks } from '../src/data/progress';
+import { goalStreak, heldOutcome, heldReps, milestones, personalRecords, recordSteps, stillHolding, storedHeldReps, trainingWeeks } from '../src/data/progress';
 import { calibrationQuality, sessionQuality } from '../src/data/quality';
 import { AthleteRepository } from '../src/data/repository';
 import { createSampleRepository, SAMPLE_ATHLETE_ID } from '../src/data/sample';
@@ -357,5 +358,82 @@ describe('reps held at baseline', () => {
   it('is zero for an empty set or an immediate drift', () => {
     expect(heldReps([])).toBe(0);
     expect(heldReps([r('DRIFT'), r('STABLE')])).toBe(0);
+  });
+
+  // The live detector returns a step for a rep it could not score: scored false, carrying the previous
+  // state. The fixtures above use step: null, which the detector never produces.
+  it('does not count a rep the detector marked unscored, whatever state it carries', () => {
+    const steps = runDetector(cfg, 1, 0.2, [1, 1, 1, 1, null]).steps;
+    expect(steps[4].scored).toBe(false);
+    expect(steps[4].state).toBe('STABLE');
+    const live = steps.map((step) => ({ step }));
+    expect(heldReps(live)).toBe(4);
+    expect(stillHolding(live)).toBe(true);
+    // An unscored rep between scored ones neither counts nor breaks the run.
+    expect(heldReps(runDetector(cfg, 1, 0.2, [1, null, 1, 1]).steps.map((step) => ({ step })))).toBe(3);
+  });
+
+  it('recounts a stored set from its reps: a rep stored without a score is not held', () => {
+    const stored = [...reps(['STABLE', 'STABLE', 'STABLE', 'STABLE']), { index: 5, score: null, state: 'STABLE' as const, ewma: 0.5, quality: 0.4, afterWarning: false }];
+    expect(storedHeldReps(stored)).toBe(4);
+  });
+
+  it('the repository serves the recounted value and leaves storage as it was', () => {
+    const kv = new MemoryStore();
+    const repo = new AthleteRepository(kv, 'real');
+    const a = repo.createAthlete('A');
+    const r5 = [...reps(['STABLE', 'STABLE', 'STABLE', 'STABLE']), { index: 5, score: null, state: 'STABLE' as const, ewma: 0.5, quality: 0.4, afterWarning: false }];
+    // A set saved before the fix, with the unscored rep counted as held.
+    const old = session(a.id, 5, { reps: r5, totalReps: 5, scoredReps: 4, heldReps: 5, onsetRep: null, breakpointRep: null });
+    expect(repo.saveSession(old)).toBe(true);
+    const raw = JSON.stringify(kv.keys().map((k) => [k, kv.get(k)]));
+    expect(repo.sessions(a.id)[0].heldReps).toBe(4);
+    expect(JSON.stringify(kv.keys().map((k) => [k, kv.get(k)]))).toBe(raw);
+    expect(JSON.parse(kv.get(kv.keys().find((k) => k.includes('sessions'))!)!)[0].heldReps).toBe(5);
+  });
+});
+
+// Stored history is untrusted and may be partial (audit round 2, P2): only a finite numeric score makes a
+// rep scored. Nothing is rewritten and no score is invented.
+describe('recounting held reps from stored history', () => {
+  const ok = (state = 'STABLE', over: Record<string, unknown> = {}) => ({ index: 1, score: 0.5, state, ewma: 0.5, quality: 0.9, afterWarning: false, ...over });
+  const { score: _missing, ...noScore } = ok();
+  const count = (list: unknown[]) => storedHeldReps(list as SessionRep[]);
+
+  it('a missing, null or invalid score is an unscored rep: it neither counts nor breaks the run', () => {
+    expect(count([ok(), ok(), noScore, ok()])).toBe(3);
+    expect(count([ok(), ok('STABLE', { score: null }), ok()])).toBe(2);
+    expect(count([ok(), ok('STABLE', { score: Number.NaN }), ok('STABLE', { score: Number.POSITIVE_INFINITY }), ok('STABLE', { score: '0.4' }), ok()])).toBe(2);
+    // An unscored DRIFT carries a state but says nothing about that rep, so the run goes on.
+    expect(count([ok(), ok('DRIFT', { score: null }), ok()])).toBe(2);
+    expect(count([ok(), { ...noScore, state: 'BREAKPOINT' }, ok()])).toBe(2);
+    // A scored DRIFT still ends it.
+    expect(count([ok(), ok('DRIFT'), ok()])).toBe(1);
+  });
+
+  it('partially populated entries are skipped, never a crash', () => {
+    expect(count([ok(), null, undefined, {}, { index: 3 }, ok('WOBBLY'), ok('STABLE', { state: undefined }), ok()])).toBe(2);
+    expect(count([])).toBe(0);
+  });
+
+  it('the repository recounts partial records, keeps the stored count when there are no reps to recount, and rewrites nothing', () => {
+    const kv = new MemoryStore();
+    const repo = new AthleteRepository(kv, 'real');
+    const a = repo.createAthlete('A');
+    const base = session(a.id, 3);
+    const stored = [
+      { ...base, id: 'p1', startedAt: '2026-09-01T10:00:00.000Z', reps: [ok(), noScore, ok(), ok('STABLE', { score: null })], heldReps: 4 },
+      { ...base, id: 'p2', startedAt: '2026-09-02T10:00:00.000Z', reps: [ok(), null, { index: 3 }, ok('STABLE', { score: '1' }), ok()], heldReps: 5 },
+      { ...base, id: 'p3', startedAt: '2026-09-03T10:00:00.000Z', reps: undefined, heldReps: 6 },
+    ];
+    const key = kv.keys().find((k) => k.startsWith('bp.v2.athletes'))!.replace('athletes', `sessions.${a.id}`);
+    kv.set(key, JSON.stringify(stored));
+    const raw = kv.get(key);
+    expect(repo.sessions(a.id).map((s) => [s.id, s.heldReps])).toEqual([
+      ['p1', 2],
+      ['p2', 2],
+      ['p3', 6],
+    ]);
+    expect(kv.get(key)).toBe(raw);
   });
 });

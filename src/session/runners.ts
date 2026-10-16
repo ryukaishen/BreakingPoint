@@ -129,8 +129,15 @@ export class LiveRunner implements Runner {
   /**
    * Starts the camera and the pose loop. `onEnded` fires if the camera stops on its own during the
    * session (unplugged, taken by another app, permission revoked); stop() never triggers it.
+   * `onFailed` fires if pose tracking throws while running: processing stops, the camera is released,
+   * and the session (with its reps so far) stays open. If starting fails after the camera was granted,
+   * the camera is released before the error is thrown, so it is never left on behind an error message.
+   *
+   * The video element is shared with the runner that replaces this one (Live, then Demo, then Live again).
+   * Once stopped, this runner never touches it again, and it only ever detaches its own stream, so a late
+   * success or failure of an old start cannot turn off the new camera.
    */
-  async start(onStatus?: (s: string) => void, onEnded?: () => void) {
+  async start(onStatus?: (s: string) => void, onEnded?: () => void, onFailed?: (e: unknown) => void) {
     // Browsers expose the camera only to secure pages (https or localhost).
     if (!window.isSecureContext || !navigator.mediaDevices?.getUserMedia) {
       throw new CameraError('insecure', 'Camera access needs a secure (https) page.');
@@ -159,20 +166,34 @@ export class LiveRunner implements Runner {
         onEnded?.();
       });
     }
-    this.video.srcObject = this.stream;
-    this.video.muted = true;
-    this.video.playsInline = true;
-    await this.video.play();
-    this.aspect = this.video.videoWidth / Math.max(1, this.video.videoHeight) || 16 / 9;
-    this.pipeline.setAspect(this.aspect);
-    onStatus?.('Loading pose model (runs locally)…');
     try {
-      await this.pose.init();
+      this.video.srcObject = this.stream;
+      this.video.muted = true;
+      this.video.playsInline = true;
+      try {
+        await this.video.play();
+      } catch (e) {
+        throw new CameraError('other', e instanceof Error ? e.message : String(e));
+      }
+      if (this.stopped) {
+        this.release();
+        return;
+      }
+      this.aspect = this.video.videoWidth / Math.max(1, this.video.videoHeight) || 16 / 9;
+      this.pipeline.setAspect(this.aspect);
+      onStatus?.('Loading pose model (runs locally)…');
+      try {
+        await this.pose.init();
+      } catch (e) {
+        throw new CameraError('model', e instanceof Error ? e.message : String(e));
+      }
     } catch (e) {
-      throw new CameraError('model', e instanceof Error ? e.message : String(e));
+      this.release();
+      if (this.stopped) return; // left meanwhile: nothing to report
+      throw e;
     }
     if (this.stopped) {
-      this.pose.close();
+      this.release();
       return;
     }
     onStatus?.('');
@@ -180,8 +201,17 @@ export class LiveRunner implements Runner {
     const loop = () => {
       if (this.stopped || this.ended) return;
       const now = performance.now();
-      const pose = this.pose.detect(this.video, now);
-      this.pipeline.push(pose, now / 1000);
+      try {
+        const pose = this.pose.detect(this.video, now);
+        this.pipeline.push(pose, now / 1000);
+      } catch (e) {
+        // Tracking cannot continue: stop processing and turn the camera off, so the screen never shows
+        // a running set that nothing is measuring. The reps so far stay in the session.
+        this.ended = true;
+        this.release();
+        onFailed?.(e);
+        return;
+      }
       this.frames++;
       if (now - this.fpsT > 1000) {
         this.fps = (this.frames * 1000) / (now - this.fpsT);
@@ -195,9 +225,19 @@ export class LiveRunner implements Runner {
 
   stop() {
     this.stopped = true;
+    this.release();
+  }
+
+  /**
+   * Stops the pose loop, turns this runner's camera off, detaches it from the video element (only if the
+   * element still shows it: a newer runner may own the element by now) and frees the model.
+   */
+  private release() {
     cancelAnimationFrame(this.raf);
-    this.stream?.getTracks().forEach((t) => t.stop());
+    const own = this.stream;
+    own?.getTracks().forEach((t) => t.stop());
     this.stream = null;
+    if (own && this.video.srcObject === own) this.video.srcObject = null;
     this.pose.close();
   }
 }

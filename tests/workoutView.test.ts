@@ -58,6 +58,17 @@ describe('camera states (live only)', () => {
     expect(v.rep).toBeNull();
     expect(v.quality.label).toBe('Camera off');
   });
+  it('pose tracking failing mid-set says so, keeps End set on offer, and shows the camera as off', () => {
+    const { s } = drive((x) => x.phase === 'monitoring' && x.monitorReps.length >= 2);
+    const failed = { ...LIVE, camera: { status: '', error: { problem: 'tracking' as const, text: '' } } };
+    expect(workoutState(s, failed)).toBe('camera-failure');
+    const v = workoutView(s, failed);
+    expect(v.plate).toBe('Tracking stopped');
+    expect(v.instruction).toMatch(/End the set to keep the reps so far/);
+    expect(v.cameraMessage).toBe(true);
+    expect(v.quality.label).toBe('Camera off');
+    expect(workoutView(idle(), failed).instruction).not.toMatch(/End the set/);
+  });
   it('a demo has no camera: camera fields never change its state', () => {
     expect(workoutState(idle(), { ...DEMO, camera: { status: '', error: { problem: 'denied', text: '' } } })).toBe('prepare');
     expect(workoutView(idle(), DEMO).cameraMessage).toBe(false);

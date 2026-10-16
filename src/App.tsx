@@ -17,7 +17,7 @@ import { StatusView } from './components/status/StatusView';
 import { SignalSpine } from './components/system/SignalSpine';
 import { SystemNav } from './components/system/SystemNav';
 import { PostWorkout } from './components/post/PostWorkout';
-import { clearDraft, draftAthleteId, interruptedRecord, listDrafts, type SetDraft } from './data/draft';
+import { clearDraft, clearSetDraft, draftAthleteId, finishedRecord, interruptedRecord, listDrafts, loadDraft, type SetDraft } from './data/draft';
 import { browserStore } from './data/kv';
 import { claimLegacyBaseline } from './data/migrate';
 import { calibrationQuality } from './data/quality';
@@ -37,7 +37,7 @@ import { useSustained } from './session/useSustained';
 import { workoutView, type CameraState } from './session/workoutView';
 import { DemoControls } from './components/session/DemoControls';
 import { TechnicalCorners } from './components/system/TechnicalCorners';
-import { useSessionRecorder } from './session/useSessionRecorder';
+import { SAVE_FAILED, useSessionRecorder } from './session/useSessionRecorder';
 import { useHandsFree } from './session/useHandsFree';
 import { usePref } from './session/usePref';
 import { useSetDraft } from './session/useSetDraft';
@@ -96,16 +96,35 @@ export default function App() {
   const [handsFreeOn, setHandsFreeOn] = usePref('bp.pref.handsFree', true);
   /** Live sets cut off by a refresh, crash or closed tab, waiting for the athlete to keep or discard them (oldest first). */
   const [recoveryQueue, setRecoveryQueue] = useState<SetDraft[]>([]);
+  /** A set that is not in the history yet, shown because the athlete tried to start another set meanwhile. */
+  const [unsavedPrompt, setUnsavedPrompt] = useState<SetDraft | null>(null);
+  /** The athlete's set that is waiting to be saved or discarded (not the set being recorded now), or null. */
+  const waitingSet = useRef<(athleteId: string) => SetDraft | null>(() => null);
+  /**
+   * Finished live sets the history refused, held in memory by athlete (each entry carries its set id) until
+   * saved or discarded. Independent of storage, so a set survives even when its draft could not be written;
+   * memory does not survive the page closing or reloading.
+   */
+  const heldSets = useRef(new Map<string, SetDraft>());
+  /** Drops the held copy of this set (only this set) once it is saved or discarded. */
+  const releaseHeld = (rec: { athleteId: string; id: string }) => {
+    if (heldSets.current.get(rec.athleteId)?.record.id === rec.id) heldSets.current.delete(rec.athleteId);
+  };
   const draftKv = useMemo(() => browserStore(), []);
   /** A live launch waiting for the user to create their first athlete profile. */
   const pendingLive = useRef<LaunchContext | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
+  /**
+   * The athlete a live session was launched for. It never changes while the session runs: another tab
+   * switching its active athlete must not move this set, and a deleted owner is reported, never replaced.
+   */
+  const [liveOwner, setLiveOwner] = useState<{ id: string; name: string } | null>(null);
   const exercise = launch.exercise;
 
   // Live sets belong to a real athlete; demo sets always belong to the synthetic sample athlete.
   const sessionRepo = mode === 'live' ? data.real : data.repo;
-  const sessionAthlete = mode === 'live' ? data.real.activeAthlete() : data.repo.activeAthlete();
-  const athleteName = sessionAthlete?.name ?? (mode === 'demo' ? SAMPLE_ATHLETE_NAME : 'Athlete');
+  const sessionAthlete = mode === 'live' ? data.real.athlete(liveOwner?.id) : data.repo.activeAthlete();
+  const athleteName = sessionAthlete?.name ?? (mode === 'demo' ? SAMPLE_ATHLETE_NAME : liveOwner?.name ?? 'Athlete');
 
   useEffect(() => {
     loadDetectorConfig().then((c) => {
@@ -130,6 +149,7 @@ export default function App() {
     for (const d of listDrafts(draftKv)) {
       const owner = draftAthleteId(d);
       if (!data.real.athlete(owner)) clearDraft(draftKv, owner); // the profile no longer exists: nothing to attach it to
+      else if (d.kind === 'set' && data.real.sessions(owner).some((x) => x.id === d.record.id)) clearDraft(draftKv, owner); // already saved
       else if (d.kind === 'calibration') {
         clearDraft(draftKv, owner);
         lostCalibration = true;
@@ -146,11 +166,19 @@ export default function App() {
     (m: Mode, ctx?: LaunchContext) => {
       if (m === 'live') {
         if (data.scope === 'sample') data.setScope('real');
-        if (!data.real.activeAthlete()) {
+        const owner = data.real.activeAthlete();
+        if (!owner) {
           pendingLive.current = ctx ?? launch;
           setDialog({ kind: 'add', intro: NEEDS_PROFILE });
           return;
         }
+        // One unsaved set per athlete: another cannot start until it is saved or discarded.
+        const waiting = waitingSet.current(owner.id);
+        if (waiting) {
+          setUnsavedPrompt(waiting);
+          return;
+        }
+        setLiveOwner({ id: owner.id, name: owner.name });
       } else if (data.scope !== 'sample') data.setScope('sample');
       if (ctx) setLaunch(ctx);
       setMode(m);
@@ -228,15 +256,35 @@ export default function App() {
     snap,
     mode,
     repo: sessionRepo,
-    athleteId: sessionAthlete?.id ?? null,
+    athleteId: mode === 'live' ? (liveOwner?.id ?? null) : (sessionAthlete?.id ?? null),
     launch,
     config,
     sessionKey,
-    onSaved: data.refresh,
-    onStorageError: (text) => setToast({ text, kind: 'break' }),
+    onSaved: (rec) => {
+      data.refresh();
+      draft.saved(rec);
+      releaseHeld(rec);
+    },
+    onSaveFailed: (reason, rec) => {
+      if (reason !== 'storage') {
+        setToast({ text: SAVE_FAILED[reason], kind: 'break' });
+        return;
+      }
+      const kept = draft.unsaved(rec);
+      heldSets.current.set(rec.athleteId, { v: 1, kind: 'set', savedAt: new Date().toISOString(), record: rec, ended: true });
+      setToast({
+        text:
+          SAVE_FAILED.storage +
+          (kept
+            ? ` Its reps are kept on this device. Save or discard it before starting another set for ${athleteName}.`
+            : ` It is held only until this page closes or reloads. Save or discard it before starting another set for ${athleteName}.`),
+        kind: 'break',
+      });
+    },
   });
 
   // Checkpoint a live set after every rep so an accidental refresh or close can be recovered (data/draft.ts).
+  // The draft carries the recorder's set id and is cleared only once that set is saved or deliberately discarded.
   const draft = useSetDraft({
     snap,
     mode,
@@ -247,7 +295,13 @@ export default function App() {
     config,
     active: view === 'session',
     blocked: recoveryQueue.length > 0,
+    currentSet: recorder.currentSet,
   });
+  waitingSet.current = (athleteId) => {
+    const d = loadDraft(draftKv, athleteId);
+    if (d?.kind === 'set' && d.record.id !== draft.activeSetId()) return d;
+    return heldSets.current.get(athleteId) ?? null;
+  };
 
   // Frame source lifecycle (sessions start only once the Lab config is loaded)
   useEffect(() => {
@@ -266,6 +320,7 @@ export default function App() {
       l.start(
         (st) => current && setLiveStatus(st),
         () => current && setLiveError({ problem: 'stopped', text: '' }),
+        () => current && setLiveError({ problem: 'tracking', text: '' }),
       ).catch((e: unknown) => {
         if (!current) return;
         setLiveError({ problem: e instanceof CameraError ? e.problem : 'other', text: cameraErrorText(e) });
@@ -300,8 +355,10 @@ export default function App() {
     } else if (ev.type === 'discarded') {
       setToast({ text: ev.message, kind: '' });
     }
-    // A freshly calibrated live baseline is saved for this athlete and this protocol only.
-    const owner = data.real.activeAthlete();
+    // A freshly calibrated live baseline is saved for the session's athlete and this protocol only.
+    const owner = sessionAthlete;
+    if (ev.type === 'baseline' && mode === 'live' && !owner && snap.calibrationReps.length)
+      setToast({ text: 'The baseline was not saved: its athlete was deleted on this device.', kind: 'break' });
     if (ev.type === 'baseline' && mode === 'live' && owner && snap.baseline && snap.calibrationReps.length) {
       const ok = data.real.saveBaseline({
         athleteId: owner.id,
@@ -374,7 +431,13 @@ export default function App() {
         ),
       confirmLabel: p === 'monitoring' ? 'End set and leave' : 'Leave',
       onConfirm: () => {
-        if (p === 'monitoring' && snap.monitorReps.length) engine.endSet();
+        // The dialog may have stayed open while more reps were recorded: act on the set as it is now. It is
+        // saved before `action` can replace the engine (a new session, the demo, another protocol).
+        const now = engine.getSnapshot();
+        if (now.phase === 'monitoring' && now.monitorReps.length) {
+          engine.endSet();
+          recorder.saveNow(engine.getSnapshot());
+        }
         action();
       },
     });
@@ -389,7 +452,15 @@ export default function App() {
     requestAnimationFrame(() => document.getElementById('main')?.focus());
   };
 
+  /** In a live session, the athlete's unsaved set (if any) must be saved or discarded before another set starts. */
+  const blockedByUnsaved = (): boolean => {
+    const waiting = mode === 'live' && sessionAthlete ? waitingSet.current(sessionAthlete.id) : null;
+    if (waiting) setUnsavedPrompt(waiting);
+    return !!waiting;
+  };
+
   const newSet = () => {
+    if (blockedByUnsaved()) return;
     showWorkout();
     setSelectedRep(null);
     if (mode === 'demo') setSessionKey((k) => k + 1);
@@ -404,7 +475,7 @@ export default function App() {
   };
 
   const doResetBaseline = () => {
-    const owner = data.real.activeAthlete();
+    const owner = sessionAthlete;
     if (mode === 'live' && owner) {
       data.real.clearBaseline(owner.id, launch.protocol.id);
       data.refresh();
@@ -416,6 +487,7 @@ export default function App() {
 
   const resetBaseline = () => {
     if (mode === 'demo') return doResetBaseline();
+    if (blockedByUnsaved()) return;
     setConfirm({
       title: 'Reset this baseline?',
       bar: 'Reset baseline',
@@ -476,6 +548,7 @@ export default function App() {
           return;
         }
         clearDraft(draftKv, a.id);
+        heldSets.current.delete(a.id);
         data.refresh();
         setToast({ text: `${a.name} was deleted from this device.`, kind: '' });
       },
@@ -613,10 +686,13 @@ export default function App() {
 
   const pendingRecovery = recoveryQueue[0] ?? null;
 
+  // During a live session the menu names, and Rename changes, the session's own athlete.
+  const liveSessionView = view === 'session' && mode === 'live';
+  const renameTarget = liveSessionView ? sessionAthlete : data.real.activeAthlete();
   const athleteMenu = (
     <AthleteMenu
       scope={data.scope}
-      athlete={data.scope === 'sample' ? data.repo.activeAthlete() : data.real.activeAthlete()}
+      athlete={liveSessionView ? sessionAthlete : data.scope === 'sample' ? data.repo.activeAthlete() : data.real.activeAthlete()}
       athletes={data.real.athletes()}
       legacyCount={data.real.legacy().length}
       locked={liveActive}
@@ -978,7 +1054,10 @@ export default function App() {
                     : {
                         code: 'Nothing stored',
                         title: 'This set was not saved',
-                        text: 'Browser storage was full or unavailable, so the set could not be added to the history. Summary still shows it for this visit.',
+                        text:
+                          mode === 'live' && !sessionAthlete
+                            ? 'Its athlete was deleted on this device, so the set could not be added to the history. Summary still shows it for this visit.'
+                            : 'Browser storage was full or unavailable, so the set could not be added to the history. Summary still shows it for this visit.',
                       },
                 }}
               />
@@ -1047,7 +1126,7 @@ export default function App() {
                       view={workout}
                       flash={flash}
                       onRetryLive={() => guardLeave(() => startSession('live'))}
-                      onSwitchToDemo={() => startSession('demo')}
+                      onSwitchToDemo={() => guardLeave(() => startSession('demo'))}
                       onEndSet={mode === 'live' ? () => engine.endSet() : undefined}
                       evidence={showEvidence}
                       hidden={post.open && !!postSet}
@@ -1137,36 +1216,50 @@ export default function App() {
           }}
         />
       )}
-      {dialog?.kind === 'rename' && data.real.activeAthlete() && (
+      {dialog?.kind === 'rename' && renameTarget && (
         <AthleteDialog
           mode="rename"
-          initialName={data.real.activeAthlete()!.name}
+          initialName={renameTarget.name}
           onCancel={() => setDialog(null)}
           onSubmit={(name) => {
-            renameAthlete(data.real.activeAthlete()!.id, name);
+            renameAthlete(renameTarget.id, name);
             setDialog(null);
           }}
         />
       )}
-      {pendingRecovery && (
+      {(pendingRecovery ?? unsavedPrompt) && (
         <RecoveryDialog
-          athleteName={data.real.athlete(pendingRecovery.record.athleteId)?.name ?? 'Athlete'}
-          draft={pendingRecovery}
+          athleteName={data.real.athlete((pendingRecovery ?? unsavedPrompt)!.record.athleteId)?.name ?? 'Athlete'}
+          draft={(pendingRecovery ?? unsavedPrompt)!}
+          heldInMemory={(() => {
+            const d = (pendingRecovery ?? unsavedPrompt)!;
+            const stored = loadDraft(draftKv, d.record.athleteId);
+            return !(stored?.kind === 'set' && stored.record.id === d.record.id);
+          })()}
           onKeep={() => {
-            // Never drop a draft that did not reach the history: if saving fails, keep asking.
-            if (!data.real.saveSession(interruptedRecord(pendingRecovery))) {
+            const d = (pendingRecovery ?? unsavedPrompt)!;
+            // Never drop a draft that did not reach the history: if saving fails, keep asking. The record keeps
+            // the set's id, so saving the same set again replaces it instead of adding a second copy.
+            if (!data.real.saveSession(d.ended ? finishedRecord(d) : interruptedRecord(d))) {
               setToast({ text: 'That set could not be saved: browser storage is full or unavailable.', kind: 'break' });
               return;
             }
-            clearDraft(draftKv, pendingRecovery.record.athleteId);
-            setRecoveryQueue((q) => q.slice(1));
+            clearSetDraft(draftKv, d.record.athleteId, d.record.id);
+            releaseHeld(d.record);
+            if (pendingRecovery) setRecoveryQueue((q) => q.slice(1));
+            else setUnsavedPrompt(null);
             data.refresh();
-            setToast({ text: 'Interrupted set kept. It does not count toward records.', kind: '' });
+            setToast(d.ended ? { text: 'Set saved.', kind: '' } : { text: 'Interrupted set kept. It does not count toward records.', kind: '' });
           }}
           onDiscard={() => {
-            clearDraft(draftKv, pendingRecovery.record.athleteId);
-            setRecoveryQueue((q) => q.slice(1));
+            const d = (pendingRecovery ?? unsavedPrompt)!;
+            clearSetDraft(draftKv, d.record.athleteId, d.record.id);
+            releaseHeld(d.record);
+            recorder.discarded(d.record.id);
+            if (pendingRecovery) setRecoveryQueue((q) => q.slice(1));
+            else setUnsavedPrompt(null);
           }}
+          onLater={pendingRecovery ? undefined : () => setUnsavedPrompt(null)}
         />
       )}
       {confirm && (
