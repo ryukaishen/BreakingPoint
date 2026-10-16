@@ -502,6 +502,16 @@
 @media (max-width: 1100px) and (max-height: 539px) {
   /* A phone held sideways: the STOP band rides higher so its End set is on the first screen. */
   .workout-stop-alert { top: 16%; }
+  /* The camera is taller than the screen here, so a camera message (permission, refused, missing or
+     stopped) sits at the top of the camera, compact, with its buttons on the first screen. Opaque, because
+     a session toast sits under it there. */
+  .st-session .stage-center { place-items: start center; padding: 10px 16px; }
+  .workout-center-message { gap: 6px; padding: 14px 18px; background: rgb(5 16 29); }
+  .workout-center-symbol { display: none; }
+  .workout-center-message > strong { font-size: 26px; }
+  .workout-center-message p { font-size: 14px; line-height: 1.4; }
+  .workout-center-message > div { margin-top: 2px; }
+  .workout-center-message .threshold-action { min-height: 44px; }
 }
 @media (max-width: 760px) and (min-height: 540px) {
   .st-session.is-live .stage-col { height: min(123vw, 520px, calc(100svh - 260px)); }

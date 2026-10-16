@@ -125,9 +125,9 @@ function Overview({ c, go }: { c: DetectorConfig; go: (t: ResearchTab) => void }
             <span className="research-tag">Not measured yet</span>
             <h4>Live webcam performance</h4>
             <p>
-              An earlier version was tried by hand with a physical webcam and real movements, and it worked. That was not a measured test, and the redesigned
-              live screens still need a fresh real-webcam check. The synthetic results have not been shown on camera footage, so no accuracy figure applies to
-              live use.
+              The live camera has been tried by hand with a physical webcam and real movements, in an earlier version and in the current build, and it worked.
+              Those were manual checks, not measured tests. The synthetic results have not been shown on camera footage, so no accuracy figure applies to live
+              use.
             </p>
           </li>
           <li className="is-future">

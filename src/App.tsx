@@ -604,6 +604,8 @@ export default function App() {
           ? 'Status | BreakingPoint'
           : view === 'athletes'
             ? 'Athletes | BreakingPoint'
+          : view === 'history'
+            ? 'History | BreakingPoint'
           : view === 'sport'
             ? `${sportForPage?.name ?? 'Sport'} | BreakingPoint`
             : `${launch.contextName}: ${launch.title} | BreakingPoint`;

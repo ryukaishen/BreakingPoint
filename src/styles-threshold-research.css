@@ -135,8 +135,9 @@
   .research-matrix > div:nth-child(n + 4) { grid-column: span 3; }
   .research-tiers { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
-/* Above phone width every section stays in view: the tabs wrap rather than scroll. */
-@media (min-width: 761px) {
+/* Above phone width every section stays in view: the tabs wrap rather than scroll. Not on short screens
+   (a phone held sideways), where a second row of tabs would leave little room for the content. */
+@media (min-width: 761px) and (min-height: 540px) {
   .research-tabs { flex-wrap: wrap; overflow-x: visible; }
 }
 @media (max-width: 760px) {

@@ -442,8 +442,10 @@ the app.
 
 Nothing in §8 or §14 runs on camera footage. The live camera path itself has been used: an earlier version was tried by
 hand with a physical webcam and real movements, and it worked. That was a manual check, not a controlled study, and it
-produced no accuracy figures. The redesigned live screens (M4 and M5) have been checked only with Chromium's fake camera
-and the synthetic athlete, so they need a fresh real-webcam regression test. Real-world detector accuracy has not been
+produced no accuracy figures. The automated checks of the redesigned live screens (M4 to M7) use Chromium's fake
+camera and the synthetic athlete. On 2026-10-16 the owner reported running the physical-webcam smoke test
+(`docs/WEBCAM_SMOKE_TEST.md`) on the M7 build, on an ASUS ProArt laptop with real movements, and that everything tested
+worked. It is recorded there as a manual functional check, not a measurement. Real-world detector accuracy has not been
 established. Before any accuracy claim about the live app, recorded sessions need to go through MediaPipe and be
 compared with a reference for rep segmentation, measurement agreement and alert behaviour, across lighting, clothing,
 occlusion, camera angle and distance. The hands-free thresholds and spoken cues also need testing with people at
@@ -453,7 +455,9 @@ training distance.
 
 Known and unresolved. Each needs a fix or an explicit decision before a production release.
 
-1. Empty-camera tracking anomaly (probable cause found during M5; not conclusively resolved, open for M7). The live
+1. Empty-camera tracking anomaly (probable cause found during M5; not conclusively resolved). The owner's 2026-10-16
+   webcam smoke test reported no problems, but its record does not say whether the empty-room step
+   (`docs/WEBCAM_SMOKE_TEST.md` step 4) was run. The live
    workout was tested in a browser with Chromium's fake camera (a moving test pattern, no person) and the app's
    synthetic athlete pushed into the live engine. In one of 20 runs the engine still reported an athlete 15 s after
    the camera's empty frames resumed, so Tracking lost never showed; in the others it took 2 to 6 s. Six further
@@ -464,16 +468,20 @@ Known and unresolved. Each needs a fix or an explicit decision before a producti
    camera's frames continue the engine's clock, as they do in a real session (one monotonic camera clock; switching
    between demo and live starts a new engine), Tracking lost appeared after 1.2 to 2.3 s in each of the 16 M4
    browser runs since. That fits the explanation but does not prove it: the delay was not reproduced on demand and
-   then removed, and the redesigned live screens have not been retried with a real camera (risk 3). Close it only
-   after a check with a real webcam and an empty room. Separately, the pose model returns occasional isolated stray
+   then removed, and no empty-room check with a real camera has been recorded. Close it only after a recorded check
+   with a real webcam and an empty room. Separately, the pose model returns occasional isolated stray
    poses from the empty pattern (smoothed quality under 0.03, against the 0.65 needed to start calibration), which the
    screen ignores until presence has held for 500 ms.
-2. Camera failure on a phone held sideways. When the screen is under 540px tall, the camera is taller than the
-   screen. The centred Camera stopped message, with its Try again and End set buttons, then starts below the fold and
-   needs a scroll. Portrait phones, tablets and desktop show it without scrolling.
+2. Camera failure on a phone held sideways (fixed in M7; confirm on a real phone). When the screen is under 540px
+   tall, the camera is taller than the screen, and the centred Camera stopped message, with its Try again and End set
+   buttons, started below the fold. On screens up to 1100px wide and under 540px tall, the camera messages now sit at
+   the top of the camera in a compact form (`styles-threshold-workout.css`), and the M4 browser check F2b passes at
+   844x390: the message and both buttons are in view, on top and 44px tall without scrolling. Other sizes are
+   unchanged. Not yet seen on a real phone held sideways (`docs/WEBCAM_SMOKE_TEST.md` steps 15 and 16).
 3. No controlled real-webcam validation. An earlier version was tried by hand with a physical webcam and real
-   movements, and it worked, but that was not a measured test. Since the M4 and M5 redesign every live check has used
-   the fake camera, with the app's synthetic athlete supplying the poses, so the redesigned live experience needs a
-   fresh real-webcam regression test. Pose tracking, frame rate on phones and on machines without a usable GPU,
-   hands-free timing and the live screen's states have not been measured with a real camera and a real person, and
-   real-world detector accuracy has not been established (§15).
+   movements, and it worked. On 2026-10-16 the owner reported running `docs/WEBCAM_SMOKE_TEST.md` on the M7 build
+   (ASUS ProArt laptop, physical webcam, real movements), and everything tested worked. Both were manual functional
+   checks reported by the owner, not measured tests; the automated checks still use the fake camera. Pose tracking
+   accuracy, frame rate on phones and on machines without a usable GPU, hands-free timing and the live screen's
+   states have not been measured with a real camera and a real person, and real-world detector accuracy has not been
+   established (§15).
